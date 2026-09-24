@@ -18,7 +18,7 @@ export default function PricingSection({ language, onOpenEnquiry }: PricingSecti
       name: language === "fr" ? "Option Flexible Nomade" : language === "en" ? "Flexible Nomad Pass" : "Opción Flexible Nómada",
       tagline: language === "fr" ? "Idéal pour télétravailleurs & indépendants" : language === "en" ? "Ideal for remote workers & founders" : "Ideal para nómadas y remotos",
       price: "20€ / 10€",
-      tax: "TTC",
+      tax: "HT",
       period: language === "fr" ? "journée (20€) / demi-journée (10€)" : language === "en" ? "day (€20) / half-day (€10)" : "día (20€) / media jornada (10€)",
       popular: false,
       features: language === "fr" ? [
@@ -79,12 +79,12 @@ export default function PricingSection({ language, onOpenEnquiry }: PricingSecti
       id: "office-17m",
       name: language === "fr" ? "Bureaux Privatifs" : language === "en" ? "Private Office Suites" : "Despachos Privados",
       tagline: language === "fr" ? "Pour équipes de 3 à 6 collaborateurs" : language === "en" ? "For teams of 3 to 6 members" : "Para equipos de 3 a 6 personas",
-      price: "750€ à 1100€",
+      price: "750€ à 1000€",
       tax: "HT",
-      period: language === "fr" ? "par mois (17 m² à 30 m²)" : language === "en" ? "per month (17 sqm to 30 sqm)" : "al mes (17 m² a 30 m²)",
+      period: language === "fr" ? "par mois (17 m² à 25 m²)" : language === "en" ? "per month (17 sqm to 25 sqm)" : "al mes (17 m² a 25 m²)",
       popular: false,
       features: language === "fr" ? [
-        "Bureaux privatifs fermés de 17 à 30 m²",
+        "Bureaux privatifs fermés de 17 à 25 m²",
         "Ameublement personnalisé complet",
         "Accessible 7j/7 et 24h/24",
         "Accès illimité aux espaces communs",
@@ -92,7 +92,7 @@ export default function PricingSection({ language, onOpenEnquiry }: PricingSecti
         "Domiciliation d'entreprise comprise (1ère année)",
         "Accès prioritaire aux 9 places de parking"
       ] : language === "en" ? [
-        "Enclosed private offices 17 to 30 sqm",
+        "Enclosed private offices 17 to 25 sqm",
         "Complete bespoke furniture provided",
         "24/7 keyless secure access",
         "Unlimited access to common areas",
@@ -100,7 +100,7 @@ export default function PricingSection({ language, onOpenEnquiry }: PricingSecti
         "Business domiciliation included (1st year)",
         "Priority access to 9 courtyard parking spaces"
       ] : [
-        "Despachos privados cerrados de 17 a 30 m²",
+        "Despachos privados cerrados de 17 a 25 m²",
         "Mobiliario completo a medida",
         "Acceso seguro 24/7",
         "Acceso ilimitado a zonas comunes",
@@ -114,7 +114,7 @@ export default function PricingSection({ language, onOpenEnquiry }: PricingSecti
       name: language === "fr" ? "Salle de Réunion 30 m²" : language === "en" ? "Meeting Room 30 sqm" : "Sala de Reuniones 30 m²",
       tagline: language === "fr" ? "Comités, formations & séminaires" : language === "en" ? "Board meetings, trainings & workshops" : "Reuniones de consejo y formaciones",
       price: "120€ / 200€",
-      tax: "TTC",
+      tax: "HT",
       period: language === "fr" ? "demi-journée (120€) / journée (200€)" : language === "en" ? "half-day (€120) / full day (€200)" : "media jornada (120€) / día (200€)",
       popular: false,
       features: language === "fr" ? [

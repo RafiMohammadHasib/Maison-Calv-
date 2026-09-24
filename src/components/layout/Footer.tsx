@@ -87,10 +87,10 @@ export default function Footer({
               <li>
                 <a href="#espaces" className="hover:text-white transition-colors">
                   {language === "en"
-                    ? "Nomad desk (€20 / €10 VAT incl.)"
+                    ? "Nomad desk (€20 / €10 Excl. VAT)"
                     : language === "es"
-                    ? "Pase nómada (20€ / 10€ con IVA)"
-                    : "Poste nomade (20€ / 10€ TTC)"}
+                    ? "Pase nómada (20€ / 10€ sin IVA)"
+                    : "Poste nomade (20€ / 10€ HT)"}
                 </a>
               </li>
               <li>
@@ -103,26 +103,12 @@ export default function Footer({
                 </a>
               </li>
               <li>
-                <a href="#bento" className="hover:text-white transition-colors">
+                <a href="#positionnement" className="hover:text-white transition-colors">
                   {language === "en"
-                    ? "Maison Calvé Ecosystem"
+                    ? "Our Positioning"
                     : language === "es"
-                    ? "Ecosistema Maison Calvé"
-                    : "L'Écosystème Maison Calvé"}
-                </a>
-              </li>
-              <li>
-                <a href="#parking" className="hover:text-white transition-colors flex items-center gap-1.5">
-                  <span>
-                    {language === "en"
-                      ? "Secure private parking"
-                      : language === "es"
-                      ? "Parking privado seguro"
-                      : "Parking privé sécurisé"}
-                  </span>
-                  <span className="px-1.5 py-0.2 rounded bg-emerald-900 text-emerald-300 text-[10px]">
-                    {language === "en" ? "9 spots" : language === "es" ? "9 plazas" : "9 places"}
-                  </span>
+                    ? "Nuestro Posicionamiento"
+                    : "Notre Positionnement"}
                 </a>
               </li>
               <li>

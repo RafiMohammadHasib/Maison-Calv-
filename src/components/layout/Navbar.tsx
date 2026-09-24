@@ -32,7 +32,7 @@ export default function Navbar({
           {/* Brand Logo */}
           <a href="#" className="flex items-center pl-1 sm:pl-2 py-0.5 group">
             <div className="flex flex-col leading-[0.84] text-lg sm:text-xl font-extrabold tracking-tighter lowercase select-none">
-              <span className="text-calve-charcoal group-hover:text-calve-slate transition-colors">
+              <span className="text-calve-slate">
                 maison
               </span>
               <span className="text-calve-slate">

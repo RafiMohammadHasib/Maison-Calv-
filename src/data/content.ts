@@ -152,11 +152,11 @@ export const CONTENT: Record<Language, LocaleContent> = {
       contact: "Contact"
     },
     hero: {
-      badge: "Hôtel Particulier · Bordeaux Fondaudège",
+      badge: "Coworking haut de gamme - Bordeaux Fondaudège",
       title: "Maison Calvé",
-      subtitle: "Peaceful Coworking",
+      subtitle: "",
       district: "48 rue Calvé, 33000 Bordeaux",
-      description: "Un espace de travail à taille humaine, personnalisé et serein. Fini le côté usine des grands coworkings : installez votre équipe dans un écrin architectural préservé avec parking privé.",
+      description: "Un espace de travail confortable, calme et haut de gamme pensé pour s’y installer dans le temps.",
       ctaExplore: "Explorer les espaces",
       ctaVisit: "Demander une visite",
       urgentBadge: "2 bureaux privatifs & postes open space disponibles"
@@ -188,8 +188,8 @@ export const CONTENT: Record<Language, LocaleContent> = {
       title: "Des bureaux pensés pour inspirer l'excellence",
       subtitle: "Que vous cherchiez un bureau privatif prestigieux pour votre entreprise, un poste dédié en open space ou une salle de réunion équipée, découvrez nos options transparentes.",
       filterAll: "Tous les espaces",
-      filterOffices: "Bureaux privatifs (5)",
-      filterOpenSpace: "Open space (12 postes)",
+      filterOffices: "Bureaux privatifs (2)",
+      filterOpenSpace: "Open space (10 postes)",
       filterMeeting: "Salle de réunion (30 m²)",
       ctaEnquire: "Vérifier la disponibilité",
       ctaDetails: "Voir la fiche détaillée",
@@ -238,7 +238,7 @@ export const CONTENT: Record<Language, LocaleContent> = {
       tag: "Transparence & Sérénité",
       title: "Grille tarifaire claire et sans mauvaise surprise",
       subtitle: "Toutes nos formules incluent l'accès aux espaces partagés, les boissons chaudes/fraîches, la fibre ultra-rapide et l'entretien régulier.",
-      disclaimer: "Les tarifs des bureaux privatifs et du poste fixe sont indiqués Hors Taxes (HT). Les tarifs à la journée et pour la salle de réunion sont indiqués Toutes Taxes Comprises (TTC).",
+      disclaimer: "Tous les tarifs sont indiqués Hors Taxes (HT).",
       viewContractInfo: "Bureaux privatifs : engagement annuel privilégié pour préserver la stabilité de notre écosystème.",
       commitmentNote: "La domiciliation commerciale de votre société est offerte la première année pour toute location de bureau privatif."
     },
@@ -349,11 +349,11 @@ export const CONTENT: Record<Language, LocaleContent> = {
       contact: "Contact"
     },
     hero: {
-      badge: "Private Mansion · Bordeaux Fondaudège",
+      badge: "High-end Coworking - Bordeaux Fondaudège",
       title: "Maison Calvé",
-      subtitle: "Peaceful Coworking",
+      subtitle: "",
       district: "48 rue Calvé, 33000 Bordeaux, France",
-      description: "A human-scale, personalized and serene workspace in central Bordeaux. Leave behind crowded factory-style coworking: set up your team in an authentic 19th-century private mansion with on-site secure parking.",
+      description: "A comfortable, calm, and high-end workspace designed to settle in over time.",
       ctaExplore: "Explore Spaces",
       ctaVisit: "Book a Private Tour",
       urgentBadge: "2 private offices & open-space desks currently available"
@@ -385,8 +385,8 @@ export const CONTENT: Record<Language, LocaleContent> = {
       title: "Thoughtfully crafted spaces designed for focus",
       subtitle: "Whether you need a prestigious private office for your company, a dedicated resident desk, or a fully-equipped meeting room, discover our straightforward offerings.",
       filterAll: "All Spaces",
-      filterOffices: "Private Offices (5)",
-      filterOpenSpace: "Open Space (12 desks)",
+      filterOffices: "Private Offices (2)",
+      filterOpenSpace: "Open Space (10 desks)",
       filterMeeting: "Meeting Room (30 sqm)",
       ctaEnquire: "Check Availability",
       ctaDetails: "View Details",
@@ -435,7 +435,7 @@ export const CONTENT: Record<Language, LocaleContent> = {
       tag: "Transparency & Peace of Mind",
       title: "Straightforward pricing with zero surprises",
       subtitle: "Every plan includes access to common spaces, specialty coffee and tea, ultra-fast fiber, and regular maintenance.",
-      disclaimer: "Private office and resident desk rates are quoted Excl. VAT (HT). Day passes and meeting room bookings are quoted All-Inclusive (TTC).",
+      disclaimer: "All prices are quoted excluding VAT (HT).",
       viewContractInfo: "Private offices: 1-year minimum commitment favored to preserve community stability.",
       commitmentNote: "Commercial business address domiciliation is included for free during the first year for private office leases."
     },
@@ -546,11 +546,11 @@ export const CONTENT: Record<Language, LocaleContent> = {
       contact: "Contacto"
     },
     hero: {
-      badge: "Palacete Histórico · Burdeos Fondaudège",
+      badge: "Coworking de alta gama - Burdeos Fondaudège",
       title: "Maison Calvé",
-      subtitle: "Peaceful Coworking",
+      subtitle: "",
       district: "48 rue Calvé, 33000 Burdeos, Francia",
-      description: "Un espacio de trabajo a escala humana, personalizado y sereno en el centro de Burdeos. Olvídese del modelo masivo e impersonal: instale a su equipo en un palacete preservado con parking privado vigilado.",
+      description: "Un espacio de trabajo confortable, tranquilo y de alta gama pensado para establecerse en el tiempo.",
       ctaExplore: "Explorar los espacios",
       ctaVisit: "Pedir una visita privada",
       urgentBadge: "2 oficinas privadas y puestos en open space disponibles"
@@ -582,8 +582,8 @@ export const CONTENT: Record<Language, LocaleContent> = {
       title: "Despachos concebidos para inspirar excelencia",
       subtitle: "Tanto si busca un despacho privado de prestigio para su empresa como un puesto fijo en open space o una sala de reuniones equipada, descubra nuestras fórmulas transparentes.",
       filterAll: "Todos los espacios",
-      filterOffices: "Oficinas privadas (5)",
-      filterOpenSpace: "Open Space (12 puestos)",
+      filterOffices: "Oficinas privadas (2)",
+      filterOpenSpace: "Open Space (10 puestos)",
       filterMeeting: "Sala de reuniones (30 m²)",
       ctaEnquire: "Consultar disponibilidad",
       ctaDetails: "Ver detalles",
@@ -632,7 +632,7 @@ export const CONTENT: Record<Language, LocaleContent> = {
       tag: "Transparencia & Confianza",
       title: "Tarifas claras y sin cargos ocultos",
       subtitle: "Todas las modalidades incluyen acceso a zonas comunes, café y bebidas de calidad, fibra óptica de alta velocidad y limpieza diaria.",
-      disclaimer: "Los precios de oficinas privadas y puesto fijo se expresan sin IVA (HT). Los pases diarios y el alquiler de sala de reuniones incluyen IVA (TTC).",
+      disclaimer: "Todas las tarifas están indicadas sin IVA (HT).",
       viewContractInfo: "Oficinas privadas: compromiso anual preferido para preservar la estabilidad de la comunidad.",
       commitmentNote: "La domiciliación comercial de su sociedad está incluida gratis el primer año con el alquiler de oficina privada."
     },

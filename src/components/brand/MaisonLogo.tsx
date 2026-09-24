@@ -20,7 +20,7 @@ export default function MaisonLogo({
     xl: "text-6xl sm:text-7xl lg:text-8xl leading-[0.82]"
   };
 
-  const textColor = light ? "text-white" : "text-calve-charcoal";
+  const textColor = light ? "text-white" : "text-calve-slate";
   const calveColor = light ? "text-white/90" : "text-calve-slate";
 
   return (
@@ -29,11 +29,6 @@ export default function MaisonLogo({
         <span className={textColor}>maison</span>
         <span className={calveColor}>calvé</span>
       </div>
-      {withTagline && (
-        <span className={`text-[10px] sm:text-xs font-bold tracking-[0.28em] uppercase mt-2 ${light ? "text-white/80" : "text-calve-muted"}`}>
-          Peaceful Coworking
-        </span>
-      )}
     </div>
   );
 }
