@@ -14,14 +14,17 @@ import EnquiryModal from "@/components/enquiry/EnquiryModal";
 import ScrollProgress from "@/components/ui/ScrollProgress";
 import ScrollToTop from "@/components/ui/ScrollToTop";
 import { Language } from "@/data/content";
+import { useLanguage } from "@/lib/languageContext";
 
 export default function MaisonApp() {
-  const [language, setLanguage] = useState<Language>("fr");
+  const { language, setLanguage } = useLanguage();
   const [modalOpen, setModalOpen] = useState(false);
   const [selectedSpaceId, setSelectedSpaceId] = useState<string | null>(null);
+  const [enquirySource, setEnquirySource] = useState<string>("Website Enquiry");
 
-  const handleOpenEnquiry = (spaceId?: string) => {
+  const handleOpenEnquiry = (spaceId?: string, source?: string) => {
     setSelectedSpaceId(spaceId || null);
+    setEnquirySource(source || "Website Enquiry");
     setModalOpen(true);
   };
 
@@ -37,8 +40,8 @@ export default function MaisonApp() {
 
       {/* Floating Modern Header Capsule */}
       <Navbar
-        language={language}
-        onLanguageChange={setLanguage}
+        language={language as Language}
+        onLanguageChange={(l) => setLanguage(l === "en" ? "en" : "fr")}
         onOpenEnquiry={handleOpenEnquiry}
       />
 
@@ -82,6 +85,7 @@ export default function MaisonApp() {
         onClose={handleCloseEnquiry}
         language={language}
         initialSpaceId={selectedSpaceId}
+        source={enquirySource}
       />
     </div>
   );

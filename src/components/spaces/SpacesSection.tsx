@@ -32,7 +32,7 @@ export default function SpacesSection({ language, onOpenEnquiry }: SpacesSection
   }[language];
 
   return (
-    <section id="espaces" className="py-24 sm:py-32 bg-calve-cream">
+    <section id="espaces" className="py-12 sm:py-16 bg-calve-cream">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         {/* Availability & Urgency Pill */}
         <div className="flex justify-start mb-6">

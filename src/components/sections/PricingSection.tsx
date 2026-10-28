@@ -143,10 +143,10 @@ export default function PricingSection({ language, onOpenEnquiry }: PricingSecti
   ];
 
   return (
-    <section id="tarifs" className="py-24 sm:py-32 bg-white">
+    <section id="tarifs" className="py-12 sm:py-16 bg-white">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         {/* Header */}
-        <div className="text-center max-w-3xl mx-auto mb-16">
+        <div className="text-center max-w-3xl mx-auto mb-10 sm:mb-12">
           <div className="inline-flex items-center gap-2 px-3.5 py-1 rounded-full bg-calve-stone text-xs font-semibold uppercase tracking-wider text-calve-slate mb-4">
             <Sparkles className="w-3.5 h-3.5" />
             <span>{t.tag}</span>
@@ -231,7 +231,7 @@ export default function PricingSection({ language, onOpenEnquiry }: PricingSecti
         </div>
 
         {/* Disclaimer / Transparency Box */}
-        <div className="mt-12 p-6 rounded-2xl bg-calve-stone/40 border border-calve-border text-xs text-calve-muted leading-relaxed flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
+        <div className="mt-8 sm:mt-10 p-6 rounded-2xl bg-calve-stone/40 border border-calve-border text-xs text-calve-muted leading-relaxed flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
           <div className="flex items-center gap-3">
             <ShieldCheck className="w-5 h-5 text-emerald-700 shrink-0" />
             <div>

@@ -14,7 +14,8 @@ import {
   MapPin,
   ExternalLink,
   Send,
-  Grid,
+  Grid3x3,
+  RefreshCw,
 } from "lucide-react";
 import { Language } from "@/data/content";
 
@@ -248,6 +249,25 @@ const INSTAGRAM_POSTS: InstagramPost[] = [
     },
     tags: ["#Acces247", "#Securite", "#EspaceDeTravail"],
   },
+  {
+    id: "post_10",
+    image: "/images/instagram/insta-media-102.jpg",
+    type: "single",
+    likes: 88,
+    commentsCount: 8,
+    location: "48 rue Calvé, Bordeaux",
+    timeAgo: {
+      fr: "Il y a 3 semaines",
+      en: "3 weeks ago",
+      es: "Hace 3 semanas",
+    },
+    caption: {
+      fr: "« Près de chez toi » — Un écosystème à taille humaine pensé pour votre épanouissement au cœur du quartier Fondaudège. Bienvenue à la Maison Calvé ! 🌿✨",
+      en: "“Close to home” — A human-scale workspace crafted for your daily fulfillment in the Fondaudège district. Welcome to Maison Calvé! 🌿✨",
+      es: "“Cerca de ti” — Un espacio a escala humana pensado para su desarrollo en el corazón de Fondaudège. ¡Bienvenidos a Maison Calvé! 🌿✨",
+    },
+    tags: ["#MaisonCalve", "#PresDeChezToi", "#BordeauxFondaudege", "#CoworkingBordeaux"],
+  },
 ];
 
 export default function InstagramGallery({ language }: InstagramGalleryProps) {
@@ -258,6 +278,14 @@ export default function InstagramGallery({ language }: InstagramGalleryProps) {
   const [newComments, setNewComments] = useState<Record<string, string[]>>({});
   const [commentInput, setCommentInput] = useState("");
   const [showHeartAnim, setShowHeartAnim] = useState<string | null>(null);
+  const [isRefreshing, setIsRefreshing] = useState(false);
+
+  const handleRefreshFeed = () => {
+    setIsRefreshing(true);
+    setTimeout(() => {
+      setIsRefreshing(false);
+    }, 700);
+  };
 
   useEffect(() => {
     const initialLikes: Record<string, number> = {};
@@ -314,15 +342,20 @@ export default function InstagramGallery({ language }: InstagramGalleryProps) {
         "Découvrez l'ambiance authentique, les espaces de travail et le quotidien de notre communauté bordelaise.",
       follow: "S'abonner",
       message: "Message",
+      refreshTooltip: "Actualiser le flux en direct",
       posts: "publications",
       followers: "abonnés",
       following: "abonnements",
       gridTitle: "Publications récentes",
       gridSubtitle: "Sélection en direct du compte @maisoncalvebordeaux",
       viewProfile: "Voir le profil Instagram",
+      viewAllInstagram: "Tout voir sur Instagram",
       addCommentPlaceholder: "Ajouter un commentaire...",
       publish: "Publier",
       viewOriginal: "Voir la publication originale sur Instagram",
+      ctaFollow: "Suivez nos actualités et la vie de la Maison en temps réel.",
+      ctaConsult: "Consultez l'ensemble de nos publications et reportages photos sur Instagram.",
+      openInstagram: "Ouvrir @maisoncalvebordeaux",
     },
     en: {
       tag: "Authentic Life — Instagram",
@@ -331,15 +364,20 @@ export default function InstagramGallery({ language }: InstagramGalleryProps) {
         "Experience the authentic atmosphere, workspaces, and daily rhythm of our community in Bordeaux.",
       follow: "Follow",
       message: "Message",
+      refreshTooltip: "Refresh live feed",
       posts: "posts",
       followers: "followers",
       following: "following",
       gridTitle: "Recent Publications",
       gridSubtitle: "Live selection from @maisoncalvebordeaux",
       viewProfile: "View Instagram Profile",
+      viewAllInstagram: "View all on Instagram",
       addCommentPlaceholder: "Add a comment...",
       publish: "Post",
       viewOriginal: "View original post on Instagram",
+      ctaFollow: "Follow our updates and community daily life in real time.",
+      ctaConsult: "Explore all our photo shoots and stories on Instagram.",
+      openInstagram: "Open @maisoncalvebordeaux",
     },
     es: {
       tag: "Vida Real — Instagram",
@@ -348,24 +386,29 @@ export default function InstagramGallery({ language }: InstagramGalleryProps) {
         "Descubra el ambiente auténtico, los espacios de trabajo y el día a día de nuestra comunidad en Burdeos.",
       follow: "Seguir",
       message: "Mensaje",
+      refreshTooltip: "Actualizar publicaciones en directo",
       posts: "publicaciones",
       followers: "seguidores",
       following: "seguidos",
       gridTitle: "Publicaciones recientes",
       gridSubtitle: "Selección en directo de la cuenta @maisoncalvebordeaux",
       viewProfile: "Ver perfil de Instagram",
+      viewAllInstagram: "Ver todo en Instagram",
       addCommentPlaceholder: "Añadir un comentario...",
       publish: "Publicar",
       viewOriginal: "Ver publicación original en Instagram",
+      ctaFollow: "Siga nuestras novedades y la vida de la Maison en tiempo real.",
+      ctaConsult: "Consulte todas nuestras publicaciones y reportajes en Instagram.",
+      openInstagram: "Abrir @maisoncalvebordeaux",
     },
   }[language];
 
   return (
-    <section id="photos" className="py-24 bg-white border-t border-calve-border/60 relative overflow-hidden">
+    <section id="photos" className="py-12 sm:py-16 bg-white border-t border-calve-border/60 relative overflow-hidden">
       {/* Background Soft Glow */}
       <div className="absolute top-1/4 left-1/2 -translate-x-1/2 w-[700px] h-[350px] bg-calve-slate/5 blur-3xl pointer-events-none rounded-full" />
 
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 space-y-12 relative z-10">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 space-y-8 sm:space-y-10 relative z-10">
         {/* Section Header Badge */}
         <div className="text-center max-w-2xl mx-auto">
           <div className="inline-flex items-center gap-2 px-3.5 py-1 rounded-full bg-calve-stone text-xs font-semibold uppercase tracking-wider text-calve-slate mb-3 border border-calve-border shadow-2xs">
@@ -437,6 +480,14 @@ export default function InstagramGallery({ language }: InstagramGalleryProps) {
                   >
                     <span>{t.message}</span>
                   </a>
+
+                  <button
+                    onClick={handleRefreshFeed}
+                    title={t.refreshTooltip}
+                    className="p-2.5 rounded-full bg-white hover:bg-calve-stone border border-calve-border text-calve-charcoal hover:text-calve-slate transition-colors shadow-2xs cursor-pointer flex items-center justify-center"
+                  >
+                    <RefreshCw className={`w-3.5 h-3.5 ${isRefreshing ? "animate-spin text-calve-slate" : ""}`} />
+                  </button>
                 </div>
               </div>
 
@@ -472,13 +523,13 @@ export default function InstagramGallery({ language }: InstagramGalleryProps) {
         </div>
 
         {/* ========================================================== */}
-        {/* GRID HEADER & REAL POSTS GRID                             */}
+        {/* GRID HEADER & REAL POSTS GRID (GOIZET GESTION STYLE)       */}
         {/* ========================================================== */}
         <div className="space-y-6">
           <div className="flex items-center justify-between border-b border-calve-border pb-4">
             <div className="flex items-center space-x-3">
               <div className="p-2 rounded-xl bg-calve-charcoal text-white">
-                <Grid className="w-4 h-4 text-emerald-400" />
+                <Grid3x3 className="w-4 h-4 text-emerald-400" />
               </div>
               <div>
                 <h3 className="text-lg sm:text-xl font-bold text-calve-charcoal tracking-tight">
@@ -494,15 +545,15 @@ export default function InstagramGallery({ language }: InstagramGalleryProps) {
               href={PROFILE.profileUrl}
               target="_blank"
               rel="noopener noreferrer"
-              className="text-xs font-semibold text-calve-slate hover:text-calve-charcoal flex items-center gap-1 transition-colors"
+              className="text-xs font-semibold text-calve-slate hover:text-calve-charcoal flex items-center gap-1.5 transition-colors"
             >
-              <span>{t.viewProfile}</span>
-              <ArrowUpRight className="w-3.5 h-3.5" />
+              <span>{t.viewAllInstagram}</span>
+              <ArrowUpRight className="w-4 h-4" />
             </a>
           </div>
 
-          {/* 9-Grid Responsive Instagram Mosaic */}
-          <div className="grid grid-cols-2 sm:grid-cols-3 gap-3 sm:gap-5">
+          {/* 10-Grid Responsive Instagram Mosaic (2 x 5 on Desktop) */}
+          <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-3 sm:gap-4 lg:gap-5">
             {INSTAGRAM_POSTS.map((post) => {
               const isLiked = !!likedPosts[post.id];
               const likes = likeCounts[post.id] ?? post.likes;
@@ -513,7 +564,7 @@ export default function InstagramGallery({ language }: InstagramGalleryProps) {
                   key={post.id}
                   onClick={() => setSelectedPost(post)}
                   onDoubleClick={() => handleDoubleClick(post.id)}
-                  className="group relative aspect-square rounded-2xl sm:rounded-3xl overflow-hidden bg-stone-100 border border-calve-border shadow-xs hover:shadow-md cursor-pointer transition-all duration-300"
+                  className="group relative aspect-square rounded-2xl overflow-hidden bg-stone-100 border border-calve-border shadow-xs hover:shadow-md cursor-pointer transition-all duration-300"
                 >
                   <img
                     src={post.image}
@@ -523,23 +574,28 @@ export default function InstagramGallery({ language }: InstagramGalleryProps) {
 
                   {/* Carousel Badge in Top Right */}
                   {post.type === "carousel" && (
-                    <div className="absolute top-3 right-3 p-1.5 rounded-full bg-black/50 backdrop-blur-xs text-white">
+                    <div className="absolute top-2.5 right-2.5 p-1.5 rounded-lg bg-black/60 backdrop-blur-xs text-white">
                       <Layers className="w-3.5 h-3.5" />
                     </div>
                   )}
 
-                  {/* Hover Overlay with Likes & Comments Counter */}
-                  <div className="absolute inset-0 bg-black/40 backdrop-blur-[2px] opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center gap-6 text-white font-bold text-sm select-none">
-                    <div className="flex items-center gap-1.5">
-                      <Heart
-                        className={`w-5 h-5 ${isLiked ? "fill-rose-500 text-rose-500" : "fill-white text-white"}`}
-                      />
-                      <span>{likes}</span>
+                  {/* Hover Overlay with Likes, Comments Counter & Location Pill */}
+                  <div className="absolute inset-0 bg-calve-charcoal/65 backdrop-blur-[2px] opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex flex-col items-center justify-center space-y-2.5 text-white select-none p-3 text-center">
+                    <div className="flex items-center space-x-3.5 font-bold text-xs sm:text-sm">
+                      <div className="flex items-center space-x-1.5">
+                        <Heart
+                          className={`w-4 h-4 ${isLiked ? "fill-rose-500 text-rose-500" : "fill-white text-white"}`}
+                        />
+                        <span>{likes}</span>
+                      </div>
+                      <div className="flex items-center space-x-1.5">
+                        <MessageCircle className="w-4 h-4 fill-white text-white" />
+                        <span>{comments}</span>
+                      </div>
                     </div>
-                    <div className="flex items-center gap-1.5">
-                      <MessageCircle className="w-5 h-5 fill-white text-white" />
-                      <span>{comments}</span>
-                    </div>
+                    <span className="text-[10px] text-emerald-200 font-semibold bg-white/10 px-2.5 py-1 rounded-full border border-white/15 backdrop-blur-xs truncate max-w-[90%]">
+                      {post.location}
+                    </span>
                   </div>
 
                   {/* Double Click Heart Animation */}
@@ -551,6 +607,33 @@ export default function InstagramGallery({ language }: InstagramGalleryProps) {
                 </div>
               );
             })}
+          </div>
+
+          {/* Bottom Call-To-Action Banner (Goizet Gestion Signature Design) */}
+          <div className="bg-gradient-to-r from-calve-charcoal via-[#233134] to-calve-charcoal rounded-3xl p-8 sm:p-10 text-white flex flex-col sm:flex-row items-center justify-between gap-6 shadow-xl border border-white/10 mt-8">
+            <div className="space-y-2 text-center sm:text-left">
+              <div className="inline-flex items-center space-x-2 text-xs font-semibold text-emerald-400">
+                <svg className="w-4 h-4 fill-current" viewBox="0 0 24 24">
+                  <path d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069zm0-2.163c-3.259 0-3.667.014-4.947.072-4.358.2-6.78 2.618-6.98 6.98-.059 1.281-.073 1.689-.073 4.948 0 3.259.014 3.668.072 4.948.2 4.358 2.618 6.78 6.98 6.98 1.281.058 1.689.072 4.948.072 3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.979-6.98.059-1.28.073-1.689.073-4.948 0-3.259-.014-3.667-.072-4.947-.196-4.354-2.617-6.78-6.979-6.98-1.281-.059-1.69-.073-4.949-.073zm0 5.838c-3.403 0-6.162 2.759-6.162 6.162s2.759 6.163 6.162 6.163 6.162-2.759 6.162-6.163c0-3.403-2.759-6.162-6.162-6.162zm0 10.162c-2.209 0-4-1.79-4-4 0-2.209 1.791-4 4-4s4 1.791 4 4c0 2.21-1.791 4-4 4zm6.406-11.845c-.796 0-1.441.645-1.441 1.44s.645 1.44 1.441 1.44c.795 0 1.439-.645 1.439-1.44s-.644-1.44-1.439-1.44z"/>
+                </svg>
+                <span>@{PROFILE.username}</span>
+              </div>
+              <h4 className="text-2xl sm:text-3xl font-light tracking-tight">
+                {t.ctaFollow}
+              </h4>
+              <p className="text-xs text-white/70 font-light">
+                {t.ctaConsult}
+              </p>
+            </div>
+            <a
+              href={PROFILE.profileUrl}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="bg-calve-slate hover:bg-calve-slate-dark text-white px-8 py-3.5 rounded-full text-xs font-bold transition-all duration-300 shadow-xl flex items-center space-x-2.5 shrink-0 group cursor-pointer"
+            >
+              <span>{t.openInstagram}</span>
+              <ArrowUpRight className="w-4 h-4 group-hover:translate-x-0.5 group-hover:-translate-y-0.5 transition-transform" />
+            </a>
           </div>
         </div>
       </div>

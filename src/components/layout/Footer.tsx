@@ -1,6 +1,7 @@
 "use client";
 
 import React from "react";
+import Link from "next/link";
 import { MapPin, Mail, Clock, Shield, Sparkles } from "lucide-react";
 import MaisonLogo from "@/components/brand/MaisonLogo";
 import { Language, CONTENT } from "@/data/content";
@@ -69,10 +70,10 @@ export default function Footer({
               <li>
                 <a href="#espaces" className="hover:text-white transition-colors">
                   {language === "en"
-                    ? "Private offices (17–30 sqm)"
+                    ? "Private offices (17–25 sqm)"
                     : language === "es"
-                    ? "Despachos privados (17–30 m²)"
-                    : "Bureaux privatifs (17–30 m²)"}
+                    ? "Despachos privados (17–25 m²)"
+                    : "Bureaux privatifs (17–25 m²)"}
                 </a>
               </li>
               <li>
@@ -184,8 +185,15 @@ export default function Footer({
 
         {/* Bottom Bar: Copyright & Language Selector */}
         <div className="pt-8 flex flex-col sm:flex-row items-center justify-between gap-4 text-xs text-stone-500 relative z-10">
-          <div>
-            © {new Date().getFullYear()} Maison Calvé Bordeaux. {t.rights}
+          <div className="flex items-center gap-2 flex-wrap">
+            <span>© {new Date().getFullYear()} Maison Calvé Bordeaux. {t.rights}</span>
+            <span className="text-stone-600">·</span>
+            <Link
+              href="/admin/login"
+              className="text-stone-500 hover:text-stone-300 transition-colors underline decoration-stone-700 underline-offset-4"
+            >
+              {language === "en" ? "Admin Portal" : language === "es" ? "Portal Admin" : "Portail Admin"}
+            </Link>
           </div>
 
           <div className="flex items-center gap-3">

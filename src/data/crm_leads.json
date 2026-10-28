@@ -1,0 +1,430 @@
+[
+  {
+    "name": "Rafi",
+    "email": "hello@gta.com",
+    "phone": "+33 6 015211123",
+    "company": "Studio",
+    "type": "private-office",
+    "officeSize": "25 m² (5-6 postes)",
+    "workstationCount": 5,
+    "date": "",
+    "visitRequested": true,
+    "source": "Book a Private Tour (Hero)",
+    "status": "contacted",
+    "priority": "urgent",
+    "message": "",
+    "id": "MC-2026-107",
+    "createdAt": "2026-10-28T11:25:53.300Z",
+    "updatedAt": "2026-10-28T12:00:13.222Z",
+    "notes": []
+  },
+  {
+    "name": "Sophie Desgranges",
+    "email": "sophie@desgranges-archi.fr",
+    "phone": "06 33 44 55 66",
+    "company": "Desgranges Architecture & Patrimoine",
+    "type": "private-office",
+    "officeSize": "17 m² (3-4 postes)",
+    "workstationCount": 3,
+    "date": "",
+    "visitRequested": true,
+    "source": "Book a Private Tour (Hero)",
+    "status": "tour_scheduled",
+    "priority": "urgent",
+    "message": "Bonjour, nous souhaitons visiter le bureau de 17m² jeudi matin vers 10h. Merci !",
+    "id": "MC-2026-098",
+    "createdAt": "2026-10-28T07:38:46.213Z",
+    "updatedAt": "2026-10-28T11:46:48.229Z",
+    "notes": [
+      {
+        "id": "note-1793173203823",
+        "author": "Paul (Directeur)",
+        "text": "Visite confirmée pour jeudi 10h avec Paul (accueil café offert)",
+        "createdAt": "2026-10-28T07:40:03.823Z"
+      }
+    ]
+  },
+  {
+    "name": "Rafi",
+    "email": "rafi.euroit@gmail.com",
+    "phone": "01521112363",
+    "company": "Grand Trend Agency",
+    "type": "open-space",
+    "workstationCount": 1,
+    "openSpacePlan": "fixe",
+    "date": "",
+    "timeSlot": "full-day",
+    "visitRequested": true,
+    "source": "Book a Visit (Header)",
+    "status": "qualified",
+    "priority": "high",
+    "message": "",
+    "id": "MC-2026-097",
+    "createdAt": "2026-10-28T06:33:53.448Z",
+    "updatedAt": "2026-10-28T09:33:37.363Z",
+    "notes": []
+  },
+  {
+    "name": "Julien Mercier",
+    "email": "j.mercier@gironde-tech.fr",
+    "phone": "06 77 12 34 56",
+    "company": "Gironde Tech Studio",
+    "type": "open-space",
+    "workstationCount": 2,
+    "openSpacePlan": "fixe",
+    "date": "2026-11-08",
+    "timeSlot": "morning",
+    "visitRequested": true,
+    "source": "Book a Visit (Header)",
+    "status": "closed",
+    "priority": "high",
+    "message": "Demande de visite pour tester l'ambiance calme et le wifi avant engagement résident.",
+    "id": "MC-2026-096",
+    "createdAt": "2026-10-28T06:05:43.892Z",
+    "updatedAt": "2026-10-28T11:39:19.999Z",
+    "notes": [
+      {
+        "id": "note-1793180002753",
+        "author": "Paul (Directeur)",
+        "text": "📞 Phone call completed: high interest",
+        "createdAt": "2026-10-28T09:33:22.753Z"
+      }
+    ]
+  },
+  {
+    "name": "Claire Delaunay",
+    "email": "claire.delaunay@bordeaux-notaires.fr",
+    "phone": "06 99 44 22 11",
+    "company": "Étude Notariale Delaunay & Co",
+    "type": "private-office",
+    "officeSize": "25 m² (5-6 postes)",
+    "workstationCount": 5,
+    "date": "2026-11-04",
+    "visitRequested": true,
+    "source": "Book a Private Tour (Hero)",
+    "status": "tour_scheduled",
+    "priority": "urgent",
+    "message": "Bonjour, nous souhaitons réserver une visite privée pour le bureau de 25m². Équipe de 5 personnes avec besoin de 2 places de parking.",
+    "id": "MC-2026-095",
+    "createdAt": "2026-10-28T06:05:31.913Z",
+    "updatedAt": "2026-10-28T06:06:44.541Z",
+    "notes": []
+  },
+  {
+    "id": "MC-2026-089",
+    "name": "Edouard de Montalembert",
+    "email": "e.montalembert@cabinet-avocats33.fr",
+    "phone": "06 42 18 90 22",
+    "company": "Montalembert & Associés (Avocats d'affaires)",
+    "type": "private-office",
+    "officeSize": "25 m² (5-6 postes)",
+    "workstationCount": 5,
+    "date": "2026-11-05",
+    "visitRequested": true,
+    "source": "Book a Private Tour (Hero)",
+    "status": "tour_scheduled",
+    "priority": "urgent",
+    "message": "Recherche un bureau de prestige et standing pour notre équipe de 5 associés. Besoin impératif de 2 places de parking dans la cour privée.",
+    "createdAt": "2026-10-28T02:03:14.761Z",
+    "updatedAt": "2026-10-28T04:03:14.761Z",
+    "notes": [
+      {
+        "id": "note-1",
+        "author": "Paul (Directeur)",
+        "text": "Visite privée confirmée pour jeudi 5 nov à 14h30 avec dégustation café.",
+        "createdAt": "2026-10-28T04:03:14.761Z"
+      }
+    ]
+  },
+  {
+    "id": "MC-2026-088",
+    "name": "Camille Vasseur",
+    "email": "c.vasseur@aquitaine-capital.com",
+    "phone": "07 88 55 12 34",
+    "company": "Aquitaine Venture Capital",
+    "type": "private-office",
+    "officeSize": "17 m² (3-4 postes)",
+    "workstationCount": 3,
+    "date": "2026-11-03",
+    "visitRequested": true,
+    "source": "Book a Visit (Header)",
+    "status": "new",
+    "priority": "high",
+    "message": "Installation prévue début décembre. Nous souhaitons découvrir le bureau de 17m² et tester l'insonorisation.",
+    "createdAt": "2026-10-20T19:03:14.761Z",
+    "updatedAt": "2026-10-20T19:03:14.761Z",
+    "notes": []
+  },
+  {
+    "id": "MC-2026-087",
+    "name": "Alexandre Bonnet",
+    "email": "alexandre@studio-archibordeaux.fr",
+    "phone": "06 19 82 43 00",
+    "company": "Studio Bonnet Architectes",
+    "type": "open-space",
+    "openSpacePlan": "fixe",
+    "workstationCount": 2,
+    "date": "2026-10-27",
+    "visitRequested": true,
+    "source": "Book a Visit (Header)",
+    "status": "visited",
+    "priority": "normal",
+    "message": "Deux postes fixes souhaités dans le premier open space de 5 postes. Avons visité lundi matin.",
+    "createdAt": "2026-10-20T14:30:00.000Z",
+    "updatedAt": "2026-10-21T09:00:00.000Z",
+    "notes": [
+      {
+        "id": "note-2",
+        "author": "Paul",
+        "text": "Visite très positive. Contrat de bail en cours de préparation.",
+        "createdAt": "2026-10-21T09:00:00.000Z"
+      }
+    ]
+  },
+  {
+    "id": "MC-2026-086",
+    "name": "Hélène Mercier",
+    "email": "hmercier@bordeaux-consulting.fr",
+    "phone": "06 50 11 29 84",
+    "company": "Bordeaux Strategy Consulting",
+    "type": "meeting-room",
+    "timeSlot": "full-day",
+    "date": "2026-10-24",
+    "attendees": 12,
+    "meetingPurpose": "Comité de direction trimestriel",
+    "visitRequested": false,
+    "source": "Meeting Room Booking",
+    "status": "won",
+    "priority": "normal",
+    "message": "Journée complète avec formule café barista et accueil 12 personnes avec projection 4K.",
+    "createdAt": "2026-10-19T10:15:00.000Z",
+    "updatedAt": "2026-10-20T11:00:00.000Z",
+    "notes": [
+      {
+        "id": "note-3",
+        "author": "Équipe",
+        "text": "Paiement 200€ HT validé. Clés et code d'accès envoyés.",
+        "createdAt": "2026-10-20T11:00:00.000Z"
+      }
+    ]
+  },
+  {
+    "id": "MC-2026-085",
+    "name": "Thomas Laroche",
+    "email": "thomas.laroche@fintech-gironde.io",
+    "phone": "07 62 90 01 15",
+    "company": "PayGironde SAS",
+    "type": "private-office",
+    "officeSize": "17 m² (3-4 postes)",
+    "workstationCount": 4,
+    "date": "2026-10-23",
+    "visitRequested": true,
+    "source": "Book a Private Tour (Hero)",
+    "status": "qualified",
+    "priority": "high",
+    "message": "Intéressé par le forfait 750€ HT avec domiciliation d'entreprise.",
+    "createdAt": "2026-10-18T16:20:00.000Z",
+    "updatedAt": "2026-10-19T08:30:00.000Z",
+    "notes": [
+      {
+        "id": "note-4",
+        "author": "Paul",
+        "text": "En attente de signature Kbis.",
+        "createdAt": "2026-10-19T08:30:00.000Z"
+      }
+    ]
+  },
+  {
+    "id": "MC-2026-084",
+    "name": "Duverger Mathilde",
+    "email": "m.duverger@bordeaux-notariat.fr",
+    "phone": "06 95 66 54 71",
+    "company": "Étude Notariale Duverger",
+    "type": "private-office",
+    "officeSize": "25 m² (5-6 postes)",
+    "workstationCount": 5,
+    "date": "2026-10-21",
+    "visitRequested": true,
+    "source": "Book a Private Tour (Hero)",
+    "status": "contacted",
+    "priority": "high",
+    "message": "Demande d'information pour le bureau de 25m². Échange téléphonique positif ce matin.",
+    "createdAt": "2026-10-17T09:15:00.000Z",
+    "updatedAt": "2026-10-18T10:30:00.000Z",
+    "notes": [
+      {
+        "id": "note-5",
+        "author": "Paul (Directeur)",
+        "text": "Premier contact établi. Documentation tarifaire envoyée.",
+        "createdAt": "2026-10-18T10:30:00.000Z"
+      }
+    ]
+  },
+  {
+    "id": "MC-2026-083",
+    "name": "Inès Akkouche",
+    "email": "ines.akkouche@design-aquitaine.com",
+    "phone": "06 59 87 91 68",
+    "company": "Studio Inès Design",
+    "type": "open-space",
+    "officeSize": "Poste Fixe (250€ HT)",
+    "openSpacePlan": "fixe",
+    "workstationCount": 2,
+    "date": "2026-10-23",
+    "visitRequested": true,
+    "source": "Book a Visit (Header)",
+    "status": "tour_scheduled",
+    "priority": "high",
+    "message": "Visite du premier open space de 5 postes prévue ce vendredi à 14h.",
+    "createdAt": "2026-10-16T14:20:00.000Z",
+    "updatedAt": "2026-10-17T08:00:00.000Z",
+    "notes": []
+  },
+  {
+    "id": "MC-2026-082",
+    "name": "Goizet Paul",
+    "email": "paul@goizetgestion.fr",
+    "phone": "05 56 00 22 10",
+    "company": "Goizet Gestion SARL",
+    "type": "private-office",
+    "officeSize": "Bureau Résident Aile Est",
+    "workstationCount": 4,
+    "date": "2026-10-22",
+    "visitRequested": false,
+    "source": "Owner / Resident Enquiry",
+    "status": "closed",
+    "priority": "normal",
+    "message": "Gestion courante convention partenaire.",
+    "createdAt": "2026-10-15T11:00:00.000Z",
+    "updatedAt": "2026-10-15T11:00:00.000Z",
+    "notes": []
+  },
+  {
+    "id": "MC-2026-081",
+    "name": "Marc de La Tour",
+    "email": "m.delatour@vignobles-conseil.fr",
+    "phone": "06 21 44 88 90",
+    "company": "Château & Vignobles Conseil",
+    "type": "private-office",
+    "officeSize": "17 m² (3-4 postes)",
+    "workstationCount": 3,
+    "date": "2026-10-15",
+    "visitRequested": true,
+    "source": "Book a Private Tour (Hero)",
+    "status": "visited",
+    "priority": "high",
+    "message": "Recherche un bureau privatif au calme pour conseil en acquisitions viticoles.",
+    "createdAt": "2026-10-13T10:15:00.000Z",
+    "updatedAt": "2026-10-14T14:00:00.000Z",
+    "notes": [
+      {
+        "id": "note-081",
+        "author": "Paul (Directeur)",
+        "text": "Visite réalisée avec succès. Offre commerciale 750€ HT envoyée.",
+        "createdAt": "2026-10-14T14:00:00.000Z"
+      }
+    ]
+  },
+  {
+    "id": "MC-2026-080",
+    "name": "Sandrine Vasseur",
+    "email": "s.vasseur@bma-audit.fr",
+    "phone": "06 78 90 12 34",
+    "company": "BMA Audit & Commissariat",
+    "type": "private-office",
+    "officeSize": "25 m² (5-6 postes)",
+    "workstationCount": 5,
+    "date": "2026-10-14",
+    "visitRequested": true,
+    "source": "Book a Private Tour (Hero)",
+    "status": "negotiating",
+    "priority": "urgent",
+    "message": "Audit de comptes annuels. Besoin de 5 postes et accès salle de réunion.",
+    "createdAt": "2026-10-11T15:30:00.000Z",
+    "updatedAt": "2026-10-12T09:00:00.000Z",
+    "notes": [
+      {
+        "id": "note-080",
+        "author": "Paul (Directeur)",
+        "text": "Contrat bail dérogatoire en relecture par leur expert-comptable.",
+        "createdAt": "2026-10-12T09:00:00.000Z"
+      }
+    ]
+  },
+  {
+    "id": "MC-2026-079",
+    "name": "Lucas Fontaine",
+    "email": "lucas@alpha-design.studio",
+    "phone": "07 45 12 39 88",
+    "company": "Studio Alpha UX",
+    "type": "open-space",
+    "openSpacePlan": "fixe",
+    "workstationCount": 2,
+    "date": "2026-10-12",
+    "visitRequested": true,
+    "source": "Book a Visit (Header)",
+    "status": "visited",
+    "priority": "normal",
+    "message": "Recherche 2 postes résidents permanents avec fibre très haut débit.",
+    "createdAt": "2026-10-09T09:00:00.000Z",
+    "updatedAt": "2026-10-10T18:00:00.000Z",
+    "notes": [
+      {
+        "id": "note-079",
+        "author": "Paul (Directeur)",
+        "text": "Essai d'une journée effectué. Très satisfait de l'ambiance.",
+        "createdAt": "2026-10-10T18:00:00.000Z"
+      }
+    ]
+  },
+  {
+    "id": "MC-2026-078",
+    "name": "Élise Beaumont",
+    "email": "elise.beaumont@capdigital-aquitaine.org",
+    "phone": "06 33 21 77 40",
+    "company": "Cap Digital Aquitaine",
+    "type": "meeting-room",
+    "date": "2026-10-06",
+    "visitRequested": false,
+    "source": "Meeting Room Booking",
+    "status": "tour_scheduled",
+    "priority": "normal",
+    "message": "Réservation salle de réunion 30m² pour assemblée générale régionale.",
+    "createdAt": "2026-10-05T11:20:00.000Z",
+    "updatedAt": "2026-10-28T12:00:01.394Z",
+    "notes": [
+      {
+        "id": "note-078",
+        "author": "Paul",
+        "text": "Prestation facturée et réglée.",
+        "createdAt": "2026-10-06T17:00:00.000Z"
+      }
+    ]
+  },
+  {
+    "id": "MC-2026-077",
+    "name": "Antoine Roche",
+    "email": "a.roche@roche-partners.eu",
+    "phone": "06 89 54 12 00",
+    "company": "Roche & Partners M&A",
+    "type": "private-office",
+    "officeSize": "25 m² (5-6 postes)",
+    "workstationCount": 4,
+    "date": "2026-10-05",
+    "visitRequested": true,
+    "source": "Book a Private Tour (Hero)",
+    "status": "contacted",
+    "priority": "high",
+    "message": "Recherche bureau de standing secteur Fondaudège / Jardin Public.",
+    "createdAt": "2026-10-03T16:45:00.000Z",
+    "updatedAt": "2026-10-04T10:00:00.000Z",
+    "notes": [
+      {
+        "id": "note-077",
+        "author": "Paul (Directeur)",
+        "text": "Dossier de présentation transmis par email.",
+        "createdAt": "2026-10-04T10:00:00.000Z"
+      }
+    ]
+  }
+]

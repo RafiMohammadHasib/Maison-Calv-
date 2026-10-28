@@ -1,0 +1,379 @@
+"use client";
+
+import React, { useState } from "react";
+import Image from "next/image";
+import Link from "next/link";
+import { useRouter } from "next/navigation";
+import {
+  Lock,
+  Mail,
+  Eye,
+  EyeOff,
+  ShieldCheck,
+  Sparkles,
+  ArrowRight,
+  Server,
+  Activity,
+  KeyRound,
+  CheckCircle2,
+  AlertCircle,
+  Building2
+} from "lucide-react";
+import { useLanguage } from "@/lib/languageContext";
+
+export default function AdminLoginPage() {
+  const router = useRouter();
+  const { language, setLanguage } = useLanguage();
+
+  // Prefilled demo credentials for seamless access
+  const [email, setEmail] = useState("admin@maisoncalve.fr");
+  const [password, setPassword] = useState("admin123");
+  const [showPassword, setShowPassword] = useState(false);
+  const [rememberMe, setRememberMe] = useState(true);
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setLoading(true);
+    setError(null);
+
+    try {
+      const res = await fetch("/api/admin/auth", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ email, password, rememberMe })
+      });
+
+      const data = await res.json();
+
+      if (res.ok && data.success) {
+        if (typeof window !== "undefined") {
+          localStorage.setItem("mc_admin_logged", "true");
+          localStorage.setItem("mc_admin_user", JSON.stringify(data.user));
+        }
+        const destination = typeof window !== "undefined"
+          ? new URLSearchParams(window.location.search).get("redirect") || "/admin/pipeline"
+          : "/admin/pipeline";
+        router.push(destination);
+      } else {
+        setError(
+          data.message ||
+            (language === "fr"
+              ? "Identifiants invalides. Utilisez admin@maisoncalve.fr / admin123"
+              : "Invalid credentials. Use admin@maisoncalve.fr / admin123")
+        );
+      }
+    } catch {
+      setError(
+        language === "fr"
+          ? "Impossible de joindre le serveur d'authentification."
+          : "Unable to reach authentication server."
+      );
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  return (
+    <div className="min-h-screen flex flex-col lg:flex-row bg-white text-slate-900 font-sans selection:bg-[#2D4B49] selection:text-white">
+      {/* ========================================================== */}
+      {/* LEFT PANE: HIGH OPACITY ATMOSPHERIC WORKSPACE WITH GLASS   */}
+      {/* ========================================================== */}
+      <div className="relative hidden lg:flex lg:w-1/2 flex-col justify-between p-10 xl:p-14 2xl:p-16 overflow-hidden bg-slate-950 text-white border-r border-slate-200">
+        {/* Background Authentic Open Space Photograph with High Opacity */}
+        <div className="absolute inset-0 z-0">
+          <Image
+            src="/images/spaces/open-space-fixe.jpg"
+            alt="Maison Calvé - Executive Open Space & Desks"
+            fill
+            className="object-cover object-center opacity-85 scale-100"
+            priority
+          />
+          {/* Subtle architectural gradient vignette: keeps the image bright & warm while ensuring white typography is 100% sharp */}
+          <div className="absolute inset-0 bg-gradient-to-r from-black/85 via-black/55 to-black/35" />
+          <div className="absolute inset-0 bg-gradient-to-t from-black/85 via-transparent to-black/30" />
+        </div>
+
+        {/* Top Header in Left Pane */}
+        <div className="relative z-10 flex items-center justify-between">
+          <div className="flex items-center gap-3">
+            <div className="w-10 h-10 rounded-xl bg-white/10 backdrop-blur-md border border-white/20 flex items-center justify-center font-bold text-white text-sm shadow-inner">
+              MC
+            </div>
+            <div>
+              <div className="text-sm font-extrabold tracking-tight text-white flex items-center gap-2">
+                <span>MAISON CALVÉ</span>
+              </div>
+              <p className="text-[9px] uppercase font-bold tracking-widest text-emerald-300">
+                ■ MAISON DE BUREAUX &amp; COWORKING · BORDEAUX
+              </p>
+            </div>
+          </div>
+
+          <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-black/25 backdrop-blur-md border border-white/15 text-xs text-stone-200 shadow-sm">
+            <Lock className="w-3.5 h-3.5 text-emerald-400" />
+            <span className="font-medium text-[11px]">
+              {language === "fr" ? "Terminal d'Administration Sécurisé" : "Secure Administration Terminal"}
+            </span>
+          </div>
+        </div>
+
+        {/* Hero Narrative in Left Pane */}
+        <div className="relative z-10 my-auto py-12 max-w-xl">
+          <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-black/25 backdrop-blur-md border border-white/15 text-[11px] font-semibold text-emerald-300 mb-6 shadow-sm">
+            <Sparkles className="w-3 h-3 text-emerald-400" />
+            <span>Maison Calvé SaaS OS · Version 2026.4</span>
+          </div>
+
+          <h1 className="text-3xl xl:text-4xl 2xl:text-5xl font-extrabold text-white tracking-tight leading-[1.15]">
+            {language === "fr"
+              ? "Espaces d'exception & bureaux privatifs à Bordeaux, entièrement synchronisés."
+              : "Exceptional Bordeaux property management, fully synchronized."}
+          </h1>
+
+          <p className="mt-4 text-sm xl:text-base text-stone-200/90 leading-relaxed max-w-lg font-normal">
+            {language === "fr"
+              ? "Accédez au terminal centralisé pour superviser votre portefeuille d'espaces, le pipeline CRM des résidents et les visites privées."
+              : "Access the centralized terminal to manage your portfolio, owner & tenant CRM pipelines, and digital real estate assets."}
+          </p>
+
+          {/* 3 Metrics Glass Cards (Matching Reference Image) */}
+          <div className="grid grid-cols-3 gap-3.5 pt-8">
+            <div className="p-4 rounded-2xl bg-black/35 backdrop-blur-md border border-white/15 space-y-1 shadow-xl hover:border-white/25 transition-all">
+              <div className="text-stone-300 text-[10px] font-bold uppercase tracking-wider">
+                ENCRYPTION
+              </div>
+              <div className="text-base xl:text-lg font-black text-white tracking-tight">
+                AES-256
+              </div>
+              <div className="text-[10px] text-stone-400 font-medium">
+                Bordeaux Cloud
+              </div>
+            </div>
+
+            <div className="p-4 rounded-2xl bg-black/35 backdrop-blur-md border border-white/15 space-y-1 shadow-xl hover:border-white/25 transition-all">
+              <div className="text-stone-300 text-[10px] font-bold uppercase tracking-wider">
+                UPTIME
+              </div>
+              <div className="text-base xl:text-lg font-black text-white tracking-tight">
+                99.98%
+              </div>
+              <div className="text-[10px] text-stone-400 font-medium">
+                {language === "fr" ? "Temps réel" : "Real-time"}
+              </div>
+            </div>
+
+            <div className="p-4 rounded-2xl bg-black/35 backdrop-blur-md border border-white/15 space-y-1 shadow-xl hover:border-white/25 transition-all">
+              <div className="text-stone-300 text-[10px] font-bold uppercase tracking-wider">
+                PROTECTION
+              </div>
+              <div className="text-base xl:text-lg font-black text-white tracking-tight">
+                Rate Limit
+              </div>
+              <div className="text-[10px] text-stone-400 font-medium">
+                Anti-bruteforce
+              </div>
+            </div>
+          </div>
+        </div>
+
+        {/* Bottom Legal Notice in Left Pane */}
+        <div className="relative z-10 flex items-center justify-between text-xs text-stone-300/80 pt-6 border-t border-white/10">
+          <div>© 2026 MAISON CALVÉ SARL · 48 rue Calvé, 33000 Bordeaux</div>
+          <div className="text-[10px] tracking-widest uppercase font-mono text-stone-400">
+            CP163012023000000128
+          </div>
+        </div>
+      </div>
+
+      {/* ========================================================== */}
+      {/* RIGHT PANE: MINIMAL LUXURY ADMIN PORTAL FORM               */}
+      {/* ========================================================== */}
+      <div className="flex-1 flex flex-col justify-between p-6 sm:p-10 lg:p-12 xl:p-16 min-h-screen bg-white border-l border-slate-200">
+        {/* Top Bar in Right Pane */}
+        <div className="flex items-center justify-between">
+          <Link href="/" className="group flex items-center gap-2.5">
+            <div className="w-8 h-8 rounded-lg bg-slate-900 flex items-center justify-center font-bold text-white text-xs shadow-xs">
+              MC
+            </div>
+            <span className="font-extrabold text-sm tracking-tight text-slate-900 group-hover:text-[#2D4B49] transition-colors">
+              MAISON CALVÉ
+            </span>
+          </Link>
+
+          {/* Bilingual Language Switcher (Segmented Pill) */}
+          <div className="flex items-center gap-0.5 p-1 rounded-full bg-slate-100 border border-slate-200 text-xs">
+            <button
+              type="button"
+              onClick={() => setLanguage("fr")}
+              className={`px-3 py-1 rounded-full text-[11px] font-bold transition-all cursor-pointer ${
+                language === "fr"
+                  ? "bg-white text-slate-900 shadow-2xs"
+                  : "text-slate-500 hover:text-slate-900"
+              }`}
+            >
+              FR
+            </button>
+            <button
+              type="button"
+              onClick={() => setLanguage("en")}
+              className={`px-3 py-1 rounded-full text-[11px] font-bold transition-all cursor-pointer ${
+                language === "en"
+                  ? "bg-white text-slate-900 shadow-2xs"
+                  : "text-slate-500 hover:text-slate-900"
+              }`}
+            >
+              EN
+            </button>
+          </div>
+        </div>
+
+        {/* Center Sign In Container (Matching Reference Image) */}
+        <div className="w-full max-w-sm sm:max-w-md mx-auto my-auto py-8">
+          {/* Header */}
+          <div className="text-center mb-7">
+            <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full border border-slate-200 bg-slate-50 text-[10px] font-bold uppercase tracking-widest text-slate-500 mb-3.5 shadow-2xs">
+              <span className="w-1.5 h-1.5 rounded-full bg-slate-400" />
+              <span>{language === "fr" ? "ACCÈS SUPER ADMIN" : "SUPER ADMIN SIGN IN"}</span>
+            </div>
+
+            <h2 className="text-3xl sm:text-4xl font-extrabold text-slate-900 tracking-tight">
+              {language === "fr" ? "Admin Portal" : "Admin Portal"}
+            </h2>
+
+            <p className="mt-2 text-xs sm:text-sm text-slate-500">
+              {language === "fr"
+                ? "Veuillez saisir vos identifiants pour accéder à l'espace de gestion."
+                : "Please enter your credentials to access the management workspace."}
+            </p>
+          </div>
+
+          {/* Error Message if any */}
+          {error && (
+            <div className="mb-5 p-3.5 rounded-xl bg-rose-50 border border-rose-200 text-rose-800 text-xs flex items-center gap-2.5 animate-in fade-in">
+              <AlertCircle className="w-4 h-4 text-rose-600 shrink-0" />
+              <span>{error}</span>
+            </div>
+          )}
+
+          {/* Form */}
+          <form onSubmit={handleSubmit} className="space-y-4">
+            {/* Email Field with Soft Blue-Grey Tint Background */}
+            <div>
+              <label className="block text-[10px] font-bold uppercase tracking-wider text-slate-600 mb-1.5">
+                {language === "fr" ? "ADRESSE EMAIL" : "EMAIL ADDRESS"}
+              </label>
+              <div className="relative">
+                <div className="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-slate-400">
+                  <Mail className="w-4 h-4" />
+                </div>
+                <input
+                  type="email"
+                  required
+                  value={email}
+                  onChange={(e) => setEmail(e.target.value)}
+                  placeholder="admin@maisoncalve.fr"
+                  className="w-full pl-10 pr-4 py-3 rounded-xl bg-[#EEF3F8] border border-slate-200 text-sm font-medium text-slate-900 focus:bg-white focus:border-[#2D4B49] focus:ring-2 focus:ring-[#2D4B49]/10 transition-all placeholder:text-slate-400 shadow-2xs"
+                />
+              </div>
+            </div>
+
+            {/* Password Field with Soft Blue-Grey Tint Background */}
+            <div>
+              <div className="flex items-center justify-between mb-1.5">
+                <label className="block text-[10px] font-bold uppercase tracking-wider text-slate-600">
+                  {language === "fr" ? "MOT DE PASSE" : "PASSWORD"}
+                </label>
+                <button
+                  type="button"
+                  onClick={() =>
+                    alert(
+                      language === "fr"
+                        ? "Pour la démo, le mot de passe est : admin123"
+                        : "Demo password is: admin123"
+                    )
+                  }
+                  className="text-[11px] text-slate-500 hover:text-slate-900 transition-colors cursor-pointer"
+                >
+                  {language === "fr" ? "Mot de passe oublié ?" : "Forgot password?"}
+                </button>
+              </div>
+              <div className="relative">
+                <div className="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-slate-400">
+                  <Lock className="w-4 h-4" />
+                </div>
+                <input
+                  type={showPassword ? "text" : "password"}
+                  required
+                  value={password}
+                  onChange={(e) => setPassword(e.target.value)}
+                  placeholder="••••••••••••"
+                  className="w-full pl-10 pr-11 py-3 rounded-xl bg-[#EEF3F8] border border-slate-200 text-sm font-medium text-slate-900 focus:bg-white focus:border-[#2D4B49] focus:ring-2 focus:ring-[#2D4B49]/10 transition-all placeholder:text-slate-400 shadow-2xs font-mono"
+                />
+                <button
+                  type="button"
+                  onClick={() => setShowPassword(!showPassword)}
+                  className="absolute inset-y-0 right-0 pr-3.5 flex items-center text-slate-400 hover:text-slate-700 transition-colors cursor-pointer"
+                  tabIndex={-1}
+                >
+                  {showPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
+                </button>
+              </div>
+            </div>
+
+            {/* Remember Me Checkbox */}
+            <div className="flex items-center gap-2 pt-1">
+              <input
+                type="checkbox"
+                id="remember"
+                checked={rememberMe}
+                onChange={(e) => setRememberMe(e.target.checked)}
+                className="w-4 h-4 rounded border-slate-300 text-[#2D4B49] focus:ring-[#2D4B49] cursor-pointer"
+              />
+              <label htmlFor="remember" className="text-xs text-slate-600 font-medium cursor-pointer select-none">
+                {language === "fr" ? "Mémoriser ma session pendant 24 heures" : "Remember my session for 24 hours"}
+              </label>
+            </div>
+
+            {/* Primary Sign In Button (Deep Goizet / Maison Calvé Slate-Green) */}
+            <div className="pt-2">
+              <button
+                type="submit"
+                disabled={loading}
+                className="w-full py-3.5 px-6 rounded-xl bg-[#2D4B49] hover:bg-[#233B39] text-white text-xs sm:text-sm font-bold tracking-wide transition-all duration-200 shadow-md hover:shadow-lg hover:-translate-y-0.5 active:translate-y-0 flex items-center justify-center gap-2 cursor-pointer disabled:opacity-50"
+              >
+                {loading ? (
+                  <div className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin" />
+                ) : (
+                  <>
+                    <span>{language === "fr" ? "Se connecter au tableau de bord" : "Sign in to Dashboard"}</span>
+                    <ArrowRight className="w-4 h-4" />
+                  </>
+                )}
+              </button>
+            </div>
+          </form>
+
+          {/* Security Banner Stamp */}
+          <div className="mt-8 pt-5 border-t border-slate-100 text-center space-y-1 text-[11px] text-slate-400">
+            <div className="flex items-center justify-center gap-1.5 text-slate-600 font-medium">
+              <ShieldCheck className="w-3.5 h-3.5 text-emerald-600" />
+              <span>Secure TLS 1.3 / AES-256 Session</span>
+            </div>
+            <p>
+              {language === "fr"
+                ? "Système d'accès restreint réservé aux collaborateurs Maison Calvé autorisés."
+                : "Restricted system for authorized Maison Calvé personnel only."}
+            </p>
+          </div>
+        </div>
+
+        {/* Bottom Minimal Watermark */}
+        <div className="text-center text-[10px] text-slate-400 uppercase tracking-widest font-mono">
+          MAISON CALVÉ OS · Bordeaux Fondaudège
+        </div>
+      </div>
+    </div>
+  );
+}

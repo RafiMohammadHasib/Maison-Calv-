@@ -12,10 +12,10 @@ export default function LocationMap({ language }: LocationMapProps) {
   const t = CONTENT[language].locationSection;
 
   return (
-    <section id="localisation" className="py-24 sm:py-32 bg-calve-cream border-t border-calve-border/60">
+    <section id="localisation" className="py-12 sm:py-16 bg-calve-cream border-t border-calve-border/60">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         {/* Header */}
-        <div className="max-w-3xl mb-14">
+        <div className="max-w-3xl mb-10 sm:mb-12">
           <div className="inline-flex items-center gap-2 px-3.5 py-1 rounded-full bg-calve-stone text-xs font-semibold uppercase tracking-wider text-calve-slate mb-3">
             <Sparkles className="w-3.5 h-3.5" />
             <span>{t.tag}</span>

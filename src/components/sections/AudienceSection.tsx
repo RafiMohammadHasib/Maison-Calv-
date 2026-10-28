@@ -30,7 +30,7 @@ export default function AudienceSection({
           heading: "Le prestige d'un siège social avec parking privatif",
           description:
             "Offrez à votre entreprise une adresse de standing au cœur de Bordeaux. Recevez vos clients, partenaires et investisseurs dans un cadre d'exception tout en bénéficiant de places de parking privatives dans la cour sécurisée.",
-          recommendedSpace: "Bureaux privatifs (17–30 m²)",
+          recommendedSpace: "Bureaux privatifs (17–25 m²)",
           recommendedId: "office",
           highlights: [
             "Accès direct en voiture avec place réservée en cour fermée",
@@ -103,7 +103,7 @@ export default function AudienceSection({
           heading: "The prestige of a private mansion with on-site parking",
           description:
             "Host partners, clients, and board members in an architecturally refined setting while securing on-site courtyard parking in downtown Bordeaux.",
-          recommendedSpace: "Private Offices (17–30 m²)",
+          recommendedSpace: "Private Offices (17–25 m²)",
           recommendedId: "office",
           highlights: [
             "Direct courtyard vehicle access with assigned bay",
@@ -176,7 +176,7 @@ export default function AudienceSection({
           heading: "El prestigio de un palacete con aparcamiento privado",
           description:
             "Reciba a sus clientes e inversores en un entorno distinguido con la ventaja única de aparcar en el patio privado.",
-          recommendedSpace: "Despachos privados (17–30 m²)",
+          recommendedSpace: "Despachos privados (17–25 m²)",
           recommendedId: "office",
           highlights: [
             "Acceso en coche directo con plaza reservada en patio cerrado",
@@ -241,11 +241,11 @@ export default function AudienceSection({
   const currentTab = content.tabs[activeTab] || content.tabs[0];
 
   return (
-    <section className="py-24 bg-calve-cream relative overflow-hidden">
+    <section className="py-12 sm:py-16 bg-calve-cream relative overflow-hidden">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         {/* Header */}
         <ScrollReveal>
-          <div className="text-center max-w-3xl mx-auto mb-14">
+          <div className="text-center max-w-3xl mx-auto mb-10 sm:mb-12">
             <span className="inline-flex items-center gap-1.5 px-3.5 py-1 rounded-full text-xs font-semibold uppercase tracking-wider bg-calve-stone text-calve-slate border border-calve-border mb-3">
               {content.tag}
             </span>

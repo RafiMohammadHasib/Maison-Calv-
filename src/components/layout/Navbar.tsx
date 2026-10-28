@@ -7,7 +7,7 @@ import { Language, CONTENT } from "@/data/content";
 interface NavbarProps {
   language: Language;
   onLanguageChange: (lang: Language) => void;
-  onOpenEnquiry: (spaceId?: string) => void;
+  onOpenEnquiry: (spaceId?: string, source?: string) => void;
 }
 
 export default function Navbar({
@@ -84,7 +84,7 @@ export default function Navbar({
 
             {/* Visit CTA Pill */}
             <button
-              onClick={() => onOpenEnquiry("office")}
+              onClick={() => onOpenEnquiry("office", "Book a Visit (Header)")}
               className="group whitespace-nowrap flex items-center gap-1.5 px-4 sm:px-5 py-2 rounded-full bg-calve-slate hover:bg-calve-slate-dark text-white text-[11px] sm:text-xs font-bold tracking-wider uppercase transition-all shadow-xs hover:shadow-md cursor-pointer"
             >
               <span>{t.requestVisit}</span>

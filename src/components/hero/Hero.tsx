@@ -7,7 +7,7 @@ import { BUILDING_STATS } from "@/data/spaces";
 
 interface HeroProps {
   language: Language;
-  onOpenEnquiry: (spaceId?: string) => void;
+  onOpenEnquiry: (spaceId?: string, source?: string) => void;
 }
 
 export default function Hero({ language, onOpenEnquiry }: HeroProps) {
@@ -19,7 +19,7 @@ export default function Hero({ language, onOpenEnquiry }: HeroProps) {
   };
 
   return (
-    <section className="relative pt-32 pb-20 sm:pt-36 sm:pb-28 overflow-hidden bg-gradient-to-b from-calve-stone/40 via-calve-cream to-white">
+    <section className="relative pt-28 pb-12 sm:pt-32 sm:pb-16 overflow-hidden bg-gradient-to-b from-calve-stone/40 via-calve-cream to-white">
       {/* Background Subtle Architectural Grid */}
       <div className="absolute inset-0 opacity-[0.03] pointer-events-none bg-[radial-gradient(#172123_1px,transparent_1px)] [background-size:24px_24px]" />
 
@@ -69,7 +69,7 @@ export default function Hero({ language, onOpenEnquiry }: HeroProps) {
         {/* Action Buttons */}
         <div className="flex flex-wrap items-center justify-center gap-3 sm:gap-4 mb-14">
           <button
-            onClick={() => onOpenEnquiry("office")}
+            onClick={() => onOpenEnquiry("office", "Book a Private Tour (Hero)")}
             className="flex items-center gap-2 px-8 py-4 rounded-full bg-calve-slate hover:bg-calve-slate-dark text-white font-semibold text-xs tracking-wider uppercase transition-all shadow-sm hover:shadow-md hover:-translate-y-0.5 cursor-pointer"
           >
             <Calendar className="w-4 h-4" />
@@ -89,7 +89,7 @@ export default function Hero({ language, onOpenEnquiry }: HeroProps) {
         <div className="grid grid-cols-1 md:grid-cols-3 gap-4 sm:gap-6">
           <div className="relative rounded-2xl sm:rounded-3xl overflow-hidden border border-calve-border shadow-md aspect-4/3 bg-calve-stone group">
             <img
-              src="/images/hero/hero-open-space.jpg"
+              src="/images/hero/hero-kitchen.jpg"
               alt={
                 language === "en"
                   ? "Maison Calvé - Bright open space with oak floor and authentic stone"
@@ -103,7 +103,7 @@ export default function Hero({ language, onOpenEnquiry }: HeroProps) {
 
           <div className="relative rounded-2xl sm:rounded-3xl overflow-hidden border border-calve-border shadow-md aspect-4/3 bg-calve-stone group">
             <img
-              src="/images/hero/hero-kitchen.jpg"
+              src="/images/hero/hero-open-space.jpg"
               alt={
                 language === "en"
                   ? "Maison Calvé - Fully equipped resident kitchen"

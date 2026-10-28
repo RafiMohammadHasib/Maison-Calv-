@@ -1,5 +1,6 @@
 import { NextResponse } from "next/server";
 import { z } from "zod";
+import { addLead } from "@/lib/leads";
 
 const enquirySchema = z.object({
   type: z.enum(["private-office", "open-space", "meeting-room"]),
@@ -18,6 +19,7 @@ const enquirySchema = z.object({
   attendees: z.number().int().min(1).max(20).optional(),
   meetingPurpose: z.string().optional(),
   visitRequested: z.boolean().optional().default(true),
+  source: z.string().optional(),
   language: z.enum(["fr", "en", "es"]).default("fr")
 });
 
@@ -38,38 +40,51 @@ export async function POST(request: Request) {
 
     const data = result.data;
 
-    // Log the lead details in a production-ready structured format
-    console.log("=========================================");
-    console.log("🔔 [MAISON CALVÉ] NOUVELLE DEMANDE DE LEAD");
-    console.log(`Type: ${data.type}`);
-    console.log(`Contact: ${data.name} (${data.email} | ${data.phone})`);
-    console.log(`Entreprise: ${data.company || "Non renseignée"}`);
-    if (data.type === "private-office") {
-      console.log(`Bureau: ${data.officeSize || "Indifférent"}`);
-      console.log(`Postes estimés: ${data.workstationCount || "N/A"}`);
-      console.log(`Visite souhaitée: ${data.visitRequested ? "OUI" : "NON"}`);
-    } else if (data.type === "open-space") {
-      console.log(`Formule: ${data.openSpacePlan}`);
-      console.log(`Nombre de postes: ${data.workstationCount}`);
-      console.log(`Date: ${data.date || "Dès que possible"}`);
-      console.log(`Créneau: ${data.timeSlot || "N/A"}`);
-    } else if (data.type === "meeting-room") {
-      console.log(`Date: ${data.date}`);
-      console.log(`Format: ${data.timeSlot}`);
-      console.log(`Participants: ${data.attendees}`);
-      console.log(`Objet: ${data.meetingPurpose}`);
+    // Determine intuitive source label
+    let sourceLabel = data.source;
+    if (!sourceLabel) {
+      if (data.visitRequested) {
+        sourceLabel = data.type === "private-office" ? "Book a Private Tour (Hero/Site)" : "Book a Visit (Site)";
+      } else {
+        sourceLabel = "Website Space Enquiry";
+      }
     }
-    console.log(`Message: ${data.message || "(Aucun message supplémentaire)"}`);
-    console.log("=========================================");
 
-    // In a production setup with RESEND_API_KEY, an email can be triggered here
-    // e.g. if (process.env.RESEND_API_KEY) { await resend.emails.send(...) }
+    // Persist directly to CRM Database
+    const savedLead = addLead({
+      name: data.name,
+      email: data.email,
+      phone: data.phone,
+      company: data.company || "",
+      type: data.type,
+      officeSize: data.officeSize,
+      workstationCount: data.workstationCount,
+      openSpacePlan: data.openSpacePlan,
+      date: data.date,
+      timeSlot: data.timeSlot,
+      attendees: data.attendees,
+      meetingPurpose: data.meetingPurpose,
+      visitRequested: data.visitRequested ?? true,
+      source: sourceLabel,
+      status: "new",
+      priority: data.type === "private-office" ? "urgent" : "high",
+      message: data.message
+    });
+
+    console.log("=========================================");
+    console.log(`🔔 [MAISON CALVÉ CRM] NOUVEAU LEAD ENREGISTRÉ: ${savedLead.id}`);
+    console.log(`Source: ${savedLead.source}`);
+    console.log(`Contact: ${savedLead.name} (${savedLead.email} | ${savedLead.phone})`);
+    console.log(`Entreprise: ${savedLead.company || "Non renseignée"}`);
+    console.log(`Espace: ${savedLead.type} ${savedLead.officeSize || ""}`);
+    console.log("=========================================");
 
     return NextResponse.json({
       success: true,
       message: "Demande enregistrée avec succès. L'équipe Maison Calvé prendra contact très prochainement.",
-      leadId: `MC-${Date.now().toString(36).toUpperCase()}`,
-      receivedAt: new Date().toISOString()
+      lead: savedLead,
+      leadId: savedLead.id,
+      receivedAt: savedLead.createdAt
     });
   } catch (error) {
     console.error("Erreur traitement demande Maison Calvé:", error);

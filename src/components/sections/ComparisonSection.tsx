@@ -138,11 +138,11 @@ export default function ComparisonSection({
   }[language];
 
   return (
-    <section className="py-24 bg-calve-stone/60 border-y border-calve-border relative overflow-hidden">
+    <section id="positionnement" className="py-12 sm:py-16 bg-calve-stone/60 border-y border-calve-border relative overflow-hidden">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         {/* Header */}
         <ScrollReveal>
-          <div className="text-center max-w-3xl mx-auto mb-16">
+          <div className="text-center max-w-3xl mx-auto mb-10 sm:mb-12">
             <span className="inline-flex items-center gap-1.5 px-3.5 py-1 rounded-full text-xs font-semibold uppercase tracking-wider bg-white text-calve-slate border border-calve-border mb-3 shadow-2xs">
               <Sparkles className="w-3.5 h-3.5 text-calve-slate" />
               {content.tag}
@@ -232,7 +232,7 @@ export default function ComparisonSection({
         </div>
 
         {/* Bottom CTA Box */}
-        <div className="mt-10 flex flex-col sm:flex-row items-center justify-between gap-4 p-6 sm:p-8 rounded-2xl bg-white border border-calve-border shadow-xs">
+        <div className="mt-8 sm:mt-10 flex flex-col sm:flex-row items-center justify-between gap-4 p-6 sm:p-8 rounded-2xl bg-white border border-calve-border shadow-xs">
           <div>
             <h4 className="text-base font-bold text-calve-charcoal">
               {language === "en"
