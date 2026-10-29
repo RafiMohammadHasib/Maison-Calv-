@@ -210,8 +210,13 @@ export default function AdminLayout({
           {/* Brand Header */}
           <div className="p-6 border-b border-calve-border/60 flex items-center justify-between">
             <Link href="/admin" className="flex items-center gap-3">
-              <div className="w-10 h-10 rounded-xl bg-calve-slate text-white flex items-center justify-center font-bold text-sm shadow-xs">
-                MC
+              <div className="relative w-10 h-10 rounded-xl overflow-hidden shadow-xs border border-calve-slate/15 shrink-0">
+                <Image
+                  src="/images/brand/maison-calve-logo.png"
+                  alt="Maison Calvé"
+                  fill
+                  className="object-cover"
+                />
               </div>
               <div>
                 <div className="font-extrabold text-sm tracking-tight text-calve-charcoal leading-tight">

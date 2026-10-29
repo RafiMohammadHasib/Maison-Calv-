@@ -1,6 +1,7 @@
 "use client";
 
 import React, { useState, useEffect } from "react";
+import Image from "next/image";
 import { X, CheckCircle, Calendar, Users, Building, Mail, Phone, Clock, MapPin } from "lucide-react";
 import confetti from "canvas-confetti";
 import { Language, CONTENT } from "@/data/content";
@@ -325,8 +326,18 @@ export default function EnquiryModal({
           <>
             {/* Header */}
             <div className="mb-4">
-              <div className="text-xs font-bold tracking-[0.2em] uppercase text-calve-slate mb-1">
-                Maison Calvé · 48 Rue Calvé
+              <div className="flex items-center gap-2 mb-1.5">
+                <div className="relative w-6 h-6 rounded-md overflow-hidden shadow-2xs border border-calve-slate/15 shrink-0">
+                  <Image
+                    src="/images/brand/maison-calve-logo.png"
+                    alt="Maison Calvé"
+                    fill
+                    className="object-cover"
+                  />
+                </div>
+                <div className="text-xs font-bold tracking-[0.2em] uppercase text-calve-slate">
+                  Maison Calvé · 48 Rue Calvé
+                </div>
               </div>
               <h2 className="text-2xl sm:text-3xl font-bold tracking-tight text-calve-charcoal">
                 {t.title}

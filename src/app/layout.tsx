@@ -24,15 +24,16 @@ export const metadata: Metadata = {
     "Maison Calvé : espace de coworking haut de gamme à Bordeaux Fondaudège (48 rue Calvé). 5 bureaux privatifs, open space feutré, salle de réunion 30m² et 9 places de parking privatives sécurisées.",
   icons: {
     icon: [
-      { url: "/icon-light.svg", media: "(prefers-color-scheme: light)", type: "image/svg+xml" },
-      { url: "/icon-dark.svg", media: "(prefers-color-scheme: dark)", type: "image/svg+xml" },
+      { url: "/favicon.ico", sizes: "any" },
+      { url: "/icon.png", type: "image/png", sizes: "64x64" },
+      { url: "/images/brand/maison-calve-logo.png", type: "image/png", sizes: "512x512" },
       { url: "/icon.svg", type: "image/svg+xml" },
-      { url: "/icon", sizes: "64x64", type: "image/png" },
     ],
     apple: [
-      { url: "/apple-icon", sizes: "180x180", type: "image/png" },
+      { url: "/apple-icon.png", sizes: "180x180", type: "image/png" },
     ],
   },
+  manifest: "/site.webmanifest",
   keywords: [
     "coworking bordeaux",
     "coworking bordeaux parking",

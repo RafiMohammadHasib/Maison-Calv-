@@ -1,6 +1,7 @@
 "use client";
 
 import React, { useState, useEffect } from "react";
+import Image from "next/image";
 import {
   Menu,
   X,
@@ -62,7 +63,16 @@ export default function Navbar({
         {/* Floating Minimalist Capsule */}
         <div className="bg-white/92 backdrop-blur-2xl border border-white/90 shadow-[0_8px_32px_rgba(23,33,35,0.08)] rounded-full py-2 px-3 sm:px-5 flex items-center justify-between transition-all duration-300">
           {/* Brand Logo */}
-          <a href="#" className="flex items-center pl-1 sm:pl-2 py-0.5 group shrink-0">
+          <a href="#" className="flex items-center gap-2.5 pl-1 sm:pl-2 py-0.5 group shrink-0">
+            <div className="relative w-8 h-8 rounded-lg overflow-hidden shadow-2xs border border-calve-slate/15 group-hover:scale-105 transition-transform duration-300">
+              <Image
+                src="/images/brand/maison-calve-logo.png"
+                alt="Maison Calvé"
+                fill
+                className="object-cover"
+                priority
+              />
+            </div>
             <div className="flex flex-col leading-[0.84] text-lg sm:text-xl font-extrabold tracking-tighter lowercase select-none">
               <span className="text-calve-slate transition-colors group-hover:text-calve-charcoal">
                 maison
@@ -153,10 +163,20 @@ export default function Navbar({
               <a
                 href="#"
                 onClick={() => setMobileMenuOpen(false)}
-                className="flex flex-col leading-[0.84] text-xl font-extrabold tracking-tighter lowercase select-none text-calve-charcoal"
+                className="flex items-center gap-2.5 select-none text-calve-charcoal group"
               >
-                <span>maison</span>
-                <span>calvé</span>
+                <div className="relative w-9 h-9 rounded-xl overflow-hidden shadow-2xs border border-calve-slate/15">
+                  <Image
+                    src="/images/brand/maison-calve-logo.png"
+                    alt="Maison Calvé"
+                    fill
+                    className="object-cover"
+                  />
+                </div>
+                <div className="flex flex-col leading-[0.84] text-xl font-extrabold tracking-tighter lowercase">
+                  <span>maison</span>
+                  <span>calvé</span>
+                </div>
               </a>
 
               <div className="flex items-center gap-3">

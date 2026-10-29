@@ -1,6 +1,7 @@
 "use client";
 
 import React, { useState } from "react";
+import Image from "next/image";
 import { Briefcase, Scale, Compass, Users2, CheckCircle2, ArrowRight, ShieldCheck, MapPin } from "lucide-react";
 import ScrollReveal from "@/components/ui/ScrollReveal";
 import { Language } from "@/data/content";
@@ -396,8 +397,13 @@ export default function AudienceSection({
           {/* Bottom Lockup (Editorial Signature) */}
           <div className="relative z-10 pt-6 mt-6 border-t border-white/15 flex flex-col sm:flex-row sm:items-center justify-between gap-3 text-xs text-stone-300/80">
             <div className="flex items-center gap-3">
-              <div className="w-7 h-7 rounded-lg bg-white/10 backdrop-blur-md border border-white/20 flex items-center justify-center text-[11px] font-bold text-white shadow-inner">
-                MC
+              <div className="relative w-7 h-7 rounded-lg overflow-hidden border border-white/20 shrink-0 shadow-inner">
+                <Image
+                  src="/images/brand/maison-calve-logo.png"
+                  alt="Maison Calvé"
+                  fill
+                  className="object-cover"
+                />
               </div>
               <div className="flex items-center gap-2">
                 <span className="font-bold text-white tracking-wide">MAISON CALVÉ</span>

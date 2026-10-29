@@ -102,8 +102,14 @@ export default function AdminLoginPage() {
         {/* Top Header in Left Pane */}
         <div className="relative z-10 flex items-center justify-between">
           <Link href="/" className="flex items-center gap-3 group">
-            <div className="w-10 h-10 rounded-xl bg-white/10 backdrop-blur-md border border-white/20 flex items-center justify-center font-bold text-white text-sm shadow-inner group-hover:bg-white/20 transition-colors">
-              MC
+            <div className="relative w-10 h-10 rounded-xl overflow-hidden shadow-inner border border-white/20 shrink-0 group-hover:scale-105 transition-transform">
+              <Image
+                src="/images/brand/maison-calve-logo.png"
+                alt="Maison Calvé"
+                fill
+                className="object-cover"
+                priority
+              />
             </div>
             <div>
               <div className="text-sm font-extrabold tracking-tight text-white flex items-center gap-2 group-hover:text-emerald-300 transition-colors">
@@ -207,6 +213,16 @@ export default function AdminLoginPage() {
         <div className="w-full max-w-sm sm:max-w-md mx-auto my-auto py-8">
           {/* Header */}
           <div className="text-center mb-7">
+            <div className="inline-flex items-center justify-center mb-3">
+              <div className="relative w-12 h-12 rounded-xl overflow-hidden shadow-2xs border border-calve-slate/15">
+                <Image
+                  src="/images/brand/maison-calve-logo.png"
+                  alt="Maison Calvé"
+                  fill
+                  className="object-cover"
+                />
+              </div>
+            </div>
             <h2 className="text-3xl sm:text-4xl font-extrabold text-slate-900 tracking-tight">
               {language === "fr" ? "Espace Administration" : "Admin Portal"}
             </h2>

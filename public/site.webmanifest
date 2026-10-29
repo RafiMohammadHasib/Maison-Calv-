@@ -1,0 +1,27 @@
+{
+  "name": "Maison Calvé · Bureaux & Coworking Bordeaux",
+  "short_name": "Maison Calvé",
+  "description": "Espaces de travail d'exception, bureaux privés et coworking dans un hôtel particulier du XIXe siècle au cœur de Bordeaux.",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#748c8c",
+  "theme_color": "#748c8c",
+  "icons": [
+    {
+      "src": "/icon-192.png",
+      "sizes": "192x192",
+      "type": "image/png"
+    },
+    {
+      "src": "/icon-512.png",
+      "sizes": "512x512",
+      "type": "image/png"
+    },
+    {
+      "src": "/images/brand/maison-calve-logo.png",
+      "sizes": "1024x1024",
+      "type": "image/png",
+      "purpose": "any maskable"
+    }
+  ]
+}
