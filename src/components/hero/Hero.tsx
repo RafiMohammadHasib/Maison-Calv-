@@ -89,36 +89,16 @@ export default function Hero({ language, onOpenEnquiry }: HeroProps) {
 
         {/* Grand Architectural Showcase: 3 Authentic 4K Photographs */}
         <div className="grid grid-cols-1 md:grid-cols-3 gap-4 sm:gap-6">
-          {/* Photo 1: Authentic 21m² Private Office */}
+          {/* Photo 1: Authentic Exposed Blonde Stone Open Space */}
           <div className="relative rounded-2xl sm:rounded-3xl overflow-hidden border border-calve-border shadow-md aspect-4/3 bg-calve-stone group">
             <img
-              src="/images/spaces/real-office-21m-4k.jpg"
+              src="/images/hero/hero-open-space.jpg"
               alt={
                 language === "en"
-                  ? "Maison Calvé - 21 sqm private office with blue accent wall and woven pendant lights"
+                  ? "Maison Calvé - Exposed blonde limestone loft open space with ergonomic desks"
                   : language === "es"
-                  ? "Maison Calvé - Despacho privado 21 m² con pared azul y lámpara de ratán"
-                  : "Maison Calvé - Bureau privatif 21 m² avec mur bleu, parquet chaleureux et luminaires en rotin"
-              }
-              className="w-full h-full object-cover group-hover:scale-104 transition-transform duration-700"
-            />
-            <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent flex items-end p-4">
-              <span className="text-xs font-bold text-white drop-shadow-sm uppercase tracking-wider">
-                {language === "en" ? "Private Office 21 sqm" : language === "es" ? "Despacho Privado 21 m²" : "Bureau Privatif 21 m²"}
-              </span>
-            </div>
-          </div>
-
-          {/* Photo 2: Authentic Exposed Blonde Stone Open Space */}
-          <div className="relative rounded-2xl sm:rounded-3xl overflow-hidden border border-calve-border shadow-md aspect-4/3 bg-calve-stone group">
-            <img
-              src="/images/spaces/real-open-space-fixe-4k.jpg"
-              alt={
-                language === "en"
-                  ? "Maison Calvé - Exposed blonde limestone loft open space"
-                  : language === "es"
-                  ? "Maison Calvé - Open space con auténtica pared de piedra bordelesa"
-                  : "Maison Calvé - Open space avec authentique pierre blonde bordelaise et lustres ambrés"
+                  ? "Maison Calvé - Open space con auténtica pared de piedra bordelesa y mobiliario ergonómico"
+                  : "Maison Calvé - Open space avec authentique pierre blonde bordelaise et mobilier ergonomique"
               }
               className="w-full h-full object-cover group-hover:scale-104 transition-transform duration-700"
             />
@@ -129,22 +109,42 @@ export default function Hero({ language, onOpenEnquiry }: HeroProps) {
             </div>
           </div>
 
-          {/* Photo 3: Authentic 28m² Private Office */}
+          {/* Photo 2: Authentic Resident Kitchen & Café */}
           <div className="relative rounded-2xl sm:rounded-3xl overflow-hidden border border-calve-border shadow-md aspect-4/3 bg-calve-stone group">
             <img
-              src="/images/spaces/real-office-28m-4k.jpg"
+              src="/images/hero/hero-kitchen.jpg"
               alt={
                 language === "en"
-                  ? "Maison Calvé - 28 sqm private office with modern cluster chandelier and cobalt accent wall"
+                  ? "Maison Calvé - Fully equipped resident kitchen, organic coffee and tea corner"
                   : language === "es"
-                  ? "Maison Calvé - Despacho privado 28 m² con lámpara de diseño"
-                  : "Maison Calvé - Bureau privatif 28 m² avec lustre moderne et parquet authentique"
+                  ? "Maison Calvé - Cocina totalmente equipada y rincón de café"
+                  : "Maison Calvé - Cuisine équipée contemporaine et espace café des résidents"
               }
               className="w-full h-full object-cover group-hover:scale-104 transition-transform duration-700"
             />
             <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent flex items-end p-4">
               <span className="text-xs font-bold text-white drop-shadow-sm uppercase tracking-wider">
-                {language === "en" ? "Private Office 28 sqm" : language === "es" ? "Despacho Privado 28 m²" : "Bureau Privatif 28 m²"}
+                {language === "en" ? "Resident Kitchen & Café" : language === "es" ? "Cocina & Café de Residentes" : "Cuisine & Café Résidents"}
+              </span>
+            </div>
+          </div>
+
+          {/* Photo 3: Authentic 30m² Boardroom */}
+          <div className="relative rounded-2xl sm:rounded-3xl overflow-hidden border border-calve-border shadow-md aspect-4/3 bg-calve-stone group">
+            <img
+              src="/images/hero/hero-meeting.jpg"
+              alt={
+                language === "en"
+                  ? "Maison Calvé - 30 sqm executive boardroom with 4K screen and video conferencing"
+                  : language === "es"
+                  ? "Maison Calvé - Sala de juntas de 30 m² con pantalla 4K y videoconferencia"
+                  : "Maison Calvé - Grande salle de réunion 30 m² équipée d'écran 4K et visioconférence"
+              }
+              className="w-full h-full object-cover group-hover:scale-104 transition-transform duration-700"
+            />
+            <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent flex items-end p-4">
+              <span className="text-xs font-bold text-white drop-shadow-sm uppercase tracking-wider">
+                {language === "en" ? "Executive Boardroom (30 sqm)" : language === "es" ? "Sala de Juntas (30 m²)" : "Salle de Réunion (30 m²)"}
               </span>
             </div>
           </div>
