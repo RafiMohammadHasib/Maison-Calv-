@@ -10,6 +10,8 @@ import {
   Eye,
   EyeOff,
   ArrowRight,
+  ArrowLeft,
+  X,
   AlertCircle
 } from "lucide-react";
 import { useLanguage } from "@/lib/languageContext";
@@ -99,19 +101,28 @@ export default function AdminLoginPage() {
 
         {/* Top Header in Left Pane */}
         <div className="relative z-10 flex items-center justify-between">
-          <div className="flex items-center gap-3">
-            <div className="w-10 h-10 rounded-xl bg-white/10 backdrop-blur-md border border-white/20 flex items-center justify-center font-bold text-white text-sm shadow-inner">
+          <Link href="/" className="flex items-center gap-3 group">
+            <div className="w-10 h-10 rounded-xl bg-white/10 backdrop-blur-md border border-white/20 flex items-center justify-center font-bold text-white text-sm shadow-inner group-hover:bg-white/20 transition-colors">
               MC
             </div>
             <div>
-              <div className="text-sm font-extrabold tracking-tight text-white flex items-center gap-2">
+              <div className="text-sm font-extrabold tracking-tight text-white flex items-center gap-2 group-hover:text-emerald-300 transition-colors">
                 <span>MAISON CALVÉ</span>
               </div>
               <p className="text-[10px] uppercase font-medium tracking-widest text-stone-300">
                 Hôtel Particulier · Bordeaux Fondaudège
               </p>
             </div>
-          </div>
+          </Link>
+
+          <Link
+            href="/"
+            className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-white/10 hover:bg-white/20 backdrop-blur-md border border-white/20 text-xs font-semibold text-white transition-all shadow-sm cursor-pointer"
+            title={language === "fr" ? "Retour au site public" : "Return to website"}
+          >
+            <ArrowLeft className="w-3.5 h-3.5" />
+            <span>{language === "fr" ? "Retour au site" : "Back to website"}</span>
+          </Link>
         </div>
 
         {/* Hero Narrative in Left Pane */}
@@ -144,39 +155,51 @@ export default function AdminLoginPage() {
       <div className="flex-1 flex flex-col justify-between p-6 sm:p-10 lg:p-12 xl:p-16 min-h-screen bg-white border-l border-slate-200">
         {/* Top Bar in Right Pane */}
         <div className="flex items-center justify-between">
-          <Link href="/" className="group flex items-center gap-2.5">
-            <div className="w-8 h-8 rounded-lg bg-slate-900 flex items-center justify-center font-bold text-white text-xs shadow-xs">
-              MC
-            </div>
-            <span className="font-extrabold text-sm tracking-tight text-slate-900 group-hover:text-[#2D4B49] transition-colors">
-              MAISON CALVÉ
-            </span>
+          <Link
+            href="/"
+            className="group flex items-center gap-2 text-xs font-bold uppercase tracking-wider text-slate-500 hover:text-slate-900 transition-colors cursor-pointer"
+            title={language === "fr" ? "Retour au site public" : "Return to website"}
+          >
+            <ArrowLeft className="w-4 h-4 text-slate-400 group-hover:text-slate-900 transition-transform group-hover:-translate-x-0.5" />
+            <span>{language === "fr" ? "Retour au site" : "Back to website"}</span>
           </Link>
 
-          {/* Bilingual Language Switcher (Segmented Pill) */}
-          <div className="flex items-center gap-0.5 p-1 rounded-full bg-slate-100 border border-slate-200 text-xs">
-            <button
-              type="button"
-              onClick={() => setLanguage("fr")}
-              className={`px-3 py-1 rounded-full text-[11px] font-bold transition-all cursor-pointer ${
-                language === "fr"
-                  ? "bg-white text-slate-900 shadow-2xs"
-                  : "text-slate-500 hover:text-slate-900"
-              }`}
+          <div className="flex items-center gap-2.5">
+            {/* Bilingual Language Switcher (Segmented Pill) */}
+            <div className="flex items-center gap-0.5 p-1 rounded-full bg-slate-100 border border-slate-200 text-xs">
+              <button
+                type="button"
+                onClick={() => setLanguage("fr")}
+                className={`px-3 py-1 rounded-full text-[11px] font-bold transition-all cursor-pointer ${
+                  language === "fr"
+                    ? "bg-white text-slate-900 shadow-2xs"
+                    : "text-slate-500 hover:text-slate-900"
+                }`}
+              >
+                FR
+              </button>
+              <button
+                type="button"
+                onClick={() => setLanguage("en")}
+                className={`px-3 py-1 rounded-full text-[11px] font-bold transition-all cursor-pointer ${
+                  language === "en"
+                    ? "bg-white text-slate-900 shadow-2xs"
+                    : "text-slate-500 hover:text-slate-900"
+                }`}
+              >
+                EN
+              </button>
+            </div>
+
+            {/* Circular Cross / Close Button */}
+            <Link
+              href="/"
+              className="w-9 h-9 rounded-full bg-slate-100 hover:bg-slate-200 border border-slate-200 flex items-center justify-center text-slate-600 hover:text-slate-900 transition-colors shadow-2xs cursor-pointer"
+              aria-label={language === "fr" ? "Fermer et retourner au site" : "Close and return to website"}
+              title={language === "fr" ? "Fermer et retourner au site public" : "Close and return to website"}
             >
-              FR
-            </button>
-            <button
-              type="button"
-              onClick={() => setLanguage("en")}
-              className={`px-3 py-1 rounded-full text-[11px] font-bold transition-all cursor-pointer ${
-                language === "en"
-                  ? "bg-white text-slate-900 shadow-2xs"
-                  : "text-slate-500 hover:text-slate-900"
-              }`}
-            >
-              EN
-            </button>
+              <X className="w-4 h-4" />
+            </Link>
           </div>
         </div>
 
