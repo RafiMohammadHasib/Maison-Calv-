@@ -1,14 +1,46 @@
 import { NextResponse } from "next/server";
-import { getLeads, addLead, updateLead, addLeadNote, deleteLead, getCRMStats } from "@/lib/leads";
+import { getLeads, addLead, updateLead, addLeadNote, deleteLead, getCRMStats, Lead } from "@/lib/leads";
+import {
+  isOvhBridgeConfigured,
+  fetchOvhLeads,
+  addOvhLead,
+  updateOvhLead,
+  deleteOvhLead
+} from "@/lib/ovhBridge";
 
 export async function GET(request: Request) {
   try {
     const { searchParams } = new URL(request.url);
     const search = (searchParams.get("q") || "").toLowerCase().trim();
-    const status = searchParams.get("status");
-    const type = searchParams.get("type");
-    const source = searchParams.get("source");
+    const status = searchParams.get("status") || "all";
+    const type = searchParams.get("type") || "all";
+    const source = searchParams.get("source") || "all";
 
+    // 1. Try fetching from OVH MySQL Database Bridge
+    if (isOvhBridgeConfigured()) {
+      try {
+        const ovhResult = await fetchOvhLeads({
+          q: search,
+          status,
+          type,
+          source
+        });
+
+        if (ovhResult.success && Array.isArray(ovhResult.leads)) {
+          return NextResponse.json({
+            success: true,
+            source: "ovh_mysql",
+            leads: ovhResult.leads,
+            stats: ovhResult.stats || getCRMStats(),
+            timestamp: new Date().toISOString()
+          });
+        }
+      } catch (ovhErr) {
+        console.warn("OVH Bridge temporarily unreachable, falling back to local storage:", ovhErr);
+      }
+    }
+
+    // 2. Fallback to local storage (crm_leads.json)
     let leads = getLeads();
 
     if (search) {
@@ -39,6 +71,7 @@ export async function GET(request: Request) {
 
     return NextResponse.json({
       success: true,
+      source: "local_storage",
       leads,
       stats,
       timestamp: new Date().toISOString()
@@ -60,7 +93,8 @@ export async function POST(request: Request) {
       );
     }
 
-    const lead = addLead({
+    // 1. Save to local storage
+    const localLead = addLead({
       name: body.name,
       email: body.email,
       phone: body.phone,
@@ -87,10 +121,25 @@ export async function POST(request: Request) {
         : []
     });
 
+    // 2. Synchronize with OVH MySQL Database
+    let ovhSuccess = false;
+    if (isOvhBridgeConfigured()) {
+      try {
+        const ovhRes = await addOvhLead({
+          ...localLead,
+          initialNote: body.initialNote
+        });
+        ovhSuccess = Boolean(ovhRes.success);
+      } catch (e) {
+        console.warn("Could not sync new lead to OVH MySQL:", e);
+      }
+    }
+
     return NextResponse.json({
       success: true,
       message: "Lead créé avec succès.",
-      lead,
+      lead: localLead,
+      syncedWithOvh: ovhSuccess,
       stats: getCRMStats()
     });
   } catch (err) {
@@ -108,7 +157,8 @@ export async function PATCH(request: Request) {
       return NextResponse.json({ success: false, message: "ID manquant." }, { status: 400 });
     }
 
-    let updatedLead = null;
+    // 1. Update local storage
+    let updatedLead: Lead | null = null;
 
     if (newNote && newNote.text) {
       updatedLead = addLeadNote(id, newNote.author || "Administrateur", newNote.text);
@@ -121,6 +171,21 @@ export async function PATCH(request: Request) {
       updatedLead = updateLead(id, updates);
     }
 
+    // 2. Update OVH MySQL Database
+    let ovhSuccess = false;
+    if (isOvhBridgeConfigured()) {
+      try {
+        const ovhRes = await updateOvhLead(id, {
+          status,
+          priority,
+          newNote
+        });
+        ovhSuccess = Boolean(ovhRes.success);
+      } catch (e) {
+        console.warn("Could not sync lead update to OVH MySQL:", e);
+      }
+    }
+
     if (!updatedLead) {
       return NextResponse.json({ success: false, message: "Lead introuvable." }, { status: 404 });
     }
@@ -129,6 +194,7 @@ export async function PATCH(request: Request) {
       success: true,
       message: "Lead mis à jour avec succès.",
       lead: updatedLead,
+      syncedWithOvh: ovhSuccess,
       stats: getCRMStats()
     });
   } catch (err) {
@@ -146,7 +212,20 @@ export async function DELETE(request: Request) {
       return NextResponse.json({ success: false, message: "ID manquant" }, { status: 400 });
     }
 
+    // 1. Delete locally
     const success = deleteLead(id);
+
+    // 2. Delete on OVH MySQL
+    let ovhSuccess = false;
+    if (isOvhBridgeConfigured()) {
+      try {
+        const ovhRes = await deleteOvhLead(id);
+        ovhSuccess = Boolean(ovhRes.success);
+      } catch (e) {
+        console.warn("Could not delete lead on OVH MySQL:", e);
+      }
+    }
+
     if (!success) {
       return NextResponse.json({ success: false, message: "Lead introuvable" }, { status: 404 });
     }
@@ -154,6 +233,7 @@ export async function DELETE(request: Request) {
     return NextResponse.json({
       success: true,
       message: "Lead supprimé",
+      syncedWithOvh: ovhSuccess,
       stats: getCRMStats()
     });
   } catch (err) {
