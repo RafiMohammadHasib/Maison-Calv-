@@ -201,10 +201,22 @@ export default function Footer({
           <p>{t.bordeauxSeoText}</p>
         </div>
 
-        {/* Bottom Bar: Copyright & Language Selector */}
+        {/* Bottom Bar: Copyright, Credits & Language Selector */}
         <div className="pt-8 flex flex-col sm:flex-row items-center justify-between gap-4 text-xs text-stone-500 relative z-10">
           <div className="flex items-center gap-2 flex-wrap">
             <span>© {new Date().getFullYear()} Maison Calvé Bordeaux. {t.rights}</span>
+            <span className="text-stone-600">·</span>
+            <span>
+              {language === "en" ? "Created by" : language === "es" ? "Creado por" : "Créé par"}{" "}
+              <a
+                href="https://euroitechnology.com"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="text-stone-400 hover:text-white font-medium transition-colors underline decoration-stone-700 hover:decoration-white underline-offset-4"
+              >
+                EURO IT
+              </a>
+            </span>
             <span className="text-stone-600">·</span>
             <Link
               href="/admin/login"
