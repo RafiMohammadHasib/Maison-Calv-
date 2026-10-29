@@ -69,9 +69,9 @@ export const metadata: Metadata = {
     siteName: "Maison Calvé",
     images: [
       {
-        url: "/images/calve-exterior.jpg",
+        url: "/images/spaces/real-open-space-fixe-4k.jpg",
         width: 1200,
-        height: 675,
+        height: 800,
         alt: "Maison Calvé - Coworking Hôtel Particulier Bordeaux Fondaudège"
       }
     ],
@@ -83,7 +83,7 @@ export const metadata: Metadata = {
     title: "Maison Calvé — Coworking Bordeaux Fondaudège avec Parking",
     description:
       "5 bureaux privatifs, open space feutré et 9 places de parking en plein centre de Bordeaux.",
-    images: ["/images/calve-exterior.jpg"]
+    images: ["/images/spaces/real-open-space-fixe-4k.jpg"]
   },
   robots: {
     index: true,
@@ -109,6 +109,14 @@ export default function RootLayout({
       className={`${jakartaSans.variable} font-sans h-full antialiased scroll-smooth`}
       suppressHydrationWarning
     >
+      <head>
+        {/* Anti-extension DOM mutation sanitizer to prevent hydration mismatch errors (e.g. bis_skin_checked injected by Bitdefender) */}
+        <script
+          dangerouslySetInnerHTML={{
+            __html: `(function(){var A=['bis_skin_checked','bis_register','data-gramm','cz-shortcut-listen'];function C(n){if(!n)return;try{if(n.nodeType===1){for(var i=0;i<A.length;i++){if(n.hasAttribute(A[i]))n.removeAttribute(A[i])}}if(n.querySelectorAll){for(var i=0;i<A.length;i++){var els=n.querySelectorAll('['+A[i]+']');for(var j=0;j<els.length;j++)els[j].removeAttribute(A[i])}}}catch(e){}}C(document.documentElement);if(typeof MutationObserver!=='undefined'){var obs=null;function O(){if(obs&&document.documentElement){obs.observe(document.documentElement,{attributes:true,subtree:true,attributeFilter:A})}}obs=new MutationObserver(function(m){var hit=false;for(var i=0;i<m.length;i++){if(A.indexOf(m[i].attributeName)!==-1){hit=true;break}}if(hit){obs.disconnect();C(document.documentElement);O()}});O();if(typeof window!=='undefined'){window.addEventListener('load',function(){C(document.documentElement);setTimeout(function(){if(obs)obs.disconnect()},2000)})}}})();`
+          }}
+        />
+      </head>
       <body
         className="min-h-full flex flex-col font-sans bg-calve-cream text-calve-charcoal"
         suppressHydrationWarning

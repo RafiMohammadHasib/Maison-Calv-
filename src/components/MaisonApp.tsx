@@ -4,6 +4,7 @@ import React, { useState } from "react";
 import Navbar from "@/components/layout/Navbar";
 import Hero from "@/components/hero/Hero";
 import SpacesSection from "@/components/spaces/SpacesSection";
+import Manifesto from "@/components/sections/Manifesto";
 import ComparisonSection from "@/components/sections/ComparisonSection";
 import AudienceSection from "@/components/sections/AudienceSection";
 import PricingSection from "@/components/sections/PricingSection";
@@ -13,6 +14,7 @@ import Footer from "@/components/layout/Footer";
 import EnquiryModal from "@/components/enquiry/EnquiryModal";
 import ScrollProgress from "@/components/ui/ScrollProgress";
 import ScrollToTop from "@/components/ui/ScrollToTop";
+
 import { Language } from "@/data/content";
 import { useLanguage } from "@/lib/languageContext";
 
@@ -53,6 +55,9 @@ export default function MaisonApp() {
         {/* Workspaces Showcase */}
         <SpacesSection language={language} onOpenEnquiry={handleOpenEnquiry} />
 
+        {/* About Us / Manifesto: The Story & Heritage of 48 rue Calvé */}
+        <Manifesto language={language} onOpenEnquiry={handleOpenEnquiry} />
+
         {/* Executive Comparison: Coworking Usine vs Maison Calvé */}
         <ComparisonSection language={language} onOpenEnquiry={handleOpenEnquiry} />
 
@@ -78,6 +83,8 @@ export default function MaisonApp() {
 
       {/* Circular Progress Scroll-To-Top Button */}
       <ScrollToTop language={language} />
+
+
 
       {/* High-Conversion Enquiry / Viewing Modal */}
       <EnquiryModal

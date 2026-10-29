@@ -1,7 +1,7 @@
 "use client";
 
 import React, { useState, useEffect } from "react";
-import { X, CheckCircle, Calendar, Users, Building, Mail, Phone, Clock, Sparkles } from "lucide-react";
+import { X, CheckCircle, Calendar, Users, Building, Mail, Phone, Clock, MapPin } from "lucide-react";
 import confetti from "canvas-confetti";
 import { Language, CONTENT } from "@/data/content";
 
@@ -324,10 +324,9 @@ export default function EnquiryModal({
         ) : (
           <>
             {/* Header */}
-            <div className="mb-6">
-              <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-calve-stone text-xs font-semibold text-calve-slate mb-2">
-                <Sparkles className="w-3.5 h-3.5" />
-                <span>Maison Calvé · 48 Rue Calvé</span>
+            <div className="mb-4">
+              <div className="text-xs font-bold tracking-[0.2em] uppercase text-calve-slate mb-1">
+                Maison Calvé · 48 Rue Calvé
               </div>
               <h2 className="text-2xl sm:text-3xl font-bold tracking-tight text-calve-charcoal">
                 {t.title}
@@ -335,6 +334,24 @@ export default function EnquiryModal({
               <p className="text-xs sm:text-sm text-calve-muted mt-1">
                 {t.subtitle}
               </p>
+            </div>
+
+            {/* Direct Instant Contact Banner */}
+            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 p-3 sm:px-4 rounded-xl bg-calve-cream/80 border border-calve-border/80 text-xs mb-5">
+              <span className="text-calve-charcoal font-medium">
+                {language === "en"
+                  ? "Prefer to speak right now or book for today?"
+                  : language === "es"
+                  ? "¿Prefiere hablar directamente o reservar para hoy?"
+                  : "Vous préférez échanger de vive voix ou visiter aujourd'hui ?"}
+              </span>
+              <a
+                href="tel:+33695577033"
+                className="inline-flex items-center gap-1.5 font-bold text-calve-slate hover:text-calve-charcoal transition-colors shrink-0"
+              >
+                <Phone className="w-3.5 h-3.5" />
+                <span>+33 6 95 57 70 33</span>
+              </a>
             </div>
 
             {/* Category Tabs */}

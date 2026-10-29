@@ -2,7 +2,7 @@
 
 import React from "react";
 import Link from "next/link";
-import { MapPin, Mail, Clock, Shield, Sparkles } from "lucide-react";
+import { MapPin, Mail, Clock, Shield } from "lucide-react";
 import MaisonLogo from "@/components/brand/MaisonLogo";
 import { Language, CONTENT } from "@/data/content";
 
@@ -20,8 +20,17 @@ export default function Footer({
   const t = CONTENT[language].footer;
 
   return (
-    <footer className="bg-calve-charcoal text-white pt-20 pb-12 border-t border-calve-slate-deep">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+    <footer className="relative bg-calve-charcoal text-white pt-20 pb-8 border-t border-calve-slate-deep overflow-hidden">
+      {/* Subtle Ambient Background Watermark */}
+      <div
+        aria-hidden="true"
+        className="absolute -right-10 top-1/3 -translate-y-1/2 select-none pointer-events-none text-right opacity-[0.035] hidden xl:block leading-[0.76] font-black tracking-tighter lowercase text-white"
+      >
+        <span className="text-[14rem] block">maison</span>
+        <span className="text-[14rem] block -mt-12">calvé</span>
+      </div>
+
+      <div className="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-12 gap-12 pb-16 border-b border-white/10">
           {/* Brand & Address */}
           <div className="lg:col-span-5 space-y-4">
@@ -101,6 +110,15 @@ export default function Footer({
                     : language === "es"
                     ? "Sala de reuniones 30 m²"
                     : "Salle de réunion 30 m²"}
+                </a>
+              </li>
+              <li>
+                <a href="#about" className="hover:text-white transition-colors">
+                  {language === "en"
+                    ? "About Maison Calvé"
+                    : language === "es"
+                    ? "Sobre Maison Calvé"
+                    : "L'Histoire & Philosophie"}
                 </a>
               </li>
               <li>
@@ -217,11 +235,22 @@ export default function Footer({
         </div>
       </div>
 
-      {/* Giant Architectural Typographic Watermark */}
-      <div className="w-full overflow-hidden select-none pointer-events-none text-center pt-8 sm:pt-12 -mb-8 sm:-mb-10">
-        <span className="block text-[13vw] sm:text-[15vw] font-black uppercase tracking-tighter text-white/[0.04] leading-none whitespace-nowrap">
-          MAISON CALVÉ
-        </span>
+      {/* Signature Brand Logo Watermark */}
+      <div
+        aria-hidden="true"
+        className="relative w-full overflow-hidden select-none pointer-events-none mt-14 sm:mt-20 pt-8 border-t border-white/[0.08] flex flex-col items-center justify-center text-center"
+      >
+        <div className="flex flex-col items-center text-center leading-[0.74] font-black tracking-tighter lowercase select-none text-white/[0.08] transition-colors pointer-events-none">
+          <span className="text-[20vw] sm:text-[18vw] lg:text-[15vw] block">maison</span>
+          <span className="text-[20vw] sm:text-[18vw] lg:text-[15vw] block -mt-[3.5vw]">calvé</span>
+        </div>
+        <div className="flex items-center gap-3 text-[10px] sm:text-xs font-mono uppercase tracking-[0.3em] text-white/25 mt-4 mb-2">
+          <span>48 Rue Calvé</span>
+          <span>·</span>
+          <span>Bordeaux Fondaudège</span>
+          <span>·</span>
+          <span>Hôtel Particulier</span>
+        </div>
       </div>
     </footer>
   );

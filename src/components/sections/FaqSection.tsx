@@ -1,7 +1,7 @@
 "use client";
 
 import React, { useState } from "react";
-import { Plus, Minus, HelpCircle, Sparkles } from "lucide-react";
+import { Plus, Minus, HelpCircle } from "lucide-react";
 import { Language, CONTENT } from "@/data/content";
 
 interface FaqSectionProps {
@@ -22,9 +22,8 @@ export default function FaqSection({ language, onOpenEnquiry }: FaqSectionProps)
       <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
         {/* Header */}
         <div className="text-center mb-16">
-          <div className="inline-flex items-center gap-2 px-3.5 py-1 rounded-full bg-calve-stone text-xs font-semibold uppercase tracking-wider text-calve-slate mb-4">
-            <HelpCircle className="w-3.5 h-3.5" />
-            <span>{t.tag}</span>
+          <div className="text-xs font-bold tracking-[0.2em] uppercase text-calve-slate mb-3">
+            {t.tag}
           </div>
           <h2 className="text-3xl sm:text-4xl md:text-5xl font-bold text-calve-charcoal leading-tight tracking-tight">
             {t.title}

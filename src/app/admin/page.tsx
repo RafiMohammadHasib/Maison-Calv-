@@ -26,7 +26,6 @@ import {
   Check,
   ExternalLink,
   Briefcase,
-  Sparkles,
   ArrowUpRight,
   Filter,
   X

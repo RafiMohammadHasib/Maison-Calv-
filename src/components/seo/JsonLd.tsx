@@ -51,9 +51,9 @@ export default function JsonLd() {
     ],
     priceRange: "10€ - 1100€",
     image: [
-      "https://maisoncalve.fr/images/calve-exterior.jpg",
+      "https://maisoncalve.fr/images/spaces/real-open-space-fixe-4k.jpg",
       "https://maisoncalve.fr/images/real/maison-calve-open-space.jpg",
-      "https://maisoncalve.fr/images/real/maison-calve-private-office.jpg",
+      "https://maisoncalve.fr/images/spaces/real-office-17m-4k.jpg",
       "https://maisoncalve.fr/images/real/maison-calve-meeting-room.jpg",
       "https://maisoncalve.fr/images/real/maison-calve-kitchen.jpg",
       "https://maisoncalve.fr/images/calve-parking.jpg"
