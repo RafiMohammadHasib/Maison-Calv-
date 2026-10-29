@@ -115,15 +115,6 @@ export default function Footer({
               <li>
                 <a href="#about" className="hover:text-white transition-colors">
                   {language === "en"
-                    ? "About Maison Calvé"
-                    : language === "es"
-                    ? "Sobre Maison Calvé"
-                    : "L'Histoire & Philosophie"}
-                </a>
-              </li>
-              <li>
-                <a href="#positionnement" className="hover:text-white transition-colors">
-                  {language === "en"
                     ? "Our Positioning"
                     : language === "es"
                     ? "Nuestro Posicionamiento"

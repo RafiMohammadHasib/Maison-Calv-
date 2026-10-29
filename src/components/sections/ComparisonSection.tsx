@@ -138,7 +138,8 @@ export default function ComparisonSection({
   }[language];
 
   return (
-    <section id="positionnement" className="py-12 sm:py-16 bg-calve-stone/60 border-y border-calve-border relative overflow-hidden">
+    <section id="about" className="py-12 sm:py-16 bg-calve-stone/60 border-y border-calve-border relative overflow-hidden">
+      <span id="positionnement" className="sr-only" />
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         {/* Header */}
         <ScrollReveal>

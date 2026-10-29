@@ -4,9 +4,7 @@ import React, { useState } from "react";
 import Navbar from "@/components/layout/Navbar";
 import Hero from "@/components/hero/Hero";
 import SpacesSection from "@/components/spaces/SpacesSection";
-import Manifesto from "@/components/sections/Manifesto";
 import ComparisonSection from "@/components/sections/ComparisonSection";
-import AudienceSection from "@/components/sections/AudienceSection";
 import PricingSection from "@/components/sections/PricingSection";
 import InstagramGallery from "@/components/sections/InstagramGallery";
 import LocationMap from "@/components/sections/LocationMap";
@@ -55,14 +53,8 @@ export default function MaisonApp() {
         {/* Workspaces Showcase */}
         <SpacesSection language={language} onOpenEnquiry={handleOpenEnquiry} />
 
-        {/* About Us / Manifesto: The Story & Heritage of 48 rue Calvé */}
-        <Manifesto language={language} onOpenEnquiry={handleOpenEnquiry} />
-
         {/* Executive Comparison: Coworking Usine vs Maison Calvé */}
         <ComparisonSection language={language} onOpenEnquiry={handleOpenEnquiry} />
-
-        {/* Interactive Audience & Profile Solutions */}
-        <AudienceSection language={language} onOpenEnquiry={handleOpenEnquiry} />
 
         {/* Transparent Pricing Table */}
         <PricingSection language={language} onOpenEnquiry={handleOpenEnquiry} />
