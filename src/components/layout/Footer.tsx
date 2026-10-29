@@ -220,6 +220,12 @@ export default function Footer({
             <span className="text-stone-600">·</span>
             <Link
               href="/admin/login"
+              onClick={() => {
+                if (typeof window !== "undefined") {
+                  sessionStorage.setItem("mc_login_return_url", window.location.pathname + window.location.hash);
+                  sessionStorage.setItem("mc_login_return_scroll", String(window.scrollY));
+                }
+              }}
               className="text-stone-500 hover:text-stone-300 transition-colors underline decoration-stone-700 underline-offset-4"
             >
               {language === "en" ? "Admin Portal" : language === "es" ? "Portal Admin" : "Portail Admin"}

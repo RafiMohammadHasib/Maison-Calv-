@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import Image from "next/image";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
@@ -27,6 +27,50 @@ export default function AdminLoginPage() {
   const [rememberMe, setRememberMe] = useState(true);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
+
+  useEffect(() => {
+    if (typeof window !== "undefined" && !sessionStorage.getItem("mc_login_return_url")) {
+      if (document.referrer && document.referrer.includes(window.location.host)) {
+        try {
+          const refUrl = new URL(document.referrer);
+          sessionStorage.setItem("mc_login_return_url", refUrl.pathname + refUrl.search + refUrl.hash);
+        } catch {}
+      }
+    }
+  }, []);
+
+  const handleClose = (e?: React.MouseEvent) => {
+    if (e) e.preventDefault();
+    if (typeof window !== "undefined") {
+      const returnUrl = sessionStorage.getItem("mc_login_return_url");
+      // Clean up stored return url
+      sessionStorage.removeItem("mc_login_return_url");
+
+      if (returnUrl && !returnUrl.startsWith("/admin")) {
+        router.push(returnUrl);
+        return;
+      }
+
+      // Check document.referrer for same-origin non-admin return
+      if (document.referrer && document.referrer.includes(window.location.host)) {
+        try {
+          const ref = new URL(document.referrer);
+          if (!ref.pathname.startsWith("/admin")) {
+            router.push(ref.pathname + ref.search + ref.hash);
+            return;
+          }
+        } catch {}
+      }
+
+      // If user arrived via an unauthenticated redirect to /admin, going back would loop
+      const searchRedirect = new URLSearchParams(window.location.search).get("redirect");
+      if (!searchRedirect && window.history.length > 1) {
+        router.back();
+        return;
+      }
+    }
+    router.push("/");
+  };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -121,14 +165,15 @@ export default function AdminLoginPage() {
             </div>
           </Link>
 
-          <Link
-            href="/"
+          <button
+            type="button"
+            onClick={handleClose}
             className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-white/10 hover:bg-white/20 backdrop-blur-md border border-white/20 text-xs font-semibold text-white transition-all shadow-sm cursor-pointer"
             title={language === "fr" ? "Retour au site public" : "Return to website"}
           >
             <ArrowLeft className="w-3.5 h-3.5" />
             <span>{language === "fr" ? "Retour au site" : "Back to website"}</span>
-          </Link>
+          </button>
         </div>
 
         {/* Hero Narrative in Left Pane */}
@@ -161,14 +206,15 @@ export default function AdminLoginPage() {
       <div className="flex-1 flex flex-col justify-between p-6 sm:p-10 lg:p-12 xl:p-16 min-h-screen bg-white border-l border-slate-200">
         {/* Top Bar in Right Pane */}
         <div className="flex items-center justify-between">
-          <Link
-            href="/"
+          <button
+            type="button"
+            onClick={handleClose}
             className="group flex items-center gap-2 text-xs font-bold uppercase tracking-wider text-slate-500 hover:text-slate-900 transition-colors cursor-pointer"
             title={language === "fr" ? "Retour au site public" : "Return to website"}
           >
             <ArrowLeft className="w-4 h-4 text-slate-400 group-hover:text-slate-900 transition-transform group-hover:-translate-x-0.5" />
             <span>{language === "fr" ? "Retour au site" : "Back to website"}</span>
-          </Link>
+          </button>
 
           <div className="flex items-center gap-2.5">
             {/* Bilingual Language Switcher (Segmented Pill) */}
@@ -198,14 +244,15 @@ export default function AdminLoginPage() {
             </div>
 
             {/* Circular Cross / Close Button */}
-            <Link
-              href="/"
+            <button
+              type="button"
+              onClick={handleClose}
               className="w-9 h-9 rounded-full bg-slate-100 hover:bg-slate-200 border border-slate-200 flex items-center justify-center text-slate-600 hover:text-slate-900 transition-colors shadow-2xs cursor-pointer"
-              aria-label={language === "fr" ? "Fermer et retourner au site" : "Close and return to website"}
-              title={language === "fr" ? "Fermer et retourner au site public" : "Close and return to website"}
+              aria-label={language === "fr" ? "Fermer et retourner" : "Close and return"}
+              title={language === "fr" ? "Fermer et retourner" : "Close and return"}
             >
               <X className="w-4 h-4" />
-            </Link>
+            </button>
           </div>
         </div>
 

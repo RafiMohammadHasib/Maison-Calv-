@@ -23,6 +23,7 @@ export default function SpacesSection({ language, onOpenEnquiry }: SpacesSection
 
   // References
   const thumbnailsRef = useRef<HTMLDivElement>(null);
+  const isFirstRender = useRef(true);
   const touchStartX = useRef<number | null>(null);
   const touchEndX = useRef<number | null>(null);
 
@@ -38,13 +39,19 @@ export default function SpacesSection({ language, onOpenEnquiry }: SpacesSection
     setActiveSlide(0);
   }, [filter]);
 
-  // Center active thumbnail in scroll container
+  // Center active thumbnail horizontally in container only (WITHOUT scrolling the window)
   useEffect(() => {
-    if (thumbnailsRef.current) {
-      const activeThumb = thumbnailsRef.current.children[activeSlide] as HTMLElement;
-      if (activeThumb) {
-        activeThumb.scrollIntoView({ behavior: "smooth", block: "nearest", inline: "center" });
-      }
+    if (isFirstRender.current) {
+      isFirstRender.current = false;
+      return;
+    }
+    const container = thumbnailsRef.current;
+    if (!container) return;
+    const activeThumb = container.children[activeSlide] as HTMLElement;
+    if (activeThumb) {
+      const scrollTarget =
+        activeThumb.offsetLeft - container.offsetWidth / 2 + activeThumb.offsetWidth / 2;
+      container.scrollTo({ left: Math.max(0, scrollTarget), behavior: "smooth" });
     }
   }, [activeSlide]);
 

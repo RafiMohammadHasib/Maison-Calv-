@@ -36,9 +36,29 @@ export default function SmoothScroll({ children }: { children: React.ReactNode }
     };
   }, []);
 
-  // 2. Reset scroll to top on route change across any page in the application
+  // 2. Reset scroll to top on route change across any page in the application (or restore if returning from modal/portal)
   useEffect(() => {
     if (typeof window === "undefined") return;
+
+    const pendingScroll = sessionStorage.getItem("mc_login_return_scroll");
+    if (pendingScroll !== null) {
+      sessionStorage.removeItem("mc_login_return_scroll");
+      const targetY = parseFloat(pendingScroll);
+      if (!isNaN(targetY)) {
+        window.scrollTo({ top: targetY, left: 0, behavior: "instant" });
+        if (lenisRef.current) {
+          lenisRef.current.scrollTo(targetY, { immediate: true });
+        }
+        setTimeout(() => {
+          window.scrollTo({ top: targetY, left: 0, behavior: "instant" });
+          if (lenisRef.current) {
+            lenisRef.current.scrollTo(targetY, { immediate: true });
+          }
+        }, 60);
+        return;
+      }
+    }
+
     window.scrollTo({ top: 0, left: 0, behavior: "instant" });
     if (lenisRef.current) {
       lenisRef.current.scrollTo(0, { immediate: true });
