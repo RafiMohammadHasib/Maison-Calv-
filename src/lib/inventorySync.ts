@@ -236,7 +236,7 @@ export function getUnifiedSpaces(providedLeads?: Lead[]): SpaceInventoryRecord[]
         freeA === 0
           ? "Complet (5/5 postes résidents occupés)"
           : `${freeA} poste${freeA > 1 ? "s" : ""} disponible${freeA > 1 ? "s" : ""}`,
-      image: "/images/spaces/open-space-fixe.jpg",
+      image: "/images/spaces/real-open-space-fixe-4k.jpg",
       parkingIncluded: false,
       currentTenant:
         wonOpenSpaceLeads.length > 0

@@ -80,18 +80,27 @@ export default function AdminLoginPage() {
       {/* LEFT PANE: HIGH OPACITY ATMOSPHERIC WORKSPACE WITH GLASS   */}
       {/* ========================================================== */}
       <div className="relative hidden lg:flex lg:w-1/2 flex-col justify-between p-10 xl:p-14 2xl:p-16 overflow-hidden bg-slate-950 text-white border-r border-slate-200">
-        {/* Background Authentic Open Space Photograph with High Opacity */}
+        {/* Background Authentic 4K Photography with Architectural Gradient & Subtle Left Blur */}
         <div className="absolute inset-0 z-0">
           <Image
-            src="/images/spaces/open-space-fixe.jpg"
+            src="/images/spaces/real-open-space-fixe-4k.jpg"
             alt="Maison Calvé - Executive Open Space & Desks"
             fill
-            className="object-cover object-center opacity-85 scale-100"
+            quality={95}
+            className="object-cover object-center scale-100"
             priority
           />
-          {/* Subtle architectural gradient vignette: keeps the image bright & warm while ensuring white typography is 100% sharp */}
-          <div className="absolute inset-0 bg-gradient-to-r from-black/85 via-black/55 to-black/35" />
-          <div className="absolute inset-0 bg-gradient-to-t from-black/85 via-transparent to-black/30" />
+          {/* Left subtle frosted blur mask so typography sits comfortably on top */}
+          <div
+            className="absolute inset-y-0 left-0 w-full lg:w-4/5 backdrop-blur-[3px] pointer-events-none"
+            style={{
+              maskImage: "linear-gradient(to right, black 35%, transparent 100%)",
+              WebkitMaskImage: "linear-gradient(to right, black 35%, transparent 100%)",
+            }}
+          />
+          {/* Architectural gradient: keeps natural daylight & stone textures visible while ensuring 100% white text contrast */}
+          <div className="absolute inset-0 bg-gradient-to-r from-slate-950/92 via-slate-950/70 sm:via-slate-950/50 to-slate-950/20 pointer-events-none" />
+          <div className="absolute inset-0 bg-gradient-to-t from-slate-950/90 via-transparent to-slate-950/30 pointer-events-none" />
         </div>
 
         {/* Top Header in Left Pane */}
