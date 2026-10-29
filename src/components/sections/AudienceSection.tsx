@@ -246,9 +246,9 @@ export default function AudienceSection({
         {/* Header */}
         <ScrollReveal>
           <div className="text-center max-w-3xl mx-auto mb-10 sm:mb-12">
-            <span className="inline-flex items-center gap-1.5 px-3.5 py-1 rounded-full text-xs font-semibold uppercase tracking-wider bg-calve-stone text-calve-slate border border-calve-border mb-3">
+            <div className="text-xs font-bold tracking-[0.2em] uppercase text-calve-slate mb-3">
               {content.tag}
-            </span>
+            </div>
             <h2 className="text-3xl sm:text-4xl lg:text-5xl font-extrabold text-calve-charcoal tracking-tight">
               {content.title}
             </h2>
@@ -258,8 +258,8 @@ export default function AudienceSection({
           </div>
         </ScrollReveal>
 
-        {/* Tab Buttons Pill Strip */}
-        <div className="flex items-center justify-center gap-2 sm:gap-3 flex-wrap mb-10">
+        {/* Tab Buttons Pill Strip (Responsive Scroll on Mobile) */}
+        <div className="flex items-center justify-start sm:justify-center gap-2 sm:gap-3 overflow-x-auto pb-3 pt-1 scrollbar-none snap-x mb-8 sm:mb-10 px-1">
           {content.tabs.map((tab, index) => {
             const Icon = tab.icon;
             const isActive = activeTab === index;
@@ -267,9 +267,9 @@ export default function AudienceSection({
               <button
                 key={tab.id}
                 onClick={() => setActiveTab(index)}
-                className={`inline-flex items-center gap-2 px-4 sm:px-5 py-2.5 rounded-full text-xs font-semibold uppercase tracking-wider transition-all duration-200 cursor-pointer ${
+                className={`inline-flex items-center gap-2 px-4 sm:px-5 py-2.5 rounded-full text-xs font-semibold uppercase tracking-wider transition-all duration-200 cursor-pointer shrink-0 snap-start whitespace-nowrap ${
                   isActive
-                    ? "bg-calve-charcoal text-white shadow-sm scale-105"
+                    ? "bg-calve-charcoal text-white shadow-sm"
                     : "bg-white text-calve-muted hover:text-calve-charcoal hover:bg-calve-stone/70 border border-calve-border"
                 }`}
               >

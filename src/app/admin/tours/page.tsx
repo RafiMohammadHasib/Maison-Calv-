@@ -16,7 +16,7 @@ import {
   Coffee,
   Car,
   Shield,
-  Sparkles,
+  ClipboardCheck,
   ArrowRight,
   AlertCircle,
   Search,
@@ -530,7 +530,7 @@ export default function ToursPage() {
                   <div className="p-3 rounded-xl bg-white border border-slate-200/80 space-y-2">
                     <div className="flex items-center justify-between">
                       <span className="text-[10px] uppercase font-bold tracking-wider text-calve-muted flex items-center gap-1.5">
-                        <Sparkles className="w-3 h-3 text-amber-500" />
+                        <ClipboardCheck className="w-3.5 h-3.5 text-calve-slate" />
                         <span>{t("tours.protocol_title")}</span>
                       </span>
                       <span className="text-[10px] text-slate-400 font-mono">

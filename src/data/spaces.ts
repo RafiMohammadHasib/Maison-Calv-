@@ -95,7 +95,7 @@ export const SPACES: SpaceItem[] = [
       },
       badgeClass: "bg-emerald-100 text-emerald-800 border-emerald-300"
     },
-    image: "/images/spaces/bureau-privatif-17m.png",
+    image: "/images/spaces/real-office-17m-4k.jpg",
     features: {
       fr: [
         "Ameublement personnalisé haut de gamme",
@@ -172,7 +172,7 @@ export const SPACES: SpaceItem[] = [
       },
       badgeClass: "bg-amber-100 text-amber-800 border-amber-300"
     },
-    image: "/images/spaces/bureau-privatif-25m.png",
+    image: "/images/spaces/real-office-25m-4k.jpg",
     features: {
       fr: [
         "Ameublement personnalisé haut de gamme",
@@ -200,9 +200,9 @@ export const SPACES: SpaceItem[] = [
       ]
     },
     highlight: {
-      fr: "Espace de prestige avec cheminée décorative en marbre et volumes hauts sous plafond.",
-      en: "Prestige workspace featuring decorative marble fireplace and high ceilings.",
-      es: "Espacio de prestigio con chimenea decorativa de mármol y techos altos."
+      fr: "Spacieux bureau de 25 m² avec mur d'accent bleu cobalt, parquet authentique et double exposition lumineuse.",
+      en: "Spacious 25 sqm private office featuring a cobalt blue accent wall, authentic hardwood floors, and bright dual-window exposure.",
+      es: "Espaciosa oficina de 25 m² con pared azul cobalto, suelo de madera auténtica y luminosa doble orientación."
     },
     description: {
       fr: "Conçu pour des équipes de 4 à 6 personnes, recherchant un espace calme avec des services de qualités pour développer leur projet.",
@@ -249,7 +249,7 @@ export const SPACES: SpaceItem[] = [
       },
       badgeClass: "bg-emerald-100 text-emerald-800 border-emerald-300"
     },
-    image: "/images/spaces/open-space-fixe.jpg",
+    image: "/images/spaces/real-open-space-fixe-4k.jpg",
     features: {
       fr: [
         "Poste de travail attribué avec rangements privatifs",
@@ -326,7 +326,7 @@ export const SPACES: SpaceItem[] = [
       },
       badgeClass: "bg-blue-100 text-blue-800 border-blue-300"
     },
-    image: "/images/spaces/open-space-nomade.png",
+    image: "/images/spaces/real-open-space-nomade-4k.jpg",
     features: {
       fr: [
         "20€ HT la journée complète (accessible 24h)",
@@ -403,7 +403,7 @@ export const SPACES: SpaceItem[] = [
       },
       badgeClass: "bg-purple-100 text-purple-800 border-purple-300"
     },
-    image: "/images/real/maison-calve-meeting-room.jpg",
+    image: "/images/spaces/real-meeting-room-30m-4k.jpg",
     features: {
       fr: [
         "120€ HT la demi-journée / 200€ HT la journée",
@@ -557,7 +557,7 @@ export const SPACES: SpaceItem[] = [
       },
       badgeClass: "bg-emerald-100 text-emerald-800 border-emerald-300"
     },
-    image: "/images/real/maison-calve-kitchen.jpg",
+    image: "/images/spaces/real-kitchen-4k.jpg",
     features: {
       fr: [
         "Sélection de thés biologiques, infusions et café de torréfacteur",

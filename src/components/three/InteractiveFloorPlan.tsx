@@ -2,7 +2,7 @@
 
 import React, { useEffect, useRef, useState } from "react";
 import * as THREE from "three";
-import { ArrowRight, CheckCircle2, Eye, Sparkles } from "lucide-react";
+import { ArrowRight, CheckCircle2, Eye } from "lucide-react";
 
 interface FloorPlanRoom {
   id: string;

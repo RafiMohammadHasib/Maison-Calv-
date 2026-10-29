@@ -1,7 +1,7 @@
 "use client";
 
 import React from "react";
-import { Check, X, ShieldAlert, Sparkles, Car, Volume2, Landmark, Users, ArrowRight } from "lucide-react";
+import { Check, X, ShieldAlert, ShieldCheck, Car, Volume2, Landmark, Users, ArrowRight } from "lucide-react";
 import ScrollReveal from "@/components/ui/ScrollReveal";
 import { Language } from "@/data/content";
 
@@ -49,7 +49,7 @@ export default function ComparisonSection({
         },
         {
           criteria: "Frais cachés",
-          icon: Sparkles,
+          icon: ShieldCheck,
           bad: "Des frais cachés comme la domiciliation d’entreprise, l’impression, les boissons...",
           good: "La transparence est notre maître mot, ici pas de frais cachés, tout est compris !",
         },
@@ -89,7 +89,7 @@ export default function ComparisonSection({
         },
         {
           criteria: "Hidden Fees",
-          icon: Sparkles,
+          icon: ShieldCheck,
           bad: "Hidden charges for mail handling, business address, printing, beverages...",
           good: "Absolute transparency is our core promise: zero hidden fees, everything is included!",
         },
@@ -129,7 +129,7 @@ export default function ComparisonSection({
         },
         {
           criteria: "Gastos ocultos",
-          icon: Sparkles,
+          icon: ShieldCheck,
           bad: "Gastos ocultos por domiciliación de empresa, impresión, bebidas...",
           good: "La transparencia es nuestro lema: sin cargos sorpresa, ¡todo está incluido!",
         },
@@ -143,10 +143,9 @@ export default function ComparisonSection({
         {/* Header */}
         <ScrollReveal>
           <div className="text-center max-w-3xl mx-auto mb-10 sm:mb-12">
-            <span className="inline-flex items-center gap-1.5 px-3.5 py-1 rounded-full text-xs font-semibold uppercase tracking-wider bg-white text-calve-slate border border-calve-border mb-3 shadow-2xs">
-              <Sparkles className="w-3.5 h-3.5 text-calve-slate" />
+            <div className="text-xs font-bold tracking-[0.2em] uppercase text-calve-slate mb-3">
               {content.tag}
-            </span>
+            </div>
             <h2 className="text-3xl sm:text-4xl lg:text-5xl font-extrabold text-calve-charcoal tracking-tight">
               {content.title}
             </h2>

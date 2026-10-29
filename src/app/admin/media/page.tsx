@@ -4,21 +4,22 @@ import React, { useState } from "react";
 import Image from "next/image";
 import AdminLayout from "@/components/admin/AdminLayout";
 import { useLanguage } from "@/lib/languageContext";
-import { FolderOpen, Image as ImageIcon, Eye, Download, Sparkles, ExternalLink } from "lucide-react";
+import { FolderOpen, Image as ImageIcon, Eye, Download, ExternalLink } from "lucide-react";
 
 export default function MediaLibraryPage() {
   const { language, t } = useLanguage();
   const [filter, setFilter] = useState<"all" | "spaces" | "instagram" | "hero">("all");
 
   const assets = [
-    { name: "hero-open-space.jpg", path: "/images/hero/hero-open-space.jpg", category: "hero", size: "912 KB", dims: "1920x1080" },
-    { name: "hero-kitchen.jpg", path: "/images/hero/hero-kitchen.jpg", category: "hero", size: "907 KB", dims: "1920x1080" },
-    { name: "hero-meeting.jpg", path: "/images/hero/hero-meeting.jpg", category: "hero", size: "831 KB", dims: "1920x1080" },
-    { name: "bureau-privatif-17m.png", path: "/images/spaces/bureau-privatif-17m.png", category: "spaces", size: "346 KB", dims: "1200x800" },
-    { name: "bureau-privatif-25m.png", path: "/images/spaces/bureau-privatif-25m.png", category: "spaces", size: "402 KB", dims: "1200x800" },
-    { name: "open-space-fixe.jpg", path: "/images/spaces/open-space-fixe.jpg", category: "spaces", size: "88 KB", dims: "800x600" },
-    { name: "open-space-nomade.png", path: "/images/spaces/open-space-nomade.png", category: "spaces", size: "415 KB", dims: "1200x800" },
-    { name: "calve-exterior.jpg", path: "/images/calve-exterior.jpg", category: "spaces", size: "1.1 MB", dims: "2400x1600" },
+    { name: "real-meeting-room-30m-4k.jpg", path: "/images/spaces/real-meeting-room-30m-4k.jpg", category: "spaces", size: "1.2 MB", dims: "3160x2120" },
+    { name: "real-kitchen-4k.jpg", path: "/images/spaces/real-kitchen-4k.jpg", category: "spaces", size: "1.1 MB", dims: "3160x2120" },
+    { name: "real-office-17m-4k.jpg", path: "/images/spaces/real-office-17m-4k.jpg", category: "spaces", size: "830 KB", dims: "1792x2400" },
+    { name: "real-office-25m-4k.jpg", path: "/images/spaces/real-office-25m-4k.jpg", category: "spaces", size: "1.1 MB", dims: "1792x2400" },
+    { name: "real-open-space-fixe-4k.jpg", path: "/images/spaces/real-open-space-fixe-4k.jpg", category: "spaces", size: "1.0 MB", dims: "2528x1696" },
+    { name: "real-open-space-nomade-4k.jpg", path: "/images/spaces/real-open-space-nomade-4k.jpg", category: "spaces", size: "1.1 MB", dims: "1792x2400" },
+    { name: "hero-open-space.jpg", path: "/images/hero/hero-open-space.jpg", category: "hero", size: "1.0 MB", dims: "3160x2120" },
+    { name: "hero-kitchen.jpg", path: "/images/hero/hero-kitchen.jpg", category: "hero", size: "1.1 MB", dims: "3160x2120" },
+    { name: "hero-meeting.jpg", path: "/images/hero/hero-meeting.jpg", category: "hero", size: "1.2 MB", dims: "3160x2120" },
     { name: "insta-media-10.jpg", path: "/images/instagram/insta-media-10.jpg", category: "instagram", size: "320 KB", dims: "1080x1080" },
     { name: "insta-media-100.jpg", path: "/images/instagram/insta-media-100.jpg", category: "instagram", size: "290 KB", dims: "1080x1080" },
     { name: "insta-media-103.jpg", path: "/images/instagram/insta-media-103.jpg", category: "instagram", size: "310 KB", dims: "1080x1080" },

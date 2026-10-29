@@ -1,7 +1,7 @@
 "use client";
 
 import React from "react";
-import { Check, Sparkles, ArrowRight, ShieldCheck } from "lucide-react";
+import { Check, ArrowRight, ShieldCheck } from "lucide-react";
 import { Language, CONTENT } from "@/data/content";
 
 interface PricingSectionProps {
@@ -147,9 +147,8 @@ export default function PricingSection({ language, onOpenEnquiry }: PricingSecti
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         {/* Header */}
         <div className="text-center max-w-3xl mx-auto mb-10 sm:mb-12">
-          <div className="inline-flex items-center gap-2 px-3.5 py-1 rounded-full bg-calve-stone text-xs font-semibold uppercase tracking-wider text-calve-slate mb-4">
-            <Sparkles className="w-3.5 h-3.5" />
-            <span>{t.tag}</span>
+          <div className="text-xs font-bold tracking-[0.2em] uppercase text-calve-slate mb-3">
+            {t.tag}
           </div>
           <h2 className="text-3xl sm:text-4xl md:text-5xl font-bold text-calve-charcoal leading-tight tracking-tight">
             {t.title}

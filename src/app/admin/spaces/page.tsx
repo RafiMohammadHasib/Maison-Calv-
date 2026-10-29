@@ -14,7 +14,6 @@ import {
   Car,
   Wifi,
   Coffee,
-  Sparkles,
   Edit,
   Eye,
   ArrowUpRight,

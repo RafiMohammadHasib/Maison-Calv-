@@ -19,7 +19,6 @@ import {
   Plus,
   ExternalLink,
   LogOut,
-  Sparkles,
   ShieldCheck,
   X,
   Menu,

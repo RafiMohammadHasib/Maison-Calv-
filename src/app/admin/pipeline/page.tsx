@@ -18,7 +18,6 @@ import {
   RefreshCw,
   MoreVertical,
   CheckCircle2,
-  Sparkles,
   MapPin,
   X,
   Plus,
@@ -700,8 +699,8 @@ export default function PipelinePage() {
 
                   {/* Drop Indicator */}
                   {isColumnOver && (
-                    <div className="p-3 my-1 border-2 border-dashed border-emerald-500 rounded-2xl bg-emerald-100/50 text-emerald-900 text-xs font-bold text-center animate-pulse flex items-center justify-center gap-1.5 shadow-2xs shrink-0">
-                      <Sparkles className="w-3.5 h-3.5 text-emerald-600" />
+                    <div className="p-3 my-1 border-2 border-dashed border-emerald-500 rounded-2xl bg-emerald-100/50 text-emerald-900 text-xs font-bold text-center flex items-center justify-center gap-1.5 shadow-2xs shrink-0">
+                      <Plus className="w-3.5 h-3.5 text-emerald-600" />
                       <span>
                         {language === "fr"
                           ? `Déposer dans "${stage.label}"`

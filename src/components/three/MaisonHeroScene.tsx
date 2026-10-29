@@ -350,7 +350,7 @@ export default function MaisonHeroScene({ onExploreClick }: MaisonHeroSceneProps
     return (
       <div className="relative w-full h-full min-h-[500px] overflow-hidden rounded-2xl bg-calve-stone/40 flex items-center justify-center">
         <img
-          src="/images/calve-exterior.jpg"
+          src="/images/spaces/real-open-space-fixe-4k.jpg"
           alt="Maison Calvé - 48 rue Calvé, Bordeaux"
           className="w-full h-full object-cover"
         />

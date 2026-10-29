@@ -1,7 +1,7 @@
 "use client";
 
 import React from "react";
-import { MapPin, Navigation, Train, Car, Bike, Sparkles, ExternalLink } from "lucide-react";
+import { MapPin, Navigation, Train, Car, Bike, ExternalLink, Phone } from "lucide-react";
 import { Language, CONTENT } from "@/data/content";
 
 interface LocationMapProps {
@@ -16,9 +16,8 @@ export default function LocationMap({ language }: LocationMapProps) {
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         {/* Header */}
         <div className="max-w-3xl mb-10 sm:mb-12">
-          <div className="inline-flex items-center gap-2 px-3.5 py-1 rounded-full bg-calve-stone text-xs font-semibold uppercase tracking-wider text-calve-slate mb-3">
-            <Sparkles className="w-3.5 h-3.5" />
-            <span>{t.tag}</span>
+          <div className="text-xs font-bold tracking-[0.2em] uppercase text-calve-slate mb-3">
+            {t.tag}
           </div>
           <h2 className="text-3xl sm:text-4xl md:text-5xl font-bold text-calve-charcoal leading-tight tracking-tight">
             {t.title}
@@ -67,15 +66,23 @@ export default function LocationMap({ language }: LocationMapProps) {
               ))}
             </div>
 
-            <div className="pt-2">
+            <div className="pt-2 flex flex-wrap items-center gap-3">
               <a
                 href="https://maps.google.com/?q=48+Rue+Calve+33000+Bordeaux"
                 target="_blank"
                 rel="noopener noreferrer"
-                className="inline-flex items-center gap-2 px-6 py-3.5 rounded-full bg-calve-slate hover:bg-calve-slate-dark text-white text-xs font-semibold tracking-wider uppercase transition-all shadow-xs cursor-pointer"
+                className="inline-flex items-center gap-2 px-6 py-3.5 rounded-full bg-calve-charcoal hover:bg-calve-slate text-white text-xs font-bold tracking-wider uppercase transition-all shadow-xs cursor-pointer"
               >
                 <span>{t.ctaDirections}</span>
                 <ExternalLink className="w-3.5 h-3.5" />
+              </a>
+
+              <a
+                href="tel:+33695577033"
+                className="inline-flex items-center gap-2 px-5 py-3.5 rounded-full bg-white hover:bg-calve-stone text-calve-charcoal border border-calve-border text-xs font-semibold tracking-wider uppercase transition-all shadow-2xs cursor-pointer"
+              >
+                <Phone className="w-3.5 h-3.5 text-calve-slate" />
+                <span>+33 6 95 57 70 33</span>
               </a>
             </div>
           </div>
@@ -103,15 +110,14 @@ export default function LocationMap({ language }: LocationMapProps) {
             {/* Map Pins overlay */}
             <div className="relative z-10">
               <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-white/95 backdrop-blur-md border border-calve-border shadow-xs text-xs font-semibold text-calve-charcoal">
-                <span className="w-2.5 h-2.5 rounded-full bg-calve-slate animate-pulse" />
+                <span className="w-2 h-2 rounded-full bg-calve-slate" />
                 <span>Bordeaux Fondaudège · 48 Rue Calvé</span>
               </div>
             </div>
 
-            {/* Central Animated Marker */}
+            {/* Central Marker */}
             <div className="relative z-10 self-center my-auto text-center">
               <div className="relative inline-flex items-center justify-center">
-                <div className="w-14 h-14 rounded-full bg-calve-slate/20 animate-ping absolute" />
                 <div className="w-12 h-12 rounded-full bg-calve-slate text-white flex items-center justify-center shadow-lg relative border-2 border-white">
                   <MapPin className="w-6 h-6" />
                 </div>

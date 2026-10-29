@@ -8,7 +8,6 @@ import {
   Share2,
   Layers,
   ArrowUpRight,
-  Sparkles,
   CheckCircle2,
   X,
   MapPin,
@@ -411,9 +410,8 @@ export default function InstagramGallery({ language }: InstagramGalleryProps) {
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 space-y-8 sm:space-y-10 relative z-10">
         {/* Section Header Badge */}
         <div className="text-center max-w-2xl mx-auto">
-          <div className="inline-flex items-center gap-2 px-3.5 py-1 rounded-full bg-calve-stone text-xs font-semibold uppercase tracking-wider text-calve-slate mb-3 border border-calve-border shadow-2xs">
-            <Sparkles className="w-3.5 h-3.5" />
-            <span>{t.tag}</span>
+          <div className="text-xs font-bold tracking-[0.2em] uppercase text-calve-slate mb-3">
+            {t.tag}
           </div>
           <h2 className="text-3xl sm:text-4xl md:text-5xl font-bold text-calve-charcoal leading-tight tracking-tight">
             {t.title}
@@ -441,9 +439,6 @@ export default function InstagramGallery({ language }: InstagramGalleryProps) {
                   </div>
                 </div>
               </div>
-              <span className="absolute bottom-1 right-1 bg-calve-slate text-white p-1.5 rounded-full border-2 border-white shadow-xs">
-                <Sparkles className="w-3 h-3" />
-              </span>
             </div>
 
             {/* Profile Meta & Actions */}

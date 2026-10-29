@@ -10,7 +10,6 @@ import {
   Eye,
   EyeOff,
   ShieldCheck,
-  Sparkles,
   ArrowRight,
   Server,
   Activity,
@@ -122,7 +121,7 @@ export default function AdminLoginPage() {
         {/* Hero Narrative in Left Pane */}
         <div className="relative z-10 my-auto py-12 max-w-xl">
           <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-black/25 backdrop-blur-md border border-white/15 text-[11px] font-semibold text-emerald-300 mb-6 shadow-sm">
-            <Sparkles className="w-3 h-3 text-emerald-400" />
+            <span className="w-2 h-2 rounded-full bg-emerald-400" />
             <span>Maison Calvé SaaS OS · Version 2026.4</span>
           </div>
 

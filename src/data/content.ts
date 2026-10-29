@@ -4,6 +4,7 @@ export interface LocaleContent {
   nav: {
     brandSubtitle: string;
     spaces: string;
+    about: string;
     floorPlan: string;
     parking: string;
     pricing: string;
@@ -42,9 +43,17 @@ export interface LocaleContent {
     filterOffices: string;
     filterOpenSpace: string;
     filterMeeting: string;
+    filterCommon: string;
     ctaEnquire: string;
     ctaDetails: string;
     featuresIncluded: string;
+    specsLabels: {
+      surface: string;
+      capacity: string;
+      parking: string;
+      access: string;
+    };
+    tourPrompt: string;
   };
   parkingSection: {
     tag: string;
@@ -143,10 +152,11 @@ export const CONTENT: Record<Language, LocaleContent> = {
     nav: {
       brandSubtitle: "Peaceful Coworking",
       spaces: "Espaces",
+      about: "À Propos",
       floorPlan: "Plan 3D",
       parking: "Parking",
       pricing: "Tarifs",
-      location: "Le Lieu",
+      location: "Localisation",
       faq: "FAQ",
       requestVisit: "Visiter",
       contact: "Contact"
@@ -184,16 +194,24 @@ export const CONTENT: Record<Language, LocaleContent> = {
       ]
     },
     spacesSection: {
-      tag: "Nos Espaces",
-      title: "Des bureaux pensés pour inspirer l'excellence",
-      subtitle: "Que vous cherchiez un bureau privatif prestigieux pour votre entreprise, un poste dédié en open space ou une salle de réunion équipée, découvrez nos options transparentes.",
-      filterAll: "Tous les espaces",
-      filterOffices: "Bureaux privatifs (2)",
-      filterOpenSpace: "Open space (10 postes)",
-      filterMeeting: "Salle de réunion (30 m²)",
-      ctaEnquire: "Vérifier la disponibilité",
-      ctaDetails: "Voir la fiche détaillée",
-      featuresIncluded: "Prestations incluses :"
+      tag: "Collection d'Espaces",
+      title: "Des espaces singuliers façonnés pour la haute exigence",
+      subtitle: "Bureaux privatifs de caractère, postes résidents feutrés et salle de réunion au cœur de Bordeaux Fondaudège.",
+      filterAll: "Toutes les pièces",
+      filterOffices: "Bureaux privatifs",
+      filterOpenSpace: "Postes de travail",
+      filterMeeting: "Salle de réunion",
+      filterCommon: "Espaces partagés",
+      ctaEnquire: "Demander une visite privée",
+      ctaDetails: "Découvrir la pièce",
+      featuresIncluded: "Prestations & services inclus :",
+      specsLabels: {
+        surface: "Superficie",
+        capacity: "Capacité",
+        parking: "Stationnement",
+        access: "Disponibilité & Accès"
+      },
+      tourPrompt: "Planifier une visite privée"
     },
     parkingSection: {
       tag: "Atout Majeur & Exclusif",
@@ -340,10 +358,11 @@ export const CONTENT: Record<Language, LocaleContent> = {
     nav: {
       brandSubtitle: "Peaceful Coworking",
       spaces: "Spaces",
+      about: "About Us",
       floorPlan: "3D Plan",
       parking: "Parking",
       pricing: "Rates",
-      location: "The Space",
+      location: "Location",
       faq: "FAQ",
       requestVisit: "Book a Visit",
       contact: "Contact"
@@ -381,16 +400,24 @@ export const CONTENT: Record<Language, LocaleContent> = {
       ]
     },
     spacesSection: {
-      tag: "Workspaces",
-      title: "Thoughtfully crafted spaces designed for focus",
-      subtitle: "Whether you need a prestigious private office for your company, a dedicated resident desk, or a fully-equipped meeting room, discover our straightforward offerings.",
+      tag: "Curated Workspaces",
+      title: "Distinctive workspaces sculpted for focus and distinction",
+      subtitle: "Characterful private suites, serene dedicated desks, and executive meeting rooms in the heart of Bordeaux Fondaudège.",
       filterAll: "All Spaces",
-      filterOffices: "Private Offices (2)",
-      filterOpenSpace: "Open Space (10 desks)",
-      filterMeeting: "Meeting Room (30 sqm)",
-      ctaEnquire: "Check Availability",
-      ctaDetails: "View Details",
-      featuresIncluded: "Included amenities:"
+      filterOffices: "Private Offices",
+      filterOpenSpace: "Workstations",
+      filterMeeting: "Meeting Suite",
+      filterCommon: "Shared Lounges",
+      ctaEnquire: "Schedule a Private Visit",
+      ctaDetails: "Explore This Space",
+      featuresIncluded: "Included amenities & services:",
+      specsLabels: {
+        surface: "Surface Area",
+        capacity: "Capacity",
+        parking: "On-Site Parking",
+        access: "Availability & Access"
+      },
+      tourPrompt: "Schedule a Private Tour"
     },
     parkingSection: {
       tag: "Key Competitive Advantage",
@@ -537,10 +564,11 @@ export const CONTENT: Record<Language, LocaleContent> = {
     nav: {
       brandSubtitle: "Peaceful Coworking",
       spaces: "Espacios",
+      about: "Sobre Nosotros",
       floorPlan: "Plano 3D",
       parking: "Parking",
       pricing: "Tarifas",
-      location: "El Espacio",
+      location: "Ubicación",
       faq: "FAQ",
       requestVisit: "Visitar",
       contact: "Contacto"
@@ -578,16 +606,24 @@ export const CONTENT: Record<Language, LocaleContent> = {
       ]
     },
     spacesSection: {
-      tag: "Nuestros Espacios",
-      title: "Despachos concebidos para inspirar excelencia",
-      subtitle: "Tanto si busca un despacho privado de prestigio para su empresa como un puesto fijo en open space o una sala de reuniones equipada, descubra nuestras fórmulas transparentes.",
+      tag: "Colección de Espacios",
+      title: "Espacios singulares diseñados para la máxima exigencia",
+      subtitle: "Oficinas privadas con carácter, puestos residentes silenciosos y salas ejecutivas en Burdeos Fondaudège.",
       filterAll: "Todos los espacios",
-      filterOffices: "Oficinas privadas (2)",
-      filterOpenSpace: "Open Space (10 puestos)",
-      filterMeeting: "Sala de reuniones (30 m²)",
-      ctaEnquire: "Consultar disponibilidad",
-      ctaDetails: "Ver detalles",
-      featuresIncluded: "Servicios incluidos:"
+      filterOffices: "Oficinas privadas",
+      filterOpenSpace: "Puestos de trabajo",
+      filterMeeting: "Sala de reuniones",
+      filterCommon: "Zonas comunes",
+      ctaEnquire: "Solicitar una visita privada",
+      ctaDetails: "Descubrir el espacio",
+      featuresIncluded: "Servicios y equipamiento incluidos:",
+      specsLabels: {
+        surface: "Superficie",
+        capacity: "Capacidad",
+        parking: "Aparcamiento",
+        access: "Disponibilidad y Acceso"
+      },
+      tourPrompt: "Planificar una visita privada"
     },
     parkingSection: {
       tag: "Ventaja Exclusiva",

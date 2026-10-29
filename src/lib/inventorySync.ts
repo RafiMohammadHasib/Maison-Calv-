@@ -267,7 +267,7 @@ export function getUnifiedSpaces(providedLeads?: Lead[]): SpaceInventoryRecord[]
       period: "par mois par poste",
       status: "available",
       statusText: "2 postes disponibles",
-      image: "/images/hero/hero-open-space.jpg",
+      image: "/images/spaces/real-open-space-fixe-4k.jpg",
       parkingIncluded: false,
       features: [
         "Bureau attitré avec caisson sécurisé",
@@ -287,7 +287,7 @@ export function getUnifiedSpaces(providedLeads?: Lead[]): SpaceInventoryRecord[]
       period: "journée (20€) / demi-journée (10€)",
       status: "available",
       statusText: "Accessible en ligne",
-      image: "/images/spaces/open-space-nomade.png",
+      image: "/images/spaces/real-open-space-nomade-4k.jpg",
       parkingIncluded: false,
       features: [
         "Fibre optique sécurisée",
@@ -308,7 +308,7 @@ export function getUnifiedSpaces(providedLeads?: Lead[]): SpaceInventoryRecord[]
       statusText: primaryMeeting
         ? `Réservée (${wonMeetingLeads.length} réservation${wonMeetingLeads.length > 1 ? "s" : ""})`
         : "Disponible à la réservation (créneaux ouverts)",
-      image: "/images/hero/hero-meeting.jpg",
+      image: "/images/spaces/real-meeting-room-30m-4k.jpg",
       parkingIncluded: true,
       currentTenant: primaryMeeting
         ? {

@@ -10,7 +10,6 @@ import {
   ShieldCheck,
   Copy,
   Check,
-  Sparkles,
   ArrowUpRight,
   Lock,
   PhoneCall,
@@ -216,10 +215,9 @@ export default function BentoGrid({ language, onOpenEnquiry }: BentoGridProps) {
         {/* Section Header */}
         <ScrollReveal>
           <div className="max-w-3xl mb-14">
-            <span className="inline-flex items-center gap-2 px-3 py-1 rounded-full text-xs font-semibold uppercase tracking-wider bg-calve-stone text-calve-slate mb-3 border border-calve-border">
-              <Sparkles className="w-3.5 h-3.5 text-calve-slate" />
+            <div className="text-xs font-bold tracking-[0.2em] uppercase text-calve-slate mb-3">
               {content.tag}
-            </span>
+            </div>
             <h2 className="text-3xl sm:text-4xl lg:text-5xl font-extrabold text-calve-charcoal tracking-tight leading-tight">
               {content.title}
             </h2>
@@ -236,8 +234,8 @@ export default function BentoGrid({ language, onOpenEnquiry }: BentoGridProps) {
             {/* Background Image with Dark Vignette */}
             <div className="absolute inset-0 z-0">
               <Image
-                src="/images/calve-exterior.jpg"
-                alt="Façade hôtel particulier Maison Calvé Bordeaux"
+                src="/images/spaces/real-open-space-fixe-4k.jpg"
+                alt="Espace de travail authentique pierre blonde Maison Calvé Bordeaux"
                 fill
                 className="object-cover object-center group-hover:scale-105 transition-transform duration-700 ease-out"
                 priority

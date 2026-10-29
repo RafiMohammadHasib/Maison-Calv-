@@ -7,7 +7,7 @@ import {
   FileEdit,
   Eye,
   CheckCircle2,
-  Sparkles,
+  LayoutTemplate,
   Save,
   ExternalLink,
   Layers,
@@ -59,7 +59,7 @@ export default function CMSPage() {
         {/* 1. Hero Content Block */}
         <div className="p-6 rounded-3xl bg-white border border-calve-border/80 shadow-2xs space-y-4">
           <div className="flex items-center gap-2 border-b border-calve-border/60 pb-3">
-            <Sparkles className="w-4 h-4 text-calve-slate" />
+            <LayoutTemplate className="w-4 h-4 text-calve-slate" />
             <h3 className="font-extrabold text-sm text-calve-charcoal">
               {isEnglish ? "Hero Section (Homepage Header)" : "Section Hero (En-tête de page)"}
             </h3>

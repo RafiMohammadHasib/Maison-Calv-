@@ -18,7 +18,7 @@ import {
   FileText,
   Search,
   ExternalLink,
-  Sparkles,
+  BadgeCheck,
   RefreshCw,
   ArrowUpRight,
   Filter,
@@ -91,7 +91,7 @@ export default function TenantsPage() {
       <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 p-4 rounded-2xl bg-gradient-to-r from-calve-charcoal to-[#1a2332] text-white shadow-xs">
         <div className="flex items-center gap-3">
           <div className="w-10 h-10 rounded-xl bg-calve-gold/20 border border-calve-gold/40 flex items-center justify-center shrink-0">
-            <Sparkles className="w-5 h-5 text-calve-gold" />
+            <BadgeCheck className="w-5 h-5 text-calve-gold" />
           </div>
           <div>
             <div className="text-sm font-bold flex items-center gap-2">
@@ -280,8 +280,8 @@ export default function TenantsPage() {
                         {/* CRM Won Badge or Foundation Partner */}
                         {tenant.isFromWonLead ? (
                           <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-[10px] font-extrabold bg-emerald-50 text-emerald-800 border border-emerald-200">
-                            <Sparkles className="w-3 h-3 text-emerald-600" />
-                            {isEnglish ? "Won CRM Lead" : "⚡ Issu du CRM (Lead Gagné)"}
+                            <CheckCircle2 className="w-3 h-3 text-emerald-600" />
+                            {isEnglish ? "Won CRM Lead" : "Lead Signé CRM"}
                           </span>
                         ) : (
                           <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-[10px] font-extrabold bg-amber-50 text-amber-900 border border-amber-200">

@@ -91,7 +91,7 @@ export const ADMIN_TRANSLATIONS: Record<AdminLanguage, Record<string, string>> =
     "pipeline.modal.delete": "Supprimer cette opportunité",
 
     // Settings
-    "settings.breadcrumb": "✦ CONFIGURATION DU SYSTÈME MAISON CALVÉ",
+    "settings.breadcrumb": "CONFIGURATION DU SYSTÈME MAISON CALVÉ",
     "settings.title": "Settings & System Rules",
     "settings.subtitle": "Gérer l'identité de l'agence, les règles locatives, intégrations et sécurité du compte.",
     "settings.last_sync": "Dernière synchro :",
@@ -115,7 +115,7 @@ export const ADMIN_TRANSLATIONS: Record<AdminLanguage, Record<string, string>> =
     "settings.backup.btn": "Télécharger Sauvegarde (.json)",
 
     // Tours & Visits
-    "tours.breadcrumb": "✦ MAISON CALVÉ CRM & PROTOCOL",
+    "tours.breadcrumb": "MAISON CALVÉ CRM & PROTOCOL",
     "tours.title": "Private Tours & Space Viewings",
     "tours.subtitle": "Planification des visites VIP, créneaux horaires, protocole d'accueil & conversion des leads au 48 rue Calvé",
     "tours.search": "Rechercher un visiteur, société, espace...",
@@ -336,7 +336,7 @@ export const ADMIN_TRANSLATIONS: Record<AdminLanguage, Record<string, string>> =
     "pipeline.modal.delete": "Delete Opportunity",
 
     // Settings
-    "settings.breadcrumb": "✦ MAISON CALVÉ SYSTEM CONFIGURATION",
+    "settings.breadcrumb": "MAISON CALVÉ SYSTEM CONFIGURATION",
     "settings.title": "Settings & System Rules",
     "settings.subtitle": "Manage agency identity, rental rules, integrations, and account security.",
     "settings.last_sync": "Last sync:",
@@ -360,7 +360,7 @@ export const ADMIN_TRANSLATIONS: Record<AdminLanguage, Record<string, string>> =
     "settings.backup.btn": "Download Backup (.json)",
 
     // Tours & Visits
-    "tours.breadcrumb": "✦ MAISON CALVÉ CRM & PROTOCOL",
+    "tours.breadcrumb": "MAISON CALVÉ CRM & PROTOCOL",
     "tours.title": "Private Tours & Space Viewings",
     "tours.subtitle": "VIP visit scheduling, calendar time-slots, reception protocol & lead conversion tracking for 48 rue Calvé",
     "tours.search": "Search visitor, company, space...",

@@ -19,8 +19,7 @@ import {
   Download,
   Lock,
   Globe,
-  Share2,
-  Sparkles
+  Share2
 } from "lucide-react";
 
 export default function SettingsPage() {
