@@ -22,7 +22,11 @@ import {
   Mail,
   Phone,
   ShieldCheck,
-  UserCheck
+  UserCheck,
+  Trash2,
+  Plus,
+  X,
+  Save
 } from "lucide-react";
 
 export default function SpacesInventoryPage() {
@@ -31,6 +35,34 @@ export default function SpacesInventoryPage() {
   const [metrics, setMetrics] = useState<any>(null);
   const [loading, setLoading] = useState(true);
   const [refreshing, setRefreshing] = useState(false);
+
+  // Edit space modal state
+  const [editingSpace, setEditingSpace] = useState<SpaceInventoryRecord | null>(null);
+  const [editForm, setEditForm] = useState({
+    name: "",
+    category: "private" as "private" | "open" | "meeting" | "parking",
+    area: "",
+    capacity: "",
+    price: "",
+    period: "par mois",
+    status: "available" as "available" | "limited" | "occupied",
+    statusText: ""
+  });
+
+  // Create space modal state
+  const [isCreateOpen, setIsCreateOpen] = useState(false);
+  const [createForm, setCreateForm] = useState({
+    id: "",
+    name: "",
+    category: "private" as "private" | "open" | "meeting" | "parking",
+    area: "",
+    capacity: "",
+    price: "",
+    period: "par mois",
+    status: "available" as "available" | "limited" | "occupied",
+    statusText: "Disponible immédiatement",
+    image: "/images/spaces/bureau-privatif-17m.png"
+  });
 
   const fetchSpaces = async () => {
     try {
@@ -53,22 +85,140 @@ export default function SpacesInventoryPage() {
     fetchSpaces();
   }, []);
 
-  const toggleStatus = (id: string) => {
+  // Quick toggle status and save directly to Database
+  const toggleStatus = async (id: string) => {
+    const space = spaces.find((s) => s.id === id);
+    if (!space) return;
+
+    const nextStatus = space.status === "available" ? "occupied" : "available";
+    const nextText =
+      nextStatus === "available"
+        ? (isEnglish ? "Available immediately" : "Disponible immédiatement")
+        : (isEnglish ? "Occupied / Manually reserved" : "Occupé / Réservé manuellement");
+
+    // Optimistic UI update
     setSpaces((prev) =>
-      prev.map((s) => {
-        if (s.id !== id) return s;
-        const nextStatus = s.status === "available" ? "occupied" : "available";
-        const nextText =
-          nextStatus === "available"
-            ? "Disponible immédiatement"
-            : "Occupé / Réservé manuellement";
-        return {
-          ...s,
-          status: nextStatus,
-          statusText: nextText
-        };
-      })
+      prev.map((s) => (s.id === id ? { ...s, status: nextStatus, statusText: nextText } : s))
     );
+
+    try {
+      await fetch("/api/admin/spaces", {
+        method: "PATCH",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ id, status: nextStatus, statusText: nextText })
+      });
+    } catch (err) {
+      console.error("Error toggling space status in DB:", err);
+      fetchSpaces();
+    }
+  };
+
+  // Open Edit Modal
+  const openEditModal = (space: SpaceInventoryRecord) => {
+    setEditingSpace(space);
+    setEditForm({
+      name: space.name,
+      category: space.category,
+      area: space.area,
+      capacity: space.capacity,
+      price: space.price,
+      period: space.period,
+      status: space.status,
+      statusText: space.statusText
+    });
+  };
+
+  // Submit Edit to Database
+  const handleEditSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!editingSpace) return;
+
+    try {
+      const res = await fetch("/api/admin/spaces", {
+        method: "PATCH",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          id: editingSpace.id,
+          ...editForm
+        })
+      });
+
+      const data = await res.json();
+      if (data.success) {
+        setSpaces((prev) =>
+          prev.map((s) => (s.id === editingSpace.id ? { ...s, ...editForm } : s))
+        );
+        setEditingSpace(null);
+      }
+    } catch (err) {
+      console.error("Error updating space:", err);
+    }
+  };
+
+  // Delete space from Database
+  const handleDeleteSpace = async (id: string, name: string) => {
+    const confirmMsg = isEnglish
+      ? `Confirm deletion of "${name}" from inventory and database?`
+      : `Confirmer la suppression de "${name}" de l'inventaire et de la base de données ?`;
+    if (!confirm(confirmMsg)) return;
+
+    setSpaces((prev) => prev.filter((s) => s.id !== id));
+
+    try {
+      await fetch(`/api/admin/spaces?id=${encodeURIComponent(id)}`, {
+        method: "DELETE"
+      });
+    } catch (err) {
+      console.error("Error deleting space:", err);
+      fetchSpaces();
+    }
+  };
+
+  // Submit Create new Space to Database
+  const handleCreateSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!createForm.name) return;
+
+    const newId = createForm.id || `space-${Date.now()}`;
+    const newSpacePayload = {
+      ...createForm,
+      id: newId,
+      parkingIncluded: createForm.category === "private" || createForm.category === "meeting",
+      features: [
+        "Ameublement haut de gamme",
+        "Accès sécurisé par badge RFID",
+        "Fibre optique ultra haut débit",
+        "Accès illimité cuisine équipée"
+      ],
+      activeBookings: []
+    };
+
+    try {
+      const res = await fetch("/api/admin/spaces", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(newSpacePayload)
+      });
+      const data = await res.json();
+      if (data.success) {
+        setIsCreateOpen(false);
+        fetchSpaces();
+        setCreateForm({
+          id: "",
+          name: "",
+          category: "private",
+          area: "",
+          capacity: "",
+          price: "",
+          period: "par mois",
+          status: "available",
+          statusText: "Disponible immédiatement",
+          image: "/images/spaces/bureau-privatif-17m.png"
+        });
+      }
+    } catch (err) {
+      console.error("Error creating space:", err);
+    }
   };
 
   return (
@@ -103,6 +253,13 @@ export default function SpacesInventoryPage() {
 
         <div className="flex items-center gap-2 w-full sm:w-auto">
           <button
+            onClick={() => setIsCreateOpen(true)}
+            className="flex-1 sm:flex-initial inline-flex items-center justify-center gap-1.5 px-3 py-2 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-xs font-bold text-white transition-all cursor-pointer shadow-xs"
+          >
+            <Plus className="w-3.5 h-3.5" />
+            <span>{isEnglish ? "+ New Space" : "+ Nouvel Espace"}</span>
+          </button>
+          <button
             onClick={fetchSpaces}
             disabled={refreshing}
             className="flex-1 sm:flex-initial inline-flex items-center justify-center gap-1.5 px-3 py-2 rounded-xl bg-white/10 hover:bg-white/15 border border-white/20 text-xs font-semibold text-white transition-all cursor-pointer disabled:opacity-50"
@@ -111,15 +268,8 @@ export default function SpacesInventoryPage() {
             <span>{isEnglish ? "Refresh" : "Actualiser"}</span>
           </button>
           <Link
-            href="/admin/pipeline"
-            className="flex-1 sm:flex-initial inline-flex items-center justify-center gap-1.5 px-3 py-2 rounded-xl bg-calve-gold hover:bg-[#b89155] text-calve-charcoal text-xs font-bold transition-all shadow-xs"
-          >
-            <span>{isEnglish ? "CRM Pipeline" : "Pipeline CRM"}</span>
-            <ArrowUpRight className="w-3.5 h-3.5" />
-          </Link>
-          <Link
             href="/admin/tenants"
-            className="flex-1 sm:flex-initial inline-flex items-center justify-center gap-1.5 px-3 py-2 rounded-xl bg-white/15 hover:bg-white/25 border border-white/30 text-white text-xs font-bold transition-all shadow-xs"
+            className="flex-1 sm:flex-initial inline-flex items-center justify-center gap-1.5 px-3 py-2 rounded-xl bg-white/10 hover:bg-white/15 border border-white/20 text-xs font-semibold text-white transition-all cursor-pointer"
           >
             <span>{isEnglish ? "View Tenants" : "Voir Résidents"}</span>
             <ArrowUpRight className="w-3.5 h-3.5" />
@@ -127,256 +277,184 @@ export default function SpacesInventoryPage() {
         </div>
       </div>
 
-      {/* Overview Stats */}
+      {/* KPI Cards Strip */}
       <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+        {/* KPI 1: Private Offices */}
         <div className="p-5 rounded-2xl bg-white border border-calve-border/80 shadow-2xs space-y-1">
-          <div className="text-xs font-bold uppercase tracking-wider text-calve-muted">
+          <div className="text-[11px] font-bold uppercase tracking-wider text-calve-muted">
             {isEnglish ? "Private Offices" : "Bureaux Privatifs"}
           </div>
           <div className="text-2xl font-black text-calve-charcoal">
-            {loading
-              ? "..."
-              : isEnglish
-              ? `${metrics?.availableSuitesCount ?? 1} available out of 5`
-              : `${metrics?.availableSuitesCount ?? 1} disponible${(metrics?.availableSuitesCount ?? 1) > 1 ? "s" : ""} sur 5`}
+            {metrics?.availablePrivateOffices ?? 2} {isEnglish ? "available out of" : "dispos sur"}{" "}
+            {metrics?.totalPrivateOffices ?? 5}
           </div>
-          <p className="text-[11px] text-emerald-800 font-semibold">
-            {isEnglish ? "17 m² (€750 HT) · 25 m² (€1,000 HT) · Partner Suite" : "17 m² (750€ HT) · 25 m² (1 000€ HT) · Suite Partenaire"}
+          <p className="text-xs text-calve-muted">
+            17 m² (750 € HT) · 25 m² (1 000 € HT) · Suite Partenaire
           </p>
         </div>
 
+        {/* KPI 2: Open Space Desks */}
         <div className="p-5 rounded-2xl bg-white border border-calve-border/80 shadow-2xs space-y-1">
-          <div className="text-xs font-bold uppercase tracking-wider text-calve-muted">
-            {isEnglish ? "Open Space Desks" : "Postes Open Space Résidents"}
+          <div className="text-[11px] font-bold uppercase tracking-wider text-calve-muted">
+            {isEnglish ? "Open Space Desks" : "Postes Open Space"}
           </div>
           <div className="text-2xl font-black text-calve-charcoal">
-            {loading
-              ? "..."
-              : isEnglish
-              ? `${metrics?.openSpaceOccupiedCount ?? 5} / 10 desks occupied`
-              : `${metrics?.openSpaceOccupiedCount ?? 5} / 10 postes occupés`}
+            {metrics?.occupiedDesks ?? 5} / {metrics?.totalDesks ?? 10} {isEnglish ? "desks occupied" : "postes occupés"}
           </div>
-          <p className="text-[11px] text-emerald-800 font-semibold">
-            {isEnglish ? "Fixed dedicated desks with secure pedestal" : "Postes fixes attitrés avec caisson sécurisé"}
+          <p className="text-xs text-emerald-700 font-medium">
+            {isEnglish ? "Fixed dedicated desks with secure pedestal" : "Postes dédiés avec caissons sécurisés"}
           </p>
         </div>
 
+        {/* KPI 3: Parking Bays */}
         <div className="p-5 rounded-2xl bg-white border border-calve-border/80 shadow-2xs space-y-1">
-          <div className="text-xs font-bold uppercase tracking-wider text-calve-muted">
-            {isEnglish ? "Courtyard & Parking" : "Cour & Parking Privé"}
+          <div className="text-[11px] font-bold uppercase tracking-wider text-calve-muted">
+            {isEnglish ? "Courtyard & Parking" : "Cour Privée & Stationnement"}
           </div>
           <div className="text-2xl font-black text-calve-charcoal">
-            {loading
-              ? "..."
-              : isEnglish
-              ? `${metrics?.assignedCourtyardBays ?? 4} / 9 bays assigned`
-              : `${metrics?.assignedCourtyardBays ?? 4} / 9 places attribuées`}
+            {metrics?.assignedParkingBays ?? 2} / {metrics?.totalParkingBays ?? 9} {isEnglish ? "bays assigned" : "places attribuées"}
           </div>
-          <p className="text-[11px] text-slate-500 font-semibold">
+          <p className="text-xs text-calve-muted">
             {isEnglish ? "Automated motorized gate with RFID keycard" : "Portail motorisé automatique avec badge RFID"}
           </p>
         </div>
       </div>
 
-      {/* Spaces Cards Grid */}
+      {/* Spaces Grid */}
       {loading ? (
-        <div className="p-16 text-center text-sm text-calve-muted">
+        <div className="p-12 text-center text-sm text-calve-muted">
           <RefreshCw className="w-5 h-5 animate-spin mx-auto mb-2 text-calve-slate" />
-          <span>{isEnglish ? "Loading live spaces inventory..." : "Chargement de l'inventaire en direct..."}</span>
+          <span>{isEnglish ? "Loading inventory records..." : "Chargement des espaces en direct..."}</span>
         </div>
       ) : (
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
           {spaces.map((space) => {
+            const isAvailable = space.status === "available";
             const isOccupied = space.status === "occupied";
             const isLimited = space.status === "limited";
 
             return (
               <div
                 key={space.id}
-                className={`rounded-3xl bg-white border overflow-hidden shadow-2xs hover:shadow-sm transition-all flex flex-col justify-between ${
+                className={`rounded-3xl bg-white border transition-all hover:shadow-md overflow-hidden flex flex-col justify-between ${
                   isOccupied
-                    ? "border-calve-slate/30 ring-1 ring-calve-slate/15"
+                    ? "border-red-200 bg-red-50/10"
+                    : isLimited
+                    ? "border-amber-200"
                     : "border-calve-border/80"
                 }`}
               >
                 <div>
-                  {/* Space Photo Preview */}
+                  {/* Image header with availability pill */}
                   <div className="relative h-48 w-full bg-slate-100 overflow-hidden">
                     <Image
                       src={space.image}
                       alt={space.name}
                       fill
-                      className="object-cover hover:scale-105 transition-transform duration-500"
+                      className="object-cover"
                     />
-
-                    {/* Gradient Overlay */}
-                    <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent pointer-events-none" />
-
-                    {/* Status Badge in Top Right */}
-                    <div className="absolute top-3 right-3 z-10">
+                    <div className="absolute top-3 right-3">
                       <span
-                        className={`inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-extrabold shadow-sm border ${
-                          isOccupied
-                            ? "bg-[#1f2937] text-white border-slate-700/80 shadow-md ring-1 ring-white/20"
-                            : isLimited
-                            ? "bg-amber-500 text-white border-amber-600"
-                            : "bg-emerald-600 text-white border-emerald-700"
+                        className={`inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-[11px] font-extrabold uppercase tracking-wider backdrop-blur-md shadow-xs ${
+                          isAvailable
+                            ? "bg-emerald-600/90 text-white"
+                            : isOccupied
+                            ? "bg-rose-700/90 text-white"
+                            : "bg-amber-600/90 text-white"
                         }`}
                       >
-                        <span
-                          className={`w-2 h-2 rounded-full ${
-                            isOccupied
-                              ? "bg-rose-400 animate-pulse"
-                              : isLimited
-                              ? "bg-amber-200"
-                              : "bg-emerald-200"
-                          }`}
-                        />
-                        {isOccupied
-                          ? isEnglish
-                            ? "BOOKED / OCCUPIED"
-                            : "RÉSERVÉ / OCCUPÉ"
-                          : isLimited
-                          ? isEnglish
-                            ? "LIMITED AVAILABILITY"
-                            : "DERNIÈRES PLACES"
-                          : isEnglish
-                          ? "AVAILABLE"
-                          : "DISPONIBLE"}
+                        <span className="w-1.5 h-1.5 rounded-full bg-white animate-pulse" />
+                        <span>
+                          {isAvailable
+                            ? isEnglish
+                              ? "AVAILABLE"
+                              : "DISPONIBLE"
+                            : isOccupied
+                            ? isEnglish
+                              ? "OCCUPIED"
+                              : "OCCUPÉ"
+                            : isEnglish
+                            ? "LIMITED"
+                            : "LIMITÉ"}
+                        </span>
                       </span>
                     </div>
 
-                    {/* Bottom overlay title */}
-                    <div className="absolute bottom-3 left-4 right-4 text-white">
-                      <div className="text-[10px] uppercase font-bold tracking-wider text-calve-gold">
+                    <div className="absolute bottom-3 left-3">
+                      <span className="text-[10px] font-extrabold uppercase tracking-widest px-2.5 py-0.5 rounded-md bg-black/60 text-white backdrop-blur-xs">
                         {space.category === "private"
-                          ? isEnglish
-                            ? "Private Executive Suite"
-                            : "Suite Bureautique Privative"
+                          ? "Private Executive Suite"
                           : space.category === "open"
-                          ? isEnglish
-                            ? "Coworking Space"
-                            : "Espace Coworking Résident"
-                          : isEnglish
-                          ? "Conference & Meeting"
-                          : "Salle de Réunion Équipée"}
-                      </div>
-                      <h3 className="font-extrabold text-base text-white drop-shadow-sm truncate">
-                        {space.name}
-                      </h3>
+                          ? "Coworking Space"
+                          : space.category === "meeting"
+                          ? "Conference Room"
+                          : "Courtyard & Parking"}
+                      </span>
                     </div>
                   </div>
 
-                  {/* Space Content */}
-                  <div className="p-6 space-y-4">
-                    {/* Area & Capacity */}
-                    <div className="flex items-center justify-between text-xs text-calve-muted">
-                      <span className="font-semibold">{space.area}</span>
-                      <span>·</span>
-                      <span className="font-medium text-calve-charcoal">{space.capacity}</span>
+                  {/* Body Content */}
+                  <div className="p-5 sm:p-6 space-y-4">
+                    <div>
+                      <h3 className="text-lg font-black text-calve-charcoal tracking-tight">
+                        {space.name}
+                      </h3>
+                      <div className="flex items-center gap-4 text-xs text-calve-muted mt-1">
+                        {space.area && <span>{space.area}</span>}
+                        {space.capacity && (
+                          <>
+                            <span>•</span>
+                            <span>{space.capacity}</span>
+                          </>
+                        )}
+                      </div>
                     </div>
 
-                    {/* Price & Parking */}
-                    <div className="py-2.5 border-y border-slate-100 flex items-baseline justify-between">
+                    {/* Price Block */}
+                    <div className="flex items-baseline justify-between pt-1 border-t border-slate-100">
                       <div>
-                        <span className="text-2xl font-black text-calve-slate">{space.price}</span>
-                        <span className="text-xs text-calve-muted block mt-0.5">{space.period}</span>
+                        <span className="text-2xl font-extrabold text-calve-charcoal">
+                          {space.price}
+                        </span>
+                        <span className="text-xs text-calve-muted ml-1">
+                          {space.period}
+                        </span>
                       </div>
+
                       {space.parkingIncluded && (
-                        <span className="inline-flex items-center gap-1 text-[11px] font-bold text-emerald-800 bg-emerald-50 border border-emerald-200 px-2.5 py-1 rounded-lg">
-                          <Car className="w-3.5 h-3.5 text-emerald-700" />
-                          {isEnglish ? "Parking bay incl." : "Place cour incluse"}
+                        <span className="inline-flex items-center gap-1 text-[11px] font-bold text-calve-slate bg-slate-100 px-2.5 py-1 rounded-lg">
+                          <Car className="w-3.5 h-3.5" />
+                          <span>Parking bay incl.</span>
                         </span>
                       )}
                     </div>
 
-                    {/* OCCUPANT DETAILS BANNER (When Occupied / Booked) */}
-                    {isOccupied && space.currentTenant && (
-                      <div className="p-3.5 rounded-2xl bg-gradient-to-br from-slate-900 to-[#1e293b] text-white border border-slate-700/80 shadow-xs space-y-2.5">
-                        <div className="flex items-center justify-between">
-                          <div className="flex items-center gap-1.5 text-[11px] font-bold text-calve-gold uppercase tracking-wider">
-                            <UserCheck className="w-3.5 h-3.5 text-calve-gold" />
-                            <span>{isEnglish ? "Current Resident / Booked By" : "Locataire / Réservé Par"}</span>
-                          </div>
-                          <span className="text-[10px] font-mono bg-white/10 px-1.5 py-0.5 rounded text-white/80">
-                            {space.currentTenant.leadId || "Résident"}
-                          </span>
-                        </div>
-
-                        <div>
-                          <div className="font-extrabold text-sm text-white flex items-center gap-1.5">
-                            <span>{space.currentTenant.company}</span>
-                            <span className="text-xs text-white/70 font-normal">
-                              ({space.currentTenant.name})
-                            </span>
-                          </div>
-                          <div className="flex flex-col gap-0.5 mt-1.5 text-[11px] text-white/80">
-                            <a
-                              href={`mailto:${space.currentTenant.email}`}
-                              className="flex items-center gap-1.5 hover:text-calve-gold truncate"
-                            >
-                              <Mail className="w-3 h-3 text-white/60 shrink-0" />
-                              <span className="truncate">{space.currentTenant.email}</span>
-                            </a>
-                            <a
-                              href={`tel:${space.currentTenant.phone}`}
-                              className="flex items-center gap-1.5 hover:text-calve-gold font-mono"
-                            >
-                              <Phone className="w-3 h-3 text-white/60 shrink-0" />
-                              <span>{space.currentTenant.phone}</span>
-                            </a>
-                          </div>
-                        </div>
-
-                        <div className="pt-2 border-t border-white/10 flex items-center justify-between text-[10px] text-white/70">
-                          <span className="flex items-center gap-1">
-                            <Calendar className="w-3 h-3" />
-                            <span>
-                              {isEnglish ? "Booking / Lease Date: " : "Prise d'effet / Date : "}
-                              {space.currentTenant.leaseStart}
-                            </span>
-                          </span>
-                          <Link
-                            href="/admin/tenants"
-                            className="font-bold text-calve-gold hover:underline flex items-center gap-0.5"
-                          >
-                            <span>{isEnglish ? "View Directory" : "Voir fiche"}</span>
-                            <ArrowUpRight className="w-2.5 h-2.5" />
-                          </Link>
-                        </div>
-                      </div>
-                    )}
-
-                    {/* MEETING ROOM SCHEDULE (if multiple bookings) */}
-                    {space.activeBookings && space.activeBookings.length > 0 && (
-                      <div className="p-3 rounded-xl bg-slate-50 border border-slate-200 text-xs space-y-1.5">
-                        <div className="font-bold text-[11px] uppercase tracking-wider text-calve-charcoal flex items-center gap-1.5">
-                          <Calendar className="w-3.5 h-3.5 text-calve-slate" />
-                          <span>{isEnglish ? "Confirmed Sessions:" : "Sessions Confirmées :"}</span>
-                        </div>
-                        <div className="divide-y divide-slate-200/70">
-                          {space.activeBookings.map((b) => (
-                            <div key={b.leadId} className="py-1.5 flex items-center justify-between">
-                              <div>
-                                <span className="font-bold text-calve-charcoal">{b.company}</span>
-                                <span className="text-calve-muted ml-1 font-mono text-[11px]">({b.date})</span>
-                              </div>
-                              <span className="text-[10px] font-semibold bg-emerald-100 text-emerald-800 px-1.5 py-0.5 rounded">
-                                {b.slot || "Confirmé"}
-                              </span>
-                            </div>
-                          ))}
-                        </div>
-                      </div>
-                    )}
-
-                    {/* Status Text Description */}
-                    <div className="p-2.5 rounded-xl bg-slate-50 border border-slate-100 text-xs">
-                      <span className="font-semibold text-calve-charcoal">
-                        {isEnglish
-                          ? isOccupied
-                            ? `Status: ${space.statusText}`
-                            : `Availability: ${space.statusText}`
+                    {/* Occupant / Status Message */}
+                    <div
+                      className={`p-3 rounded-xl text-xs font-semibold ${
+                        isAvailable
+                          ? "bg-emerald-50 text-emerald-900 border border-emerald-200"
+                          : isOccupied
+                          ? "bg-rose-50 text-rose-900 border border-rose-200"
+                          : "bg-amber-50 text-amber-900 border border-amber-200"
+                      }`}
+                    >
+                      <span className="block font-bold">
+                        {isAvailable
+                          ? isEnglish
+                            ? "Availability: "
+                            : "Disponibilité : "
+                          : isOccupied
+                          ? isEnglish
+                            ? "Occupant / Booking: "
+                            : "Réservation : "
+                          : isEnglish
+                          ? "Limited: "
+                          : "Disponibilité limitée : "}
+                      </span>
+                      <span className="text-[11px] font-normal mt-0.5 block">
+                        {space.currentTenant
+                          ? `${space.currentTenant.company} (${space.currentTenant.name})`
                           : space.statusText}
                       </span>
                     </div>
@@ -394,26 +472,302 @@ export default function SpacesInventoryPage() {
                 </div>
 
                 {/* Space Card Bottom Footer Actions */}
-                <div className="p-4 bg-slate-50 border-t border-slate-100 flex items-center justify-between">
-                  <button
-                    onClick={() => toggleStatus(space.id)}
-                    className="text-xs font-bold text-calve-slate hover:text-calve-slate-dark hover:underline cursor-pointer flex items-center gap-1"
-                  >
-                    <Edit className="w-3.5 h-3.5" />
-                    <span>{isEnglish ? "Toggle status" : "Basculer statut"}</span>
-                  </button>
-                  <a
-                    href={`/#espaces`}
-                    target="_blank"
-                    className="text-xs font-semibold text-calve-muted hover:text-calve-charcoal flex items-center gap-1"
-                  >
-                    <span>{isEnglish ? "View on site" : "Voir sur le site"}</span>
-                    <ArrowUpRight className="w-3 h-3" />
-                  </a>
+                <div className="p-4 bg-slate-50 border-t border-slate-100 flex items-center justify-between gap-2">
+                  <div className="flex items-center gap-3">
+                    <button
+                      onClick={() => toggleStatus(space.id)}
+                      className="text-xs font-bold text-calve-slate hover:text-calve-slate-dark hover:underline cursor-pointer flex items-center gap-1"
+                    >
+                      <RefreshCw className="w-3.5 h-3.5" />
+                      <span>{isEnglish ? "Toggle status" : "Basculer statut"}</span>
+                    </button>
+                    <button
+                      onClick={() => openEditModal(space)}
+                      className="text-xs font-bold text-slate-600 hover:text-slate-900 cursor-pointer flex items-center gap-1"
+                    >
+                      <Edit className="w-3.5 h-3.5" />
+                      <span>{isEnglish ? "Edit" : "Modifier"}</span>
+                    </button>
+                  </div>
+
+                  <div className="flex items-center gap-2">
+                    <button
+                      onClick={() => handleDeleteSpace(space.id, space.name)}
+                      title="Supprimer de la base de données"
+                      className="p-1.5 text-slate-400 hover:text-rose-600 rounded-lg transition-colors cursor-pointer"
+                    >
+                      <Trash2 className="w-3.5 h-3.5" />
+                    </button>
+                    <a
+                      href={`/#espaces`}
+                      target="_blank"
+                      className="text-xs font-semibold text-calve-muted hover:text-calve-charcoal flex items-center gap-1"
+                    >
+                      <span>{isEnglish ? "View on site" : "Voir"}</span>
+                      <ArrowUpRight className="w-3 h-3" />
+                    </a>
+                  </div>
                 </div>
               </div>
             );
           })}
+        </div>
+      )}
+
+      {/* ========================================================= */}
+      {/* MODAL 1: EDIT SPACE                                       */}
+      {/* ========================================================= */}
+      {editingSpace && (
+        <div className="fixed inset-0 z-50 bg-black/60 backdrop-blur-xs flex items-center justify-center p-4">
+          <div className="bg-white rounded-3xl max-w-lg w-full p-6 sm:p-8 space-y-5 border border-slate-200 shadow-2xl animate-in fade-in zoom-in-95">
+            <div className="flex items-center justify-between pb-3 border-b border-slate-100">
+              <div>
+                <h3 className="font-extrabold text-base text-calve-charcoal">
+                  {isEnglish ? "Edit Space Details" : "Modifier l'Espace"}
+                </h3>
+                <p className="text-xs text-calve-muted mt-0.5">{editingSpace.id}</p>
+              </div>
+              <button
+                onClick={() => setEditingSpace(null)}
+                className="p-2 text-slate-400 hover:text-slate-700 rounded-xl"
+              >
+                <X className="w-5 h-5" />
+              </button>
+            </div>
+
+            <form onSubmit={handleEditSubmit} className="space-y-4">
+              <div>
+                <label className="block text-[10px] font-bold uppercase text-slate-500 mb-1">
+                  Nom de l&apos;espace
+                </label>
+                <input
+                  type="text"
+                  required
+                  value={editForm.name}
+                  onChange={(e) => setEditForm({ ...editForm, name: e.target.value })}
+                  className="w-full px-3 py-2 rounded-xl border border-slate-200 text-xs font-bold text-slate-900"
+                />
+              </div>
+
+              <div className="grid grid-cols-2 gap-3">
+                <div>
+                  <label className="block text-[10px] font-bold uppercase text-slate-500 mb-1">
+                    Tarif (€ HT)
+                  </label>
+                  <input
+                    type="text"
+                    value={editForm.price}
+                    onChange={(e) => setEditForm({ ...editForm, price: e.target.value })}
+                    className="w-full px-3 py-2 rounded-xl border border-slate-200 text-xs font-bold text-slate-900"
+                  />
+                </div>
+                <div>
+                  <label className="block text-[10px] font-bold uppercase text-slate-500 mb-1">
+                    Période
+                  </label>
+                  <input
+                    type="text"
+                    value={editForm.period}
+                    onChange={(e) => setEditForm({ ...editForm, period: e.target.value })}
+                    className="w-full px-3 py-2 rounded-xl border border-slate-200 text-xs text-slate-900"
+                  />
+                </div>
+              </div>
+
+              <div className="grid grid-cols-2 gap-3">
+                <div>
+                  <label className="block text-[10px] font-bold uppercase text-slate-500 mb-1">
+                    Superficie
+                  </label>
+                  <input
+                    type="text"
+                    value={editForm.area}
+                    onChange={(e) => setEditForm({ ...editForm, area: e.target.value })}
+                    className="w-full px-3 py-2 rounded-xl border border-slate-200 text-xs text-slate-900"
+                  />
+                </div>
+                <div>
+                  <label className="block text-[10px] font-bold uppercase text-slate-500 mb-1">
+                    Capacité
+                  </label>
+                  <input
+                    type="text"
+                    value={editForm.capacity}
+                    onChange={(e) => setEditForm({ ...editForm, capacity: e.target.value })}
+                    className="w-full px-3 py-2 rounded-xl border border-slate-200 text-xs text-slate-900"
+                  />
+                </div>
+              </div>
+
+              <div className="grid grid-cols-2 gap-3">
+                <div>
+                  <label className="block text-[10px] font-bold uppercase text-slate-500 mb-1">
+                    Statut de Disponibilité
+                  </label>
+                  <select
+                    value={editForm.status}
+                    onChange={(e) =>
+                      setEditForm({
+                        ...editForm,
+                        status: e.target.value as "available" | "limited" | "occupied"
+                      })
+                    }
+                    className="w-full px-3 py-2 rounded-xl border border-slate-200 text-xs font-bold text-slate-900 bg-white"
+                  >
+                    <option value="available">Disponible (Available)</option>
+                    <option value="limited">Limité (Limited)</option>
+                    <option value="occupied">Occupé (Occupied)</option>
+                  </select>
+                </div>
+                <div>
+                  <label className="block text-[10px] font-bold uppercase text-slate-500 mb-1">
+                    Texte affiché
+                  </label>
+                  <input
+                    type="text"
+                    value={editForm.statusText}
+                    onChange={(e) => setEditForm({ ...editForm, statusText: e.target.value })}
+                    className="w-full px-3 py-2 rounded-xl border border-slate-200 text-xs text-slate-900"
+                  />
+                </div>
+              </div>
+
+              <div className="flex items-center justify-end gap-3 pt-3 border-t border-slate-100">
+                <button
+                  type="button"
+                  onClick={() => setEditingSpace(null)}
+                  className="px-4 py-2 rounded-xl border border-slate-200 text-xs font-semibold text-slate-600 hover:bg-slate-50"
+                >
+                  Annuler
+                </button>
+                <button
+                  type="submit"
+                  className="flex items-center gap-1.5 px-5 py-2 rounded-xl bg-calve-slate hover:bg-calve-slate-dark text-white text-xs font-bold shadow-xs cursor-pointer"
+                >
+                  <Save className="w-3.5 h-3.5" />
+                  <span>Enregistrer dans OVH MySQL</span>
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
+      )}
+
+      {/* ========================================================= */}
+      {/* MODAL 2: CREATE NEW SPACE                                 */}
+      {/* ========================================================= */}
+      {isCreateOpen && (
+        <div className="fixed inset-0 z-50 bg-black/60 backdrop-blur-xs flex items-center justify-center p-4">
+          <div className="bg-white rounded-3xl max-w-lg w-full p-6 sm:p-8 space-y-5 border border-slate-200 shadow-2xl animate-in fade-in zoom-in-95">
+            <div className="flex items-center justify-between pb-3 border-b border-slate-100">
+              <h3 className="font-extrabold text-base text-calve-charcoal">
+                {isEnglish ? "Add New Space to Inventory" : "Ajouter un Nouvel Espace"}
+              </h3>
+              <button
+                onClick={() => setIsCreateOpen(false)}
+                className="p-2 text-slate-400 hover:text-slate-700 rounded-xl"
+              >
+                <X className="w-5 h-5" />
+              </button>
+            </div>
+
+            <form onSubmit={handleCreateSubmit} className="space-y-4">
+              <div>
+                <label className="block text-[10px] font-bold uppercase text-slate-500 mb-1">
+                  Nom de l&apos;espace *
+                </label>
+                <input
+                  type="text"
+                  required
+                  placeholder="Ex: Bureau Privatif Standing 20m²"
+                  value={createForm.name}
+                  onChange={(e) => setCreateForm({ ...createForm, name: e.target.value })}
+                  className="w-full px-3 py-2 rounded-xl border border-slate-200 text-xs font-bold text-slate-900"
+                />
+              </div>
+
+              <div className="grid grid-cols-2 gap-3">
+                <div>
+                  <label className="block text-[10px] font-bold uppercase text-slate-500 mb-1">
+                    Catégorie
+                  </label>
+                  <select
+                    value={createForm.category}
+                    onChange={(e) =>
+                      setCreateForm({
+                        ...createForm,
+                        category: e.target.value as any
+                      })
+                    }
+                    className="w-full px-3 py-2 rounded-xl border border-slate-200 text-xs text-slate-900 bg-white"
+                  >
+                    <option value="private">Bureau Privatif (Private)</option>
+                    <option value="open">Open Space</option>
+                    <option value="meeting">Salle de Réunion</option>
+                    <option value="parking">Stationnement & Cour</option>
+                  </select>
+                </div>
+
+                <div>
+                  <label className="block text-[10px] font-bold uppercase text-slate-500 mb-1">
+                    Tarif (€ HT)
+                  </label>
+                  <input
+                    type="text"
+                    placeholder="850 € HT"
+                    value={createForm.price}
+                    onChange={(e) => setCreateForm({ ...createForm, price: e.target.value })}
+                    className="w-full px-3 py-2 rounded-xl border border-slate-200 text-xs font-bold text-slate-900"
+                  />
+                </div>
+              </div>
+
+              <div className="grid grid-cols-2 gap-3">
+                <div>
+                  <label className="block text-[10px] font-bold uppercase text-slate-500 mb-1">
+                    Superficie
+                  </label>
+                  <input
+                    type="text"
+                    placeholder="20 m²"
+                    value={createForm.area}
+                    onChange={(e) => setCreateForm({ ...createForm, area: e.target.value })}
+                    className="w-full px-3 py-2 rounded-xl border border-slate-200 text-xs text-slate-900"
+                  />
+                </div>
+
+                <div>
+                  <label className="block text-[10px] font-bold uppercase text-slate-500 mb-1">
+                    Capacité
+                  </label>
+                  <input
+                    type="text"
+                    placeholder="4 postes de travail"
+                    value={createForm.capacity}
+                    onChange={(e) => setCreateForm({ ...createForm, capacity: e.target.value })}
+                    className="w-full px-3 py-2 rounded-xl border border-slate-200 text-xs text-slate-900"
+                  />
+                </div>
+              </div>
+
+              <div className="flex items-center justify-end gap-3 pt-3 border-t border-slate-100">
+                <button
+                  type="button"
+                  onClick={() => setIsCreateOpen(false)}
+                  className="px-4 py-2 rounded-xl border border-slate-200 text-xs font-semibold text-slate-600 hover:bg-slate-50"
+                >
+                  Annuler
+                </button>
+                <button
+                  type="submit"
+                  className="flex items-center gap-1.5 px-5 py-2 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-bold shadow-xs cursor-pointer"
+                >
+                  <Plus className="w-3.5 h-3.5" />
+                  <span>Créer dans la Base de Données</span>
+                </button>
+              </div>
+            </form>
+          </div>
         </div>
       )}
     </AdminLayout>

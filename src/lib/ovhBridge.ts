@@ -1,4 +1,5 @@
 import { Lead, LeadNote } from "./leads";
+import { SpaceInventoryRecord, TenantRecord } from "./inventorySync";
 
 const OVH_API_BRIDGE_URL =
   process.env.OVH_API_BRIDGE_URL ||
@@ -23,6 +24,8 @@ export async function testOvhConnection(): Promise<{
   database?: string;
   host?: string;
   total_leads?: number;
+  total_spaces?: number;
+  total_tenants?: number;
   message?: string;
   error?: string;
 }> {
@@ -56,9 +59,10 @@ export async function testOvhConnection(): Promise<{
   }
 }
 
-/**
- * Fetch all leads from OVH MySQL database
- */
+// =============================================================
+// SECTION 1: OPPORTUNITY BOARD & CRM LEADS
+// =============================================================
+
 export async function fetchOvhLeads(params?: {
   q?: string;
   status?: string;
@@ -111,9 +115,6 @@ export async function fetchOvhLeads(params?: {
   }
 }
 
-/**
- * Insert new lead into OVH MySQL database
- */
 export async function addOvhLead(
   leadData: any
 ): Promise<{ success: boolean; lead?: Lead; stats?: any; error?: string }> {
@@ -153,9 +154,6 @@ export async function addOvhLead(
   }
 }
 
-/**
- * Update an existing lead on OVH MySQL database
- */
 export async function updateOvhLead(
   id: string,
   updates: {
@@ -192,9 +190,6 @@ export async function updateOvhLead(
   }
 }
 
-/**
- * Delete a lead from OVH MySQL database
- */
 export async function deleteOvhLead(
   id: string
 ): Promise<{ success: boolean; stats?: any; error?: string }> {
@@ -224,9 +219,6 @@ export async function deleteOvhLead(
   }
 }
 
-/**
- * Bulk import / sync all local leads to OVH MySQL database
- */
 export async function bulkSyncLeadsToOvh(
   leads: Lead[]
 ): Promise<{ success: boolean; synced_count?: number; error?: string; stats?: any }> {
@@ -255,3 +247,239 @@ export async function bulkSyncLeadsToOvh(
   }
 }
 
+// =============================================================
+// SECTION 2: SPACES & OFFICES INVENTORY
+// =============================================================
+
+export async function fetchOvhSpaces(): Promise<{
+  success: boolean;
+  spaces: SpaceInventoryRecord[];
+  metrics?: any;
+  error?: string;
+}> {
+  try {
+    const url = new URL(OVH_API_BRIDGE_URL);
+    url.searchParams.set("action", "spaces");
+
+    const res = await fetch(url.toString(), {
+      method: "GET",
+      headers: {
+        "X-API-KEY": OVH_API_SECRET_KEY,
+        Accept: "application/json"
+      },
+      cache: "no-store"
+    });
+
+    if (!res.ok) {
+      return { success: false, spaces: [], error: `HTTP ${res.status}` };
+    }
+
+    const data = await res.json();
+    return {
+      success: true,
+      spaces: data.spaces || [],
+      metrics: data.metrics
+    };
+  } catch (err: any) {
+    console.error("fetchOvhSpaces error:", err);
+    return { success: false, spaces: [], error: err.message };
+  }
+}
+
+export async function addOvhSpace(
+  space: SpaceInventoryRecord
+): Promise<{ success: boolean; space?: SpaceInventoryRecord; error?: string }> {
+  try {
+    const url = new URL(OVH_API_BRIDGE_URL);
+    url.searchParams.set("action", "space");
+
+    const res = await fetch(url.toString(), {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        "X-API-KEY": OVH_API_SECRET_KEY,
+        Accept: "application/json"
+      },
+      body: JSON.stringify(space)
+    });
+
+    const data = await res.json();
+    return data;
+  } catch (err: any) {
+    console.error("addOvhSpace error:", err);
+    return { success: false, error: err.message };
+  }
+}
+
+export async function updateOvhSpace(
+  id: string,
+  updates: Partial<SpaceInventoryRecord>
+): Promise<{ success: boolean; space?: SpaceInventoryRecord; error?: string }> {
+  try {
+    const url = new URL(OVH_API_BRIDGE_URL);
+    url.searchParams.set("action", "update_space");
+
+    const res = await fetch(url.toString(), {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        "X-API-KEY": OVH_API_SECRET_KEY,
+        Accept: "application/json"
+      },
+      body: JSON.stringify({ id, ...updates })
+    });
+
+    const data = await res.json();
+    return data;
+  } catch (err: any) {
+    console.error("updateOvhSpace error:", err);
+    return { success: false, error: err.message };
+  }
+}
+
+export async function deleteOvhSpace(
+  id: string
+): Promise<{ success: boolean; error?: string }> {
+  try {
+    const url = new URL(OVH_API_BRIDGE_URL);
+    url.searchParams.set("action", "delete_space");
+    url.searchParams.set("id", id);
+
+    const res = await fetch(url.toString(), {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        "X-API-KEY": OVH_API_SECRET_KEY,
+        Accept: "application/json"
+      },
+      body: JSON.stringify({ id })
+    });
+
+    const data = await res.json();
+    return data;
+  } catch (err: any) {
+    console.error("deleteOvhSpace error:", err);
+    return { success: false, error: err.message };
+  }
+}
+
+// =============================================================
+// SECTION 3: TENANTS & RESIDENTS DIRECTORY
+// =============================================================
+
+export async function fetchOvhTenants(params?: {
+  q?: string;
+  status?: string;
+}): Promise<{
+  success: boolean;
+  tenants: TenantRecord[];
+  metrics?: any;
+  error?: string;
+}> {
+  try {
+    const url = new URL(OVH_API_BRIDGE_URL);
+    url.searchParams.set("action", "tenants");
+    if (params?.q) url.searchParams.set("q", params.q);
+    if (params?.status) url.searchParams.set("status", params.status);
+
+    const res = await fetch(url.toString(), {
+      method: "GET",
+      headers: {
+        "X-API-KEY": OVH_API_SECRET_KEY,
+        Accept: "application/json"
+      },
+      cache: "no-store"
+    });
+
+    if (!res.ok) {
+      return { success: false, tenants: [], error: `HTTP ${res.status}` };
+    }
+
+    const data = await res.json();
+    return {
+      success: true,
+      tenants: data.tenants || [],
+      metrics: data.metrics
+    };
+  } catch (err: any) {
+    console.error("fetchOvhTenants error:", err);
+    return { success: false, tenants: [], error: err.message };
+  }
+}
+
+export async function addOvhTenant(
+  tenant: Partial<TenantRecord>
+): Promise<{ success: boolean; tenant?: TenantRecord; error?: string }> {
+  try {
+    const url = new URL(OVH_API_BRIDGE_URL);
+    url.searchParams.set("action", "tenant");
+
+    const res = await fetch(url.toString(), {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        "X-API-KEY": OVH_API_SECRET_KEY,
+        Accept: "application/json"
+      },
+      body: JSON.stringify(tenant)
+    });
+
+    const data = await res.json();
+    return data;
+  } catch (err: any) {
+    console.error("addOvhTenant error:", err);
+    return { success: false, error: err.message };
+  }
+}
+
+export async function updateOvhTenant(
+  id: string,
+  updates: Partial<TenantRecord>
+): Promise<{ success: boolean; tenant?: TenantRecord; error?: string }> {
+  try {
+    const url = new URL(OVH_API_BRIDGE_URL);
+    url.searchParams.set("action", "update_tenant");
+
+    const res = await fetch(url.toString(), {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        "X-API-KEY": OVH_API_SECRET_KEY,
+        Accept: "application/json"
+      },
+      body: JSON.stringify({ id, ...updates })
+    });
+
+    const data = await res.json();
+    return data;
+  } catch (err: any) {
+    console.error("updateOvhTenant error:", err);
+    return { success: false, error: err.message };
+  }
+}
+
+export async function deleteOvhTenant(
+  id: string
+): Promise<{ success: boolean; error?: string }> {
+  try {
+    const url = new URL(OVH_API_BRIDGE_URL);
+    url.searchParams.set("action", "delete_tenant");
+    url.searchParams.set("id", id);
+
+    const res = await fetch(url.toString(), {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        "X-API-KEY": OVH_API_SECRET_KEY,
+        Accept: "application/json"
+      },
+      body: JSON.stringify({ id })
+    });
+
+    const data = await res.json();
+    return data;
+  } catch (err: any) {
+    console.error("deleteOvhTenant error:", err);
+    return { success: false, error: err.message };
+  }
+}

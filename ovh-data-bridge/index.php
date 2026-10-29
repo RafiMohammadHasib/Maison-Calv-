@@ -45,7 +45,10 @@ function authenticate() {
     }
 }
 
-// Format DB Row into TypeScript Lead Interface
+// -------------------------------------------------------------
+// Formatters for TypeScript Compatibility
+// -------------------------------------------------------------
+
 function formatLeadRow($row) {
     if (!$row) return null;
 
@@ -82,7 +85,71 @@ function formatLeadRow($row) {
     ];
 }
 
-// Compute CRM Metrics from Leads
+function formatSpaceRow($row) {
+    if (!$row) return null;
+
+    $currentTenant = null;
+    if (!empty($row['current_tenant'])) {
+        $currentTenant = json_decode($row['current_tenant'], true);
+    }
+
+    $features = [];
+    if (!empty($row['features'])) {
+        $features = json_decode($row['features'], true) ?: [];
+    }
+
+    $activeBookings = [];
+    if (!empty($row['active_bookings'])) {
+        $activeBookings = json_decode($row['active_bookings'], true) ?: [];
+    }
+
+    return [
+        'id'              => $row['id'],
+        'name'            => $row['name'],
+        'category'        => $row['category'],
+        'area'            => $row['area'] ?? '',
+        'capacity'        => $row['capacity'] ?? '',
+        'price'           => $row['price'] ?? '',
+        'period'          => $row['period'] ?? '',
+        'status'          => $row['status'] ?? 'available',
+        'statusText'      => $row['status_text'] ?? '',
+        'image'           => $row['image'] ?? '',
+        'parkingIncluded' => (bool)$row['parking_included'],
+        'currentTenant'   => $currentTenant,
+        'features'        => $features,
+        'activeBookings'  => $activeBookings
+    ];
+}
+
+function formatTenantRow($row) {
+    if (!$row) return null;
+
+    $badgeIds = [];
+    if (!empty($row['badge_ids'])) {
+        $decoded = json_decode($row['badge_ids'], true);
+        $badgeIds = is_array($decoded) ? $decoded : [$row['badge_ids']];
+    }
+
+    return [
+        'id'            => $row['id'],
+        'leadId'        => $row['lead_id'] ?? null,
+        'name'          => $row['name'],
+        'company'       => $row['company'],
+        'role'          => $row['role'] ?? '',
+        'email'         => $row['email'],
+        'phone'         => $row['phone'],
+        'spaceAssigned' => $row['space_assigned'],
+        'workstations'  => (int)($row['workstations'] ?? 1),
+        'parkingBays'   => $row['parking_bays'] ?? '',
+        'badgeIds'      => $badgeIds,
+        'leaseStart'    => $row['lease_start'] ?? '',
+        'monthlyRent'   => $row['monthly_rent'] ?? '',
+        'status'        => $row['status'] ?? 'active',
+        'isFromWonLead' => (bool)$row['is_from_won_lead']
+    ];
+}
+
+// Compute Metrics
 function computeCrmStats($pdo) {
     $stmt = $pdo->query("SELECT status, visit_requested, source FROM `mc_leads`");
     $all = $stmt->fetchAll();
@@ -122,6 +189,60 @@ function computeCrmStats($pdo) {
     ];
 }
 
+function computeSpaceMetrics($pdo) {
+    $spaces = $pdo->query("SELECT * FROM `mc_spaces`")->fetchAll();
+    $tenants = $pdo->query("SELECT * FROM `mc_tenants`")->fetchAll();
+
+    $availOffices = 0;
+    $totalOffices = 0;
+    foreach ($spaces as $s) {
+        if ($s['category'] === 'private') {
+            $totalOffices++;
+            if ($s['status'] === 'available') $availOffices++;
+        }
+    }
+    if ($totalOffices === 0) $totalOffices = 5;
+
+    $assignedDesks = 0;
+    foreach ($tenants as $t) {
+        $assignedDesks += (int)($t['workstations'] ?? 1);
+    }
+    if ($assignedDesks < 4) $assignedDesks = 4;
+
+    return [
+        'availablePrivateOffices' => $availOffices,
+        'totalPrivateOffices'     => $totalOffices,
+        'occupiedDesks'           => $assignedDesks,
+        'totalDesks'              => 10,
+        'assignedParkingBays'     => 2,
+        'totalParkingBays'        => 9
+    ];
+}
+
+function computeTenantMetrics($pdo) {
+    $tenants = $pdo->query("SELECT * FROM `mc_tenants`")->fetchAll();
+    $uniqueCompanies = [];
+    $assignedDesks = 0;
+    $badgeCount = 0;
+
+    foreach ($tenants as $t) {
+        $uniqueCompanies[$t['company']] = true;
+        $assignedDesks += (int)($t['workstations'] ?? 1);
+        if (!empty($t['badge_ids'])) {
+            $b = json_decode($t['badge_ids'], true);
+            $badgeCount += is_array($b) ? count($b) : 1;
+        }
+    }
+
+    return [
+        'activeCompanies'     => count($uniqueCompanies) ?: 2,
+        'assignedDesks'       => $assignedDesks ?: 4,
+        'parkingBaysAssigned' => 2,
+        'totalParkingBays'    => 9,
+        'activeBadges'        => $badgeCount ?: 3
+    ];
+}
+
 // Initialize Connection and Ensure Schema Exists
 $pdo = getDbConnection();
 ensureTablesExist($pdo);
@@ -130,7 +251,7 @@ ensureTablesExist($pdo);
 $action = $_GET['action'] ?? $_POST['action'] ?? '';
 $method = $_SERVER['REQUEST_METHOD'];
 
-// Parse JSON Body for POST/PATCH/PUT
+// Parse JSON Body
 $inputData = [];
 $rawInput = file_get_contents('php://input');
 if (!empty($rawInput)) {
@@ -142,21 +263,18 @@ if (!empty($rawInput)) {
 if (empty($inputData) && !empty($_POST)) {
     $inputData = $_POST;
 }
-
-// If action is inside JSON body
 if (empty($action) && isset($inputData['action'])) {
     $action = $inputData['action'];
 }
 
 // -------------------------------------------------------------
-// Action 1: Health Check (No strict auth needed or optional for diagnostics)
+// Endpoint 1: Health Check (Public diagnostics)
 // -------------------------------------------------------------
 if ($action === 'health' || $action === 'ping') {
-    $leadCountStmt = $pdo->query("SELECT COUNT(*) AS cnt FROM `mc_leads`");
-    $leadCount = (int)$leadCountStmt->fetchColumn();
-
-    $settingsCountStmt = $pdo->query("SELECT COUNT(*) AS cnt FROM `mc_settings`");
-    $settingsCount = (int)$settingsCountStmt->fetchColumn();
+    $leadCount = (int)$pdo->query("SELECT COUNT(*) FROM `mc_leads`")->fetchColumn();
+    $spaceCount = (int)$pdo->query("SELECT COUNT(*) FROM `mc_spaces`")->fetchColumn();
+    $tenantCount = (int)$pdo->query("SELECT COUNT(*) FROM `mc_tenants`")->fetchColumn();
+    $settingsCount = (int)$pdo->query("SELECT COUNT(*) FROM `mc_settings`")->fetchColumn();
 
     echo json_encode([
         'success'        => true,
@@ -166,18 +284,21 @@ if ($action === 'health' || $action === 'ping') {
         'php_version'    => PHP_VERSION,
         'server_time'    => date('c'),
         'total_leads'    => $leadCount,
+        'total_spaces'   => $spaceCount,
+        'total_tenants'  => $tenantCount,
         'total_settings' => $settingsCount,
         'message'        => 'OVH MySQL Data Bridge is online and ready.'
     ]);
     exit;
 }
 
-// All other endpoints require authentication
+// All subsequent actions require authentication
 authenticate();
 
-// -------------------------------------------------------------
-// Action 2: GET Leads (with Search, Filter, & Stats)
-// -------------------------------------------------------------
+// =============================================================
+// SECTION 1: OPPORTUNITY BOARD & CRM LEADS (mc_leads)
+// =============================================================
+
 if ($action === 'leads' && ($method === 'GET' || $method === 'POST')) {
     $search = strtolower(trim($_GET['q'] ?? $inputData['q'] ?? ''));
     $status = trim($_GET['status'] ?? $inputData['status'] ?? '');
@@ -232,9 +353,6 @@ if ($action === 'leads' && ($method === 'GET' || $method === 'POST')) {
     exit;
 }
 
-// -------------------------------------------------------------
-// Action 3: Add / Create Single Lead
-// -------------------------------------------------------------
 if ($action === 'lead' && $method === 'POST') {
     $name  = trim($inputData['name'] ?? '');
     $email = trim($inputData['email'] ?? '');
@@ -242,14 +360,10 @@ if ($action === 'lead' && $method === 'POST') {
 
     if (empty($name) || empty($email) || empty($phone)) {
         http_response_code(400);
-        echo json_encode([
-            'success' => false,
-            'message' => 'Le nom, email et téléphone sont obligatoires.'
-        ]);
+        echo json_encode(['success' => false, 'message' => 'Le nom, email et téléphone sont obligatoires.']);
         exit;
     }
 
-    // Auto-generate ID if not passed
     $id = trim($inputData['id'] ?? '');
     if (empty($id)) {
         $cntStmt = $pdo->query("SELECT COUNT(*) FROM `mc_leads`");
@@ -324,7 +438,6 @@ if ($action === 'lead' && $method === 'POST') {
         ':notes'             => $notesJson
     ]);
 
-    // Fetch newly saved lead
     $getStmt = $pdo->prepare("SELECT * FROM `mc_leads` WHERE id = :id");
     $getStmt->execute([':id' => $id]);
     $savedLead = formatLeadRow($getStmt->fetch());
@@ -338,9 +451,6 @@ if ($action === 'lead' && $method === 'POST') {
     exit;
 }
 
-// -------------------------------------------------------------
-// Action 4: Update Lead (Status, Priority, or Add Note)
-// -------------------------------------------------------------
 if ($action === 'update_lead' || ($action === 'lead' && ($method === 'PATCH' || $method === 'PUT'))) {
     $id = trim($inputData['id'] ?? $_GET['id'] ?? '');
 
@@ -368,7 +478,6 @@ if ($action === 'update_lead' || ($action === 'lead' && ($method === 'PATCH' || 
 
     $now = date('c');
 
-    // Handle new note
     if (!empty($inputData['newNote']) && !empty($inputData['newNote']['text'])) {
         $existingNotes[] = [
             'id'        => 'note-' . time(),
@@ -398,6 +507,61 @@ if ($action === 'update_lead' || ($action === 'lead' && ($method === 'PATCH' || 
         ':id' => $id
     ]);
 
+    // If marked as Won, synchronize with Tenants Directory & Spaces Inventory
+    if ($newStatus === 'won') {
+        $tenantId = 'TEN-' . preg_replace('/[^0-9]/', '', $id);
+        $companyName = !empty($existing['company']) ? $existing['company'] : $existing['name'];
+        $spaceName = 'Bureau Privatif Maison Calvé';
+        $rentStr = '750 € HT / mois';
+        $ws = (int)($existing['workstation_count'] ?? 1);
+        $parking = 'Places #3 & #4';
+
+        if ($existing['type'] === 'private-office') {
+            if (strpos($existing['office_size'], '25') !== false) {
+                $spaceName = 'Bureau Privatif 25m² (RDC Cour)';
+                $rentStr = '1 000 € HT / mois';
+                $ws = 5;
+            } else {
+                $spaceName = 'Bureau Privatif 17 m² (Aile Ouest)';
+                $rentStr = '750 € HT / mois';
+                $ws = 3;
+            }
+        } elseif ($existing['type'] === 'open-space') {
+            $spaceName = "Open Space — Espace A ({$ws} postes fixes)";
+            $rentStr = ($ws * 250) . ' € HT / mois';
+            $parking = 'Place #7';
+        } elseif ($existing['type'] === 'meeting-room') {
+            $spaceName = 'Grande Salle de Réunion 30 m²';
+            $rentStr = '200 € HT (Journée)';
+            $parking = 'Parking Visiteurs Réservé';
+        }
+
+        $insTenant = $pdo->prepare("INSERT INTO `mc_tenants` (
+            id, lead_id, name, company, role, email, phone, space_assigned, workstations,
+            parking_bays, badge_ids, lease_start, monthly_rent, status, is_from_won_lead, updated_at
+        ) VALUES (
+            :tid, :lid, :tname, :comp, 'Résident Partenaire', :em, :ph, :sp, :ws,
+            :pb, :badges, :ls, :mr, 'active', 1, :up
+        ) ON DUPLICATE KEY UPDATE
+            name=VALUES(name), company=VALUES(company), space_assigned=VALUES(space_assigned), updated_at=VALUES(updated_at)");
+
+        $insTenant->execute([
+            ':tid'    => $tenantId,
+            ':lid'    => $id,
+            ':tname'  => "{$companyName} ({$existing['name']})",
+            ':comp'   => $companyName,
+            ':em'     => $existing['email'],
+            ':ph'     => $existing['phone'],
+            ':sp'     => $spaceName,
+            ':ws'     => $ws,
+            ':pb'     => $parking,
+            ':badges' => json_encode(["BADGE-048-" . substr($id, -3)]),
+            ':ls'     => !empty($existing['date']) ? $existing['date'] : substr($now, 0, 10),
+            ':mr'     => $rentStr,
+            ':up'     => $now
+        ]);
+    }
+
     $getStmt->execute([':id' => $id]);
     $updated = formatLeadRow($getStmt->fetch());
 
@@ -410,9 +574,6 @@ if ($action === 'update_lead' || ($action === 'lead' && ($method === 'PATCH' || 
     exit;
 }
 
-// -------------------------------------------------------------
-// Action 5: Delete Lead
-// -------------------------------------------------------------
 if ($action === 'delete_lead' || ($action === 'lead' && $method === 'DELETE')) {
     $id = trim($_GET['id'] ?? $inputData['id'] ?? '');
 
@@ -433,15 +594,12 @@ if ($action === 'delete_lead' || ($action === 'lead' && $method === 'DELETE')) {
     exit;
 }
 
-// -------------------------------------------------------------
-// Action 6: Bulk Import / Sync from crm_leads.json
-// -------------------------------------------------------------
 if ($action === 'bulk_sync' && $method === 'POST') {
     $leads = $inputData['leads'] ?? [];
 
     if (!is_array($leads) || empty($leads)) {
         http_response_code(400);
-        echo json_encode(['success' => false, 'message' => 'No leads provided for bulk sync.']);
+        echo json_encode(['success' => false, 'message' => 'No leads provided.']);
         exit;
     }
 
@@ -467,7 +625,6 @@ if ($action === 'bulk_sync' && $method === 'POST') {
 
     foreach ($leads as $l) {
         if (empty($l['id']) || empty($l['name'])) continue;
-
         $notesJson = !empty($l['notes']) ? json_encode($l['notes'], JSON_UNESCAPED_UNICODE) : '[]';
 
         $stmt->execute([
@@ -505,9 +662,385 @@ if ($action === 'bulk_sync' && $method === 'POST') {
     exit;
 }
 
-// -------------------------------------------------------------
-// Action 7: Key-Value Settings Store
-// -------------------------------------------------------------
+// =============================================================
+// SECTION 2: SPACES & OFFICES INVENTORY (mc_spaces)
+// =============================================================
+
+if ($action === 'spaces' && ($method === 'GET' || $method === 'POST')) {
+    $rows = $pdo->query("SELECT * FROM `mc_spaces` ORDER BY category ASC, id ASC")->fetchAll();
+    $spaces = array_map('formatSpaceRow', $rows);
+    $metrics = computeSpaceMetrics($pdo);
+
+    echo json_encode([
+        'success'   => true,
+        'spaces'    => $spaces,
+        'metrics'   => $metrics,
+        'timestamp' => date('c')
+    ]);
+    exit;
+}
+
+if ($action === 'space' && $method === 'POST') {
+    $id = trim($inputData['id'] ?? '');
+    $name = trim($inputData['name'] ?? '');
+
+    if (empty($id) || empty($name)) {
+        http_response_code(400);
+        echo json_encode(['success' => false, 'message' => 'ID et nom requis pour l\'espace.']);
+        exit;
+    }
+
+    $now = date('c');
+    $category        = trim($inputData['category'] ?? 'private');
+    $area            = trim($inputData['area'] ?? '');
+    $capacity        = trim($inputData['capacity'] ?? '');
+    $price           = trim($inputData['price'] ?? '');
+    $period          = trim($inputData['period'] ?? 'par mois');
+    $status          = trim($inputData['status'] ?? 'available');
+    $statusText      = trim($inputData['statusText'] ?? $inputData['status_text'] ?? 'Disponible immédiatement');
+    $image           = trim($inputData['image'] ?? '/images/spaces/bureau-privatif-17m.png');
+    $parkingIncluded = isset($inputData['parkingIncluded']) ? ($inputData['parkingIncluded'] ? 1 : 0) : 0;
+    $currentTenant   = !empty($inputData['currentTenant']) ? json_encode($inputData['currentTenant'], JSON_UNESCAPED_UNICODE) : null;
+    $features        = !empty($inputData['features']) ? json_encode($inputData['features'], JSON_UNESCAPED_UNICODE) : '[]';
+    $activeBookings  = !empty($inputData['activeBookings']) ? json_encode($inputData['activeBookings'], JSON_UNESCAPED_UNICODE) : '[]';
+
+    $stmt = $pdo->prepare("INSERT INTO `mc_spaces` (
+        id, name, category, area, capacity, price, period, status, status_text,
+        image, parking_included, current_tenant, features, active_bookings, updated_at
+    ) VALUES (
+        :id, :name, :category, :area, :capacity, :price, :period, :status, :status_text,
+        :image, :parking_included, :current_tenant, :features, :active_bookings, :updated_at
+    ) ON DUPLICATE KEY UPDATE
+        name=VALUES(name), category=VALUES(category), area=VALUES(area), capacity=VALUES(capacity),
+        price=VALUES(price), period=VALUES(period), status=VALUES(status), status_text=VALUES(status_text),
+        image=VALUES(image), parking_included=VALUES(parking_included), current_tenant=VALUES(current_tenant),
+        features=VALUES(features), updated_at=VALUES(updated_at);");
+
+    $stmt->execute([
+        ':id'               => $id,
+        ':name'             => $name,
+        ':category'         => $category,
+        ':area'             => $area,
+        ':capacity'         => $capacity,
+        ':price'            => $price,
+        ':period'           => $period,
+        ':status'           => $status,
+        ':status_text'      => $statusText,
+        ':image'            => $image,
+        ':parking_included' => $parkingIncluded,
+        ':current_tenant'   => $currentTenant,
+        ':features'         => $features,
+        ':active_bookings'  => $activeBookings,
+        ':updated_at'       => $now
+    ]);
+
+    $getStmt = $pdo->prepare("SELECT * FROM `mc_spaces` WHERE id = :id");
+    $getStmt->execute([':id' => $id]);
+    $saved = formatSpaceRow($getStmt->fetch());
+
+    echo json_encode([
+        'success' => true,
+        'message' => 'Espace enregistré avec succès dans OVH MySQL.',
+        'space'   => $saved,
+        'metrics' => computeSpaceMetrics($pdo)
+    ]);
+    exit;
+}
+
+if ($action === 'update_space' || ($action === 'space' && ($method === 'PATCH' || $method === 'PUT'))) {
+    $id = trim($inputData['id'] ?? $_GET['id'] ?? '');
+
+    if (empty($id)) {
+        http_response_code(400);
+        echo json_encode(['success' => false, 'message' => 'ID manquant pour l\'espace.']);
+        exit;
+    }
+
+    $getStmt = $pdo->prepare("SELECT * FROM `mc_spaces` WHERE id = :id");
+    $getStmt->execute([':id' => $id]);
+    $existing = $getStmt->fetch();
+
+    if (!$existing) {
+        http_response_code(404);
+        echo json_encode(['success' => false, 'message' => 'Espace introuvable.']);
+        exit;
+    }
+
+    $now = date('c');
+    $status     = $inputData['status'] ?? $existing['status'];
+    $statusText = $inputData['statusText'] ?? $inputData['status_text'] ?? $existing['status_text'];
+    $price      = $inputData['price'] ?? $existing['price'];
+    $capacity   = $inputData['capacity'] ?? $existing['capacity'];
+
+    $currentTenant = $existing['current_tenant'];
+    if (array_key_exists('currentTenant', $inputData)) {
+        $currentTenant = $inputData['currentTenant'] ? json_encode($inputData['currentTenant'], JSON_UNESCAPED_UNICODE) : null;
+    }
+
+    $stmt = $pdo->prepare("UPDATE `mc_spaces` SET 
+        status = :st, status_text = :stx, price = :pr, capacity = :cp,
+        current_tenant = :ct, updated_at = :up WHERE id = :id");
+    $stmt->execute([
+        ':st'  => $status,
+        ':stx' => $statusText,
+        ':pr'  => $price,
+        ':cp'  => $capacity,
+        ':ct'  => $currentTenant,
+        ':up'  => $now,
+        ':id'  => $id
+    ]);
+
+    $getStmt->execute([':id' => $id]);
+    $updated = formatSpaceRow($getStmt->fetch());
+
+    echo json_encode([
+        'success' => true,
+        'message' => 'Espace mis à jour avec succès.',
+        'space'   => $updated,
+        'metrics' => computeSpaceMetrics($pdo)
+    ]);
+    exit;
+}
+
+if ($action === 'delete_space' || ($action === 'space' && $method === 'DELETE')) {
+    $id = trim($_GET['id'] ?? $inputData['id'] ?? '');
+    if (empty($id)) {
+        http_response_code(400);
+        echo json_encode(['success' => false, 'message' => 'ID manquant.']);
+        exit;
+    }
+
+    $delStmt = $pdo->prepare("DELETE FROM `mc_spaces` WHERE id = :id");
+    $delStmt->execute([':id' => $id]);
+
+    echo json_encode([
+        'success' => true,
+        'message' => 'Espace supprimé avec succès.',
+        'metrics' => computeSpaceMetrics($pdo)
+    ]);
+    exit;
+}
+
+// =============================================================
+// SECTION 3: TENANTS & RESIDENTS DIRECTORY (mc_tenants)
+// =============================================================
+
+if ($action === 'tenants' && ($method === 'GET' || $method === 'POST')) {
+    $search = strtolower(trim($_GET['q'] ?? $inputData['q'] ?? ''));
+    $status = trim($_GET['status'] ?? $inputData['status'] ?? '');
+
+    $where = [];
+    $params = [];
+
+    if ($search !== '') {
+        $where[] = "(LOWER(name) LIKE :s1 OR LOWER(company) LIKE :s2 OR LOWER(email) LIKE :s3 OR LOWER(space_assigned) LIKE :s4 OR LOWER(id) LIKE :s5)";
+        $wildcard = "%{$search}%";
+        $params[':s1'] = $wildcard;
+        $params[':s2'] = $wildcard;
+        $params[':s3'] = $wildcard;
+        $params[':s4'] = $wildcard;
+        $params[':s5'] = $wildcard;
+    }
+
+    if ($status !== '' && $status !== 'all') {
+        $where[] = "status = :st";
+        $params[':st'] = $status;
+    }
+
+    $whereClause = count($where) > 0 ? "WHERE " . implode(" AND ", $where) : "";
+    $sql = "SELECT * FROM `mc_tenants` {$whereClause} ORDER BY created_at DESC, id ASC";
+
+    // Fallback if created_at column is not present in mc_tenants
+    try {
+        $stmt = $pdo->prepare($sql);
+        $stmt->execute($params);
+    } catch (Exception $e) {
+        $stmt = $pdo->prepare("SELECT * FROM `mc_tenants` {$whereClause} ORDER BY id ASC");
+        $stmt->execute($params);
+    }
+
+    $rows = $stmt->fetchAll();
+    $tenants = array_map('formatTenantRow', $rows);
+    $metrics = computeTenantMetrics($pdo);
+
+    echo json_encode([
+        'success'   => true,
+        'tenants'   => $tenants,
+        'metrics'   => $metrics,
+        'timestamp' => date('c')
+    ]);
+    exit;
+}
+
+if ($action === 'tenant' && $method === 'POST') {
+    $name    = trim($inputData['name'] ?? '');
+    $company = trim($inputData['company'] ?? '');
+    $email   = trim($inputData['email'] ?? '');
+    $phone   = trim($inputData['phone'] ?? '');
+
+    if (empty($name) || empty($company) || empty($email)) {
+        http_response_code(400);
+        echo json_encode(['success' => false, 'message' => 'Nom, entreprise et email obligatoires.']);
+        exit;
+    }
+
+    $id = trim($inputData['id'] ?? '');
+    if (empty($id)) {
+        $cnt = (int)$pdo->query("SELECT COUNT(*) FROM `mc_tenants`")->fetchColumn() + 1;
+        $id = sprintf("TEN-%03d", $cnt);
+    }
+
+    $now = date('c');
+    $leadId        = !empty($inputData['leadId']) ? trim($inputData['leadId']) : null;
+    $role          = trim($inputData['role'] ?? 'Résident Partenaire');
+    $spaceAssigned = trim($inputData['spaceAssigned'] ?? $inputData['space_assigned'] ?? 'Bureau Privatif Maison Calvé');
+    $workstations  = (int)($inputData['workstations'] ?? 1);
+    $parkingBays   = trim($inputData['parkingBays'] ?? $inputData['parking_bays'] ?? 'Places cour sécurisée');
+    $leaseStart    = trim($inputData['leaseStart'] ?? $inputData['lease_start'] ?? substr($now, 0, 10));
+    $monthlyRent   = trim($inputData['monthlyRent'] ?? $inputData['monthly_rent'] ?? '750 € HT / mois');
+    $status        = trim($inputData['status'] ?? 'active');
+    $isFromWon     = isset($inputData['isFromWonLead']) ? ($inputData['isFromWonLead'] ? 1 : 0) : 0;
+
+    $badgeIds = !empty($inputData['badgeIds']) ? json_encode($inputData['badgeIds'], JSON_UNESCAPED_UNICODE) : json_encode(["BADGE-048-" . substr($id, -3)]);
+
+    $stmt = $pdo->prepare("INSERT INTO `mc_tenants` (
+        id, lead_id, name, company, role, email, phone, space_assigned, workstations,
+        parking_bays, badge_ids, lease_start, monthly_rent, status, is_from_won_lead, updated_at
+    ) VALUES (
+        :id, :lid, :nm, :cp, :rl, :em, :ph, :sp, :ws,
+        :pb, :bg, :ls, :mr, :st, :wf, :up
+    ) ON DUPLICATE KEY UPDATE
+        name=VALUES(name), company=VALUES(company), role=VALUES(role), email=VALUES(email),
+        phone=VALUES(phone), space_assigned=VALUES(space_assigned), workstations=VALUES(workstations),
+        parking_bays=VALUES(parking_bays), badge_ids=VALUES(badge_ids), monthly_rent=VALUES(monthly_rent),
+        status=VALUES(status), updated_at=VALUES(updated_at);");
+
+    $stmt->execute([
+        ':id'  => $id,
+        ':lid' => $leadId,
+        ':nm'  => $name,
+        ':cp'  => $company,
+        ':rl'  => $role,
+        ':em'  => $email,
+        ':ph'  => $phone,
+        ':sp'  => $spaceAssigned,
+        ':ws'  => $workstations,
+        ':pb'  => $parkingBays,
+        ':bg'  => $badgeIds,
+        ':ls'  => $leaseStart,
+        ':mr'  => $monthlyRent,
+        ':st'  => $status,
+        ':wf'  => $isFromWon,
+        ':up'  => $now
+    ]);
+
+    $getStmt = $pdo->prepare("SELECT * FROM `mc_tenants` WHERE id = :id");
+    $getStmt->execute([':id' => $id]);
+    $saved = formatTenantRow($getStmt->fetch());
+
+    echo json_encode([
+        'success' => true,
+        'message' => 'Résident enregistré avec succès dans OVH MySQL.',
+        'tenant'  => $saved,
+        'metrics' => computeTenantMetrics($pdo)
+    ]);
+    exit;
+}
+
+if ($action === 'update_tenant' || ($action === 'tenant' && ($method === 'PATCH' || $method === 'PUT'))) {
+    $id = trim($inputData['id'] ?? $_GET['id'] ?? '');
+
+    if (empty($id)) {
+        http_response_code(400);
+        echo json_encode(['success' => false, 'message' => 'ID manquant.']);
+        exit;
+    }
+
+    $getStmt = $pdo->prepare("SELECT * FROM `mc_tenants` WHERE id = :id");
+    $getStmt->execute([':id' => $id]);
+    $existing = $getStmt->fetch();
+
+    if (!$existing) {
+        http_response_code(404);
+        echo json_encode(['success' => false, 'message' => 'Résident introuvable.']);
+        exit;
+    }
+
+    $now = date('c');
+    $name          = $inputData['name'] ?? $existing['name'];
+    $company       = $inputData['company'] ?? $existing['company'];
+    $role          = $inputData['role'] ?? $existing['role'];
+    $email         = $inputData['email'] ?? $existing['email'];
+    $phone         = $inputData['phone'] ?? $existing['phone'];
+    $spaceAssigned = $inputData['spaceAssigned'] ?? $inputData['space_assigned'] ?? $existing['space_assigned'];
+    $workstations  = isset($inputData['workstations']) ? (int)$inputData['workstations'] : (int)$existing['workstations'];
+    $parkingBays   = $inputData['parkingBays'] ?? $inputData['parking_bays'] ?? $existing['parking_bays'];
+    $monthlyRent   = $inputData['monthlyRent'] ?? $inputData['monthly_rent'] ?? $existing['monthly_rent'];
+    $status        = $inputData['status'] ?? $existing['status'];
+    $leaseStart    = $inputData['leaseStart'] ?? $inputData['lease_start'] ?? $existing['lease_start'];
+
+    $badgeIds = $existing['badge_ids'];
+    if (array_key_exists('badgeIds', $inputData)) {
+        $badgeIds = is_array($inputData['badgeIds']) ? json_encode($inputData['badgeIds'], JSON_UNESCAPED_UNICODE) : $inputData['badgeIds'];
+    }
+
+    $stmt = $pdo->prepare("UPDATE `mc_tenants` SET 
+        name = :nm, company = :cp, role = :rl, email = :em, phone = :ph,
+        space_assigned = :sp, workstations = :ws, parking_bays = :pb, badge_ids = :bg,
+        monthly_rent = :mr, status = :st, lease_start = :ls, updated_at = :up WHERE id = :id");
+
+    $stmt->execute([
+        ':nm' => $name,
+        ':cp' => $company,
+        ':rl' => $role,
+        ':em' => $email,
+        ':ph' => $phone,
+        ':sp' => $spaceAssigned,
+        ':ws' => $workstations,
+        ':pb' => $parkingBays,
+        ':bg' => $badgeIds,
+        ':mr' => $monthlyRent,
+        ':st' => $status,
+        ':ls' => $leaseStart,
+        ':up' => $now,
+        ':id' => $id
+    ]);
+
+    $getStmt->execute([':id' => $id]);
+    $updated = formatTenantRow($getStmt->fetch());
+
+    echo json_encode([
+        'success' => true,
+        'message' => 'Résident mis à jour avec succès.',
+        'tenant'  => $updated,
+        'metrics' => computeTenantMetrics($pdo)
+    ]);
+    exit;
+}
+
+if ($action === 'delete_tenant' || ($action === 'tenant' && $method === 'DELETE')) {
+    $id = trim($_GET['id'] ?? $inputData['id'] ?? '');
+    if (empty($id)) {
+        http_response_code(400);
+        echo json_encode(['success' => false, 'message' => 'ID manquant.']);
+        exit;
+    }
+
+    $delStmt = $pdo->prepare("DELETE FROM `mc_tenants` WHERE id = :id");
+    $delStmt->execute([':id' => $id]);
+
+    echo json_encode([
+        'success' => true,
+        'message' => 'Résident supprimé avec succès.',
+        'metrics' => computeTenantMetrics($pdo)
+    ]);
+    exit;
+}
+
+// =============================================================
+// SECTION 4: KEY-VALUE SETTINGS (mc_settings)
+// =============================================================
+
 if ($action === 'settings') {
     if ($method === 'GET') {
         $stmt = $pdo->query("SELECT setting_key, setting_value FROM `mc_settings`");
@@ -550,4 +1083,3 @@ echo json_encode([
     'success' => false,
     'message' => 'Action inconnue ou non supportée: ' . htmlspecialchars($action)
 ]);
-
