@@ -282,33 +282,35 @@ export default function AudienceSection({
           </div>
         </ScrollReveal>
 
-        {/* Tab Buttons Pill Strip (Responsive Scroll on Mobile) */}
-        <div className="flex items-center justify-start sm:justify-center gap-2 sm:gap-3 overflow-x-auto pb-3 pt-1 scrollbar-none snap-x mb-8 sm:mb-10 px-1">
-          {content.tabs.map((tab, index) => {
-            const Icon = tab.icon;
-            const isActive = activeTab === index;
-            return (
-              <button
-                key={tab.id}
-                onClick={() => setActiveTab(index)}
-                className={`inline-flex items-center gap-2 px-4 sm:px-5 py-2.5 rounded-full text-xs font-semibold uppercase tracking-wider transition-all duration-200 cursor-pointer shrink-0 snap-start whitespace-nowrap ${
-                  isActive
-                    ? "bg-calve-charcoal text-white shadow-sm border border-calve-charcoal"
-                    : "bg-white/90 text-calve-charcoal/80 hover:text-calve-charcoal hover:bg-white border border-calve-border"
-                }`}
-              >
-                <Icon className={`w-3.5 h-3.5 ${isActive ? "text-calve-slate-light" : "text-calve-slate"}`} />
-                <span>{tab.label}</span>
-              </button>
-            );
-          })}
+        {/* Tab Buttons Pill Strip (Modern Segmented Pill Design) */}
+        <div className="flex items-center justify-start sm:justify-center overflow-x-auto pb-4 pt-1 scrollbar-none snap-x mb-8 sm:mb-10">
+          <div className="inline-flex items-center gap-1 p-1.5 rounded-full bg-stone-200/80 border border-stone-300/60 backdrop-blur-md shadow-2xs">
+            {content.tabs.map((tab, index) => {
+              const Icon = tab.icon;
+              const isActive = activeTab === index;
+              return (
+                <button
+                  key={tab.id}
+                  onClick={() => setActiveTab(index)}
+                  className={`inline-flex items-center gap-2 px-4 sm:px-5 py-2 rounded-full text-xs font-bold uppercase tracking-wider transition-all duration-200 cursor-pointer shrink-0 snap-start whitespace-nowrap ${
+                    isActive
+                      ? "bg-[#2D4B49] text-white shadow-sm"
+                      : "text-stone-600 hover:text-slate-900 hover:bg-white/60"
+                  }`}
+                >
+                  <Icon className={`w-3.5 h-3.5 ${isActive ? "text-white" : "text-stone-500"}`} />
+                  <span>{tab.label}</span>
+                </button>
+              );
+            })}
+          </div>
         </div>
 
         {/* ======================================================== */}
-        {/* CINEMATIC EDITORIAL SHOWCASE CARD (Inspired by Reference) */}
-        {/* Real 4K Photography Background + Left Frosted Blur & Gradient */}
+        {/* CINEMATIC EDITORIAL SHOWCASE CARD                        */}
+        {/* Real 4K Photography + Subtle Left Blur & Vignette        */}
         {/* ======================================================== */}
-        <div className="relative rounded-3xl lg:rounded-[2.25rem] overflow-hidden border border-calve-charcoal/10 shadow-[0_24px_60px_rgba(23,33,35,0.14)] min-h-[560px] flex flex-col justify-between p-6 sm:p-10 lg:p-12 group transition-all duration-500 bg-calve-charcoal text-white">
+        <div className="relative rounded-3xl lg:rounded-[2.5rem] overflow-hidden border border-white/10 shadow-[0_24px_60px_rgba(23,33,35,0.18)] min-h-[580px] lg:min-h-[620px] flex flex-col justify-between p-6 sm:p-10 lg:p-14 group transition-all duration-500 bg-slate-950 text-white">
           
           {/* Background Real 4K Space Photo */}
           <img
@@ -318,114 +320,97 @@ export default function AudienceSection({
             className="absolute inset-0 w-full h-full object-cover object-center transition-all duration-700 ease-out group-hover:scale-102"
           />
 
-          {/* Left Side Frosted Glass Blur Mask Layer (Smoothly fades from blur on left to sharp on right) */}
+          {/* Left Side Frosted Glass Blur Mask Layer */}
           <div
-            className="absolute inset-y-0 left-0 w-full md:w-3/4 lg:w-3/5 backdrop-blur-md pointer-events-none"
+            className="absolute inset-y-0 left-0 w-full md:w-3/4 lg:w-3/5 backdrop-blur-[3px] pointer-events-none"
             style={{
               maskImage: "linear-gradient(to right, black 40%, transparent 100%)",
               WebkitMaskImage: "linear-gradient(to right, black 40%, transparent 100%)",
             }}
           />
 
-          {/* Cinematic Dark Vignette & Gradients to guarantee 100% text contrast */}
-          <div className="absolute inset-0 bg-gradient-to-r from-calve-charcoal/95 via-calve-charcoal/85 sm:via-calve-charcoal/75 md:via-calve-charcoal/60 to-calve-charcoal/30 pointer-events-none" />
-          <div className="absolute inset-0 bg-gradient-to-t from-calve-charcoal/95 via-transparent to-calve-charcoal/40 pointer-events-none" />
+          {/* Architectural Vignette: smooth, deep left gradient that lets natural daylight & room shine through on right */}
+          <div className="absolute inset-0 bg-gradient-to-r from-slate-950/94 via-slate-950/80 sm:via-slate-950/55 to-slate-950/15 pointer-events-none" />
+          <div className="absolute inset-0 bg-gradient-to-t from-slate-950/90 via-transparent to-slate-950/35 pointer-events-none" />
 
           {/* Top Bar Badges (Editorial Journal Style) */}
-          <div className="relative z-10 flex flex-wrap items-center justify-between gap-3 mb-8">
-            <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-white/10 backdrop-blur-md border border-white/20 text-[11px] font-bold tracking-wider uppercase text-amber-200">
-              <span className="w-1.5 h-1.5 rounded-full bg-amber-300 shrink-0" />
-              <span>
-                {language === "en"
-                  ? "Recommended Solution"
-                  : language === "es"
-                  ? "Espacio Recomendado"
-                  : "Formule Recommandée"}{" "}
-                — {currentTab.recommendedSpace}
-              </span>
+          <div className="relative z-10 flex flex-wrap items-center justify-between gap-3 mb-6 sm:mb-8">
+            <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-black/35 backdrop-blur-md border border-white/15 text-[11px] font-semibold tracking-wider uppercase text-stone-200">
+              <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 shrink-0" />
+              <span>{currentTab.badge}</span>
+              <span className="text-stone-500">·</span>
+              <span className="text-stone-300 font-normal">{currentTab.label}</span>
             </div>
 
-            <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-black/40 backdrop-blur-md border border-white/15 text-[11px] font-medium text-stone-200">
-              <MapPin className="w-3 h-3 text-calve-slate-light" />
+            <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-black/35 backdrop-blur-md border border-white/15 text-[11px] font-medium text-stone-300">
+              <MapPin className="w-3.5 h-3.5 text-stone-400" />
               <span>48 Rue Calvé · Bordeaux Fondaudège</span>
             </div>
           </div>
 
-          {/* Main Grid: Editorial Typography on the Left, Glassmorphism CTA on the Right */}
-          <div className="relative z-10 grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-12 items-center my-auto">
-            
-            {/* Left Column: Bold Editorial Title, Description, and Feature Chips */}
-            <div className="lg:col-span-7 space-y-6">
-              <h3 className="text-2xl sm:text-3xl md:text-4xl lg:text-[2.65rem] font-extrabold text-white tracking-tight leading-[1.14] drop-shadow-sm max-w-2xl">
-                {currentTab.heading}
-              </h3>
+          {/* Main Editorial Content: Bold Headline, Description, Elegant Highlights, Primary CTA */}
+          <div className="relative z-10 my-auto py-4 max-w-2xl">
+            <h3 className="text-2xl sm:text-3xl md:text-4xl lg:text-[2.75rem] font-extrabold text-white tracking-tight leading-[1.14] drop-shadow-sm">
+              {currentTab.heading}
+            </h3>
 
-              <p className="text-sm sm:text-base text-stone-200/95 leading-relaxed max-w-2xl font-normal drop-shadow-xs">
-                {currentTab.description}
-              </p>
+            <p className="mt-4 text-sm sm:text-base text-stone-200/90 leading-relaxed max-w-xl font-normal drop-shadow-xs">
+              {currentTab.description}
+            </p>
 
-              {/* High-Spec Feature Pills */}
-              <div className="pt-2 grid grid-cols-1 sm:grid-cols-2 gap-2.5 max-w-2xl">
-                {currentTab.highlights.map((item, idx) => (
-                  <div
-                    key={idx}
-                    className="flex items-center gap-2.5 px-3.5 py-2.5 rounded-xl bg-white/10 hover:bg-white/15 backdrop-blur-md border border-white/15 text-xs text-white font-medium transition-colors"
-                  >
-                    <CheckCircle2 className="w-4 h-4 text-emerald-400 shrink-0" />
-                    <span className="leading-snug">{item}</span>
+            {/* High-End Feature Highlights (Clean & Delicate Line Grid) */}
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-x-6 gap-y-3.5 pt-6 max-w-xl">
+              {currentTab.highlights.map((item, idx) => (
+                <div key={idx} className="flex items-center gap-2.5 text-xs sm:text-[13px] text-stone-200">
+                  <div className="w-4 h-4 rounded-full bg-white/10 border border-white/20 flex items-center justify-center shrink-0">
+                    <CheckCircle2 className="w-3 h-3 text-emerald-400" />
                   </div>
-                ))}
-              </div>
+                  <span className="leading-snug text-stone-200/95">{item}</span>
+                </div>
+              ))}
             </div>
 
-            {/* Right Column: High-End Frosted Glass Action Capsule */}
-            <div className="lg:col-span-5 flex flex-col items-center lg:items-end justify-center">
-              <div className="w-full max-w-sm rounded-2xl bg-black/45 backdrop-blur-xl border border-white/20 p-6 sm:p-7 text-center space-y-4 shadow-2xl">
-                <div className="w-12 h-12 rounded-2xl bg-white/15 border border-white/25 text-white mx-auto flex items-center justify-center shadow-inner">
-                  <currentTab.icon className="w-6 h-6 text-white" />
-                </div>
-                
-                <div>
-                  <h4 className="text-sm font-bold text-white uppercase tracking-wider">
-                    {currentTab.label}
-                  </h4>
-                  <p className="text-xs text-stone-300 mt-1 leading-relaxed">
-                    {language === "en"
-                      ? "Personalized tour & quote within 24h with Paul."
-                      : language === "es"
-                      ? "Visita guiada y presupuesto en 24h con Paul."
-                      : "Visite personnalisée et devis sous 24h avec Paul."}
-                  </p>
-                </div>
+            {/* Action Lockup: Primary Button + Host Guarantee */}
+            <div className="pt-8 flex flex-col sm:flex-row sm:items-center gap-4">
+              <button
+                onClick={() => onOpenEnquiry(currentTab.recommendedId)}
+                className="inline-flex items-center justify-center gap-2.5 px-7 py-3.5 rounded-xl bg-white hover:bg-stone-100 text-slate-950 text-xs sm:text-sm font-bold tracking-wide transition-all duration-200 shadow-xl hover:-translate-y-0.5 active:translate-y-0 cursor-pointer"
+              >
+                <span>{content.cta}</span>
+                <ArrowRight className="w-4 h-4 text-slate-950" />
+              </button>
 
-                <button
-                  onClick={() => onOpenEnquiry(currentTab.recommendedId)}
-                  className="w-full py-4 px-6 rounded-xl bg-white hover:bg-stone-100 text-calve-charcoal text-xs font-bold uppercase tracking-wider transition-all shadow-md hover:scale-[1.02] active:scale-[0.98] cursor-pointer flex items-center justify-center gap-2"
-                >
-                  <span>{content.cta}</span>
-                  <ArrowRight className="w-4 h-4 text-calve-charcoal" />
-                </button>
+              <div className="text-xs text-stone-300 flex items-center gap-2">
+                <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 shrink-0" />
+                <span>
+                  {language === "en"
+                    ? "Private tour & quote within 24h with Paul"
+                    : language === "es"
+                    ? "Visita privada y presupuesto en 24h con Paul"
+                    : "Visite privée & devis sous 24h avec Paul"}
+                </span>
               </div>
             </div>
-
           </div>
 
-          {/* Bottom Footer Lockup inside Card (Matches Editorial Reference) */}
+          {/* Bottom Lockup (Editorial Signature) */}
           <div className="relative z-10 pt-6 mt-6 border-t border-white/15 flex flex-col sm:flex-row sm:items-center justify-between gap-3 text-xs text-stone-300/80">
             <div className="flex items-center gap-3">
-              <span className="w-6 h-6 rounded-lg bg-white/15 border border-white/20 flex items-center justify-center text-[11px] font-black text-white">
+              <div className="w-7 h-7 rounded-lg bg-white/10 backdrop-blur-md border border-white/20 flex items-center justify-center text-[11px] font-bold text-white shadow-inner">
                 MC
-              </span>
-              <span className="font-semibold text-white/90">
-                Maison Calvé · Coworking & Siège Social
-              </span>
+              </div>
+              <div className="flex items-center gap-2">
+                <span className="font-bold text-white tracking-wide">MAISON CALVÉ</span>
+                <span className="text-stone-500">·</span>
+                <span className="text-stone-300 font-normal">
+                  {currentTab.recommendedSpace}
+                </span>
+              </div>
             </div>
 
-            <div className="flex items-center gap-4 text-[11px] text-stone-300/80">
-              <span className="flex items-center gap-1.5">
-                <ShieldCheck className="w-3.5 h-3.5 text-emerald-400" />
-                <span>Accès sécurisé & 9 places de parking</span>
-              </span>
+            <div className="flex items-center gap-2 text-[11px] text-stone-300/80">
+              <ShieldCheck className="w-3.5 h-3.5 text-emerald-400" />
+              <span>Accès sécurisé &amp; 9 places de parking privatives</span>
             </div>
           </div>
 
