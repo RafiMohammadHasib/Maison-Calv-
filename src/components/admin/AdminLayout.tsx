@@ -217,8 +217,8 @@ export default function AdminLayout({
                 <div className="font-extrabold text-sm tracking-tight text-calve-charcoal leading-tight">
                   MAISON CALVÉ
                 </div>
-                <div className="text-[10px] font-bold uppercase tracking-widest text-emerald-800">
-                  ADMIN OS
+                <div className="text-[10px] font-semibold uppercase tracking-widest text-slate-500">
+                  ESPACE GESTION
                 </div>
               </div>
             </Link>
@@ -425,10 +425,10 @@ export default function AdminLayout({
           {title && (
             <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-2">
               <div>
-                <div className="text-[11px] font-bold uppercase tracking-widest text-emerald-800 flex items-center gap-2 mb-1">
-                  <span>MAISON CALVÉ SAAS OS</span>
+                <div className="text-[11px] font-semibold uppercase tracking-widest text-slate-500 flex items-center gap-2 mb-1">
+                  <span>MAISON CALVÉ</span>
                   <span>•</span>
-                  <span className="text-emerald-700">FONDAUDÈGE TERMINAL</span>
+                  <span>48 RUE CALVÉ, BORDEAUX</span>
                 </div>
                 <h1 className="text-2xl sm:text-3xl font-extrabold text-calve-charcoal tracking-tight">
                   {title}

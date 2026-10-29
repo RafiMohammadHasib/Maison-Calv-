@@ -370,8 +370,7 @@ export default function MaisonHeroScene({ onExploreClick }: MaisonHeroSceneProps
 
       {/* Interactive badge & hint */}
       <div className="pointer-events-none absolute bottom-6 left-1/2 -translate-x-1/2 flex items-center gap-2 px-4 py-2 rounded-full bg-calve-cream/90 backdrop-blur-md border border-calve-border shadow-sm text-xs font-medium text-calve-charcoal/80">
-        <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse" />
-        <span>Modèle architectural 3D temps réel · 48 rue Calvé</span>
+        <span>Modèle architectural 3D · 48 rue Calvé</span>
       </div>
     </div>
   );

@@ -317,9 +317,9 @@ export default function InteractiveFloorPlan({ onSelectSpace }: InteractiveFloor
       {/* Top Filter Buttons */}
       <div className="p-4 md:p-6 border-b border-calve-border bg-calve-stone/30 flex flex-wrap items-center justify-between gap-3">
         <div className="flex items-center gap-2">
-          <span className="w-2.5 h-2.5 rounded-full bg-calve-slate animate-pulse" />
+          <span className="w-2 h-2 rounded-full bg-calve-slate" />
           <span className="text-xs font-semibold tracking-wider uppercase text-calve-charcoal/70">
-            Plan Architectural 3D Découpé · 48 Rue Calvé
+            Plan Architectural 3D · 48 Rue Calvé
           </span>
         </div>
 

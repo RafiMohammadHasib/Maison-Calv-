@@ -9,14 +9,8 @@ import {
   Mail,
   Eye,
   EyeOff,
-  ShieldCheck,
   ArrowRight,
-  Server,
-  Activity,
-  KeyRound,
-  CheckCircle2,
-  AlertCircle,
-  Building2
+  AlertCircle
 } from "lucide-react";
 import { useLanguage } from "@/lib/languageContext";
 
@@ -113,84 +107,33 @@ export default function AdminLoginPage() {
               <div className="text-sm font-extrabold tracking-tight text-white flex items-center gap-2">
                 <span>MAISON CALVÉ</span>
               </div>
-              <p className="text-[9px] uppercase font-bold tracking-widest text-emerald-300">
-                ■ MAISON DE BUREAUX &amp; COWORKING · BORDEAUX
+              <p className="text-[10px] uppercase font-medium tracking-widest text-stone-300">
+                Hôtel Particulier · Bordeaux Fondaudège
               </p>
             </div>
-          </div>
-
-          <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-black/25 backdrop-blur-md border border-white/15 text-xs text-stone-200 shadow-sm">
-            <Lock className="w-3.5 h-3.5 text-emerald-400" />
-            <span className="font-medium text-[11px]">
-              {language === "fr" ? "Terminal d'Administration Sécurisé" : "Secure Administration Terminal"}
-            </span>
           </div>
         </div>
 
         {/* Hero Narrative in Left Pane */}
         <div className="relative z-10 my-auto py-12 max-w-xl">
-          <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-black/25 backdrop-blur-md border border-white/15 text-[11px] font-semibold text-emerald-300 mb-6 shadow-sm">
-            <span className="w-2 h-2 rounded-full bg-emerald-400" />
-            <span>Maison Calvé SaaS OS · Version 2026.4</span>
-          </div>
-
           <h1 className="text-3xl xl:text-4xl 2xl:text-5xl font-extrabold text-white tracking-tight leading-[1.15]">
             {language === "fr"
-              ? "Espaces d'exception & bureaux privatifs à Bordeaux, entièrement synchronisés."
-              : "Exceptional Bordeaux property management, fully synchronized."}
+              ? "Bureaux d'exception et espaces de travail au cœur de Bordeaux."
+              : "Exceptional private offices and workspaces in the heart of Bordeaux."}
           </h1>
 
           <p className="mt-4 text-sm xl:text-base text-stone-200/90 leading-relaxed max-w-lg font-normal">
             {language === "fr"
-              ? "Accédez au terminal centralisé pour superviser votre portefeuille d'espaces, le pipeline CRM des résidents et les visites privées."
-              : "Access the centralized terminal to manage your portfolio, owner & tenant CRM pipelines, and digital real estate assets."}
+              ? "Portail de gestion dédié aux visites privées, à l'attribution des suites et au suivi des résidents du 48 rue Calvé."
+              : "Dedicated management portal for private visits, suite allocations, and resident hospitality at 48 rue Calvé."}
           </p>
-
-          {/* 3 Metrics Glass Cards (Matching Reference Image) */}
-          <div className="grid grid-cols-3 gap-3.5 pt-8">
-            <div className="p-4 rounded-2xl bg-black/35 backdrop-blur-md border border-white/15 space-y-1 shadow-xl hover:border-white/25 transition-all">
-              <div className="text-stone-300 text-[10px] font-bold uppercase tracking-wider">
-                ENCRYPTION
-              </div>
-              <div className="text-base xl:text-lg font-black text-white tracking-tight">
-                AES-256
-              </div>
-              <div className="text-[10px] text-stone-400 font-medium">
-                Bordeaux Cloud
-              </div>
-            </div>
-
-            <div className="p-4 rounded-2xl bg-black/35 backdrop-blur-md border border-white/15 space-y-1 shadow-xl hover:border-white/25 transition-all">
-              <div className="text-stone-300 text-[10px] font-bold uppercase tracking-wider">
-                UPTIME
-              </div>
-              <div className="text-base xl:text-lg font-black text-white tracking-tight">
-                99.98%
-              </div>
-              <div className="text-[10px] text-stone-400 font-medium">
-                {language === "fr" ? "Temps réel" : "Real-time"}
-              </div>
-            </div>
-
-            <div className="p-4 rounded-2xl bg-black/35 backdrop-blur-md border border-white/15 space-y-1 shadow-xl hover:border-white/25 transition-all">
-              <div className="text-stone-300 text-[10px] font-bold uppercase tracking-wider">
-                PROTECTION
-              </div>
-              <div className="text-base xl:text-lg font-black text-white tracking-tight">
-                Rate Limit
-              </div>
-              <div className="text-[10px] text-stone-400 font-medium">
-                Anti-bruteforce
-              </div>
-            </div>
-          </div>
         </div>
 
         {/* Bottom Legal Notice in Left Pane */}
         <div className="relative z-10 flex items-center justify-between text-xs text-stone-300/80 pt-6 border-t border-white/10">
-          <div>© 2026 MAISON CALVÉ SARL · 48 rue Calvé, 33000 Bordeaux</div>
+          <div>© {new Date().getFullYear()} MAISON CALVÉ · 48 rue Calvé, 33000 Bordeaux</div>
           <div className="text-[10px] tracking-widest uppercase font-mono text-stone-400">
-            CP163012023000000128
+            BORDEAUX CENTRE · JARDIN PUBLIC
           </div>
         </div>
       </div>
@@ -241,13 +184,8 @@ export default function AdminLoginPage() {
         <div className="w-full max-w-sm sm:max-w-md mx-auto my-auto py-8">
           {/* Header */}
           <div className="text-center mb-7">
-            <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full border border-slate-200 bg-slate-50 text-[10px] font-bold uppercase tracking-widest text-slate-500 mb-3.5 shadow-2xs">
-              <span className="w-1.5 h-1.5 rounded-full bg-slate-400" />
-              <span>{language === "fr" ? "ACCÈS SUPER ADMIN" : "SUPER ADMIN SIGN IN"}</span>
-            </div>
-
             <h2 className="text-3xl sm:text-4xl font-extrabold text-slate-900 tracking-tight">
-              {language === "fr" ? "Admin Portal" : "Admin Portal"}
+              {language === "fr" ? "Espace Administration" : "Admin Portal"}
             </h2>
 
             <p className="mt-2 text-xs sm:text-sm text-slate-500">
@@ -363,23 +301,19 @@ export default function AdminLoginPage() {
             </div>
           </form>
 
-          {/* Security Banner Stamp */}
-          <div className="mt-8 pt-5 border-t border-slate-100 text-center space-y-1 text-[11px] text-slate-400">
-            <div className="flex items-center justify-center gap-1.5 text-slate-600 font-medium">
-              <ShieldCheck className="w-3.5 h-3.5 text-emerald-600" />
-              <span>Secure TLS 1.3 / AES-256 Session</span>
-            </div>
+          {/* Security Notice */}
+          <div className="mt-8 pt-5 border-t border-slate-100 text-center text-xs text-slate-400">
             <p>
               {language === "fr"
-                ? "Système d'accès restreint réservé aux collaborateurs Maison Calvé autorisés."
-                : "Restricted system for authorized Maison Calvé personnel only."}
+                ? "Accès sécurisé réservé à l'équipe Maison Calvé."
+                : "Secure access restricted to Maison Calvé team."}
             </p>
           </div>
         </div>
 
         {/* Bottom Minimal Watermark */}
-        <div className="text-center text-[10px] text-slate-400 uppercase tracking-widest font-mono">
-          MAISON CALVÉ OS · Bordeaux Fondaudège
+        <div className="text-center text-[10px] text-slate-400 uppercase tracking-widest">
+          MAISON CALVÉ · 48 RUE CALVÉ, 33000 BORDEAUX
         </div>
       </div>
     </div>

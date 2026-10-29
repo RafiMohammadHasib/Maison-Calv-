@@ -595,7 +595,7 @@ export default function SettingsPage() {
                 <div className="flex items-center gap-2">
                   {ovhStatus?.success || ovhStatus?.status === "healthy" ? (
                     <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-emerald-50 text-emerald-700 border border-emerald-200 text-xs font-bold">
-                      <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span>
+                      <span className="w-2 h-2 rounded-full bg-emerald-500"></span>
                       Connecté &amp; Opérationnel
                     </span>
                   ) : ovhStatus?.error ? (
@@ -860,7 +860,7 @@ export default function SettingsPage() {
                 <div>
                   <div className="font-bold text-xs text-calve-charcoal flex items-center gap-1.5">
                     <Lock className="w-3.5 h-3.5 text-emerald-600" />
-                    <span>Chiffrement TLS 1.3 &amp; AES-256</span>
+                    <span>Sécurité des sessions &amp; jetons d&apos;accès</span>
                   </div>
                   <p className="text-[11px] text-calve-muted mt-0.5">
                     Sessions protégées avec signature sécurisée et jeton HttpOnly contre les attaques XSS.

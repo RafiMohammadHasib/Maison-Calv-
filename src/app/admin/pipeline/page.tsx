@@ -585,7 +585,7 @@ export default function PipelinePage() {
           <div className="flex items-center gap-2.5 shrink-0">
             {/* Total Active Counter */}
             <div className="hidden sm:flex items-center gap-2 px-3.5 py-1.5 rounded-xl bg-slate-100 border border-slate-200/80 text-xs font-bold text-slate-700 shadow-2xs">
-              <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse" />
+              <span className="w-2 h-2 rounded-full bg-emerald-500" />
               <span>
                 {leads.length} {language === "fr" ? "Opportunités actives" : "Active Opportunities"}
               </span>
