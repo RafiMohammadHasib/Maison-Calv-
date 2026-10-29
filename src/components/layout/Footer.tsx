@@ -79,10 +79,10 @@ export default function Footer({
               <li>
                 <a href="#espaces" className="hover:text-white transition-colors">
                   {language === "en"
-                    ? "Private offices (17–25 sqm)"
+                    ? "Private offices (21–28 sqm)"
                     : language === "es"
-                    ? "Despachos privados (17–25 m²)"
-                    : "Bureaux privatifs (17–25 m²)"}
+                    ? "Despachos privados (21–28 m²)"
+                    : "Bureaux privatifs (21–28 m²)"}
                 </a>
               </li>
               <li>

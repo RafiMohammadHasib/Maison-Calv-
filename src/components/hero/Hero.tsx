@@ -89,22 +89,22 @@ export default function Hero({ language, onOpenEnquiry }: HeroProps) {
 
         {/* Grand Architectural Showcase: 3 Authentic 4K Photographs */}
         <div className="grid grid-cols-1 md:grid-cols-3 gap-4 sm:gap-6">
-          {/* Photo 1: Authentic 17m² Private Office */}
+          {/* Photo 1: Authentic 21m² Private Office */}
           <div className="relative rounded-2xl sm:rounded-3xl overflow-hidden border border-calve-border shadow-md aspect-4/3 bg-calve-stone group">
             <img
-              src="/images/spaces/real-office-17m-4k.jpg"
+              src="/images/spaces/real-office-21m-4k.jpg"
               alt={
                 language === "en"
-                  ? "Maison Calvé - 17 sqm private office with blue accent wall and woven pendant light"
+                  ? "Maison Calvé - 21 sqm private office with blue accent wall and woven pendant lights"
                   : language === "es"
-                  ? "Maison Calvé - Despacho privado 17 m² con pared azul y lámpara de ratán"
-                  : "Maison Calvé - Bureau privatif 17 m² avec mur bleu, parquet chêne et luminaire en rotin"
+                  ? "Maison Calvé - Despacho privado 21 m² con pared azul y lámpara de ratán"
+                  : "Maison Calvé - Bureau privatif 21 m² avec mur bleu, parquet chaleureux et luminaires en rotin"
               }
               className="w-full h-full object-cover group-hover:scale-104 transition-transform duration-700"
             />
             <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent flex items-end p-4">
               <span className="text-xs font-bold text-white drop-shadow-sm uppercase tracking-wider">
-                {language === "en" ? "Private Office 17 sqm" : language === "es" ? "Despacho Privado 17 m²" : "Bureau Privatif 17 m²"}
+                {language === "en" ? "Private Office 21 sqm" : language === "es" ? "Despacho Privado 21 m²" : "Bureau Privatif 21 m²"}
               </span>
             </div>
           </div>
@@ -129,22 +129,22 @@ export default function Hero({ language, onOpenEnquiry }: HeroProps) {
             </div>
           </div>
 
-          {/* Photo 3: Authentic 25m² Private Office */}
+          {/* Photo 3: Authentic 28m² Private Office */}
           <div className="relative rounded-2xl sm:rounded-3xl overflow-hidden border border-calve-border shadow-md aspect-4/3 bg-calve-stone group">
             <img
-              src="/images/spaces/real-office-25m-4k.jpg"
+              src="/images/spaces/real-office-28m-4k.jpg"
               alt={
                 language === "en"
-                  ? "Maison Calvé - 25 sqm private office with dual windows and pine floor"
+                  ? "Maison Calvé - 28 sqm private office with modern cluster chandelier and cobalt accent wall"
                   : language === "es"
-                  ? "Maison Calvé - Despacho privado 25 m² con doble ventana"
-                  : "Maison Calvé - Bureau privatif 25 m² avec parquet authentique et double fenêtre"
+                  ? "Maison Calvé - Despacho privado 28 m² con lámpara de diseño"
+                  : "Maison Calvé - Bureau privatif 28 m² avec lustre moderne et parquet authentique"
               }
               className="w-full h-full object-cover group-hover:scale-104 transition-transform duration-700"
             />
             <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent flex items-end p-4">
               <span className="text-xs font-bold text-white drop-shadow-sm uppercase tracking-wider">
-                {language === "en" ? "Private Office 25 sqm" : language === "es" ? "Despacho Privado 25 m²" : "Bureau Privatif 25 m²"}
+                {language === "en" ? "Private Office 28 sqm" : language === "es" ? "Despacho Privado 28 m²" : "Bureau Privatif 28 m²"}
               </span>
             </div>
           </div>

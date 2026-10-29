@@ -80,12 +80,12 @@ export function getUnifiedTenants(providedLeads?: Lead[]): TenantRecord[] {
 
     if (lead.type === "private-office") {
       if (lead.officeSize?.includes("25")) {
-        spaceName = "Bureau Privatif 25m² (RDC Cour)";
+        spaceName = "Bureau Privatif 28 m² (RDC Cour)";
         rentStr = "1 000 € HT / mois";
         workstations = 5;
         parking = "Places #3 & #4";
       } else if (lead.officeSize?.includes("17")) {
-        spaceName = "Bureau Privatif 17 m² (Aile Ouest)";
+        spaceName = "Bureau Privatif 21 m² (Aile Ouest)";
         rentStr = "750 € HT / mois";
         workstations = 3;
         parking = "Place #5";
@@ -159,9 +159,9 @@ export function getUnifiedSpaces(providedLeads?: Lead[]): SpaceInventoryRecord[]
   const spaces: SpaceInventoryRecord[] = [
     {
       id: "office-17m",
-      name: "Bureau Privatif 17 m²",
+      name: "Bureau Privatif 21 m²",
       category: "private",
-      area: "17 m²",
+      area: "21 m²",
       capacity: "3 à 4 postes de travail",
       price: "750 € HT",
       period: "par mois",
@@ -169,7 +169,7 @@ export function getUnifiedSpaces(providedLeads?: Lead[]): SpaceInventoryRecord[]
       statusText: won17m
         ? `Réservé & Occupé par ${won17m.company || won17m.name}`
         : "Disponible immédiatement",
-      image: "/images/spaces/bureau-privatif-17m.png",
+      image: "/images/spaces/bureau-privatif-21m.png",
       parkingIncluded: true,
       currentTenant: won17m
         ? {
@@ -192,9 +192,9 @@ export function getUnifiedSpaces(providedLeads?: Lead[]): SpaceInventoryRecord[]
     },
     {
       id: "office-25m",
-      name: "Bureau privatif 25m²",
+      name: "Bureau privatif 28 m²",
       category: "private",
-      area: "25 m²",
+      area: "28 m²",
       capacity: "5 à 6 postes de travail",
       price: "1 000 € HT",
       period: "par mois",
@@ -202,7 +202,7 @@ export function getUnifiedSpaces(providedLeads?: Lead[]): SpaceInventoryRecord[]
       statusText: won25m
         ? `Réservé & Occupé par ${won25m.company || won25m.name}`
         : "1 bureau disponible",
-      image: "/images/spaces/bureau-privatif-25m.png",
+      image: "/images/spaces/bureau-privatif-28m.png",
       parkingIncluded: true,
       currentTenant: won25m
         ? {

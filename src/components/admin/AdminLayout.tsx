@@ -67,7 +67,7 @@ export default function AdminLayout({
     phone: "",
     company: "",
     type: "private-office" as "private-office" | "open-space" | "meeting-room",
-    officeSize: "25 m² (5-6 postes)",
+    officeSize: "28 m² (5-6 postes)",
     date: "",
     timeSlot: "morning",
     source: "Book a Private Tour (Admin)",
@@ -135,7 +135,7 @@ export default function AdminLayout({
           phone: "",
           company: "",
           type: "private-office",
-          officeSize: "25 m² (5-6 postes)",
+          officeSize: "28 m² (5-6 postes)",
           date: "",
           timeSlot: "morning",
           source: "Book a Private Tour (Admin)",
@@ -547,7 +547,7 @@ export default function AdminLayout({
                     onChange={(e: any) => setModalForm({ ...modalForm, type: e.target.value })}
                     className="w-full px-3.5 py-2.5 rounded-xl border border-calve-border text-xs focus:border-calve-slate font-medium"
                   >
-                    <option value="private-office">Bureau Privatif (17 ou 25m²)</option>
+                    <option value="private-office">Bureau Privatif (21 ou 28m²)</option>
                     <option value="open-space">Open Space (Fixe ou Nomade)</option>
                     <option value="meeting-room">Salle de Réunion 30 m²</option>
                   </select>
@@ -590,7 +590,7 @@ export default function AdminLayout({
                   rows={2}
                   value={modalForm.initialNote}
                   onChange={(e) => setModalForm({ ...modalForm, initialNote: e.target.value })}
-                  placeholder="Ex: Intéressé par le bureau 25m², visite fixée ce vendredi..."
+                  placeholder="Ex: Intéressé par le bureau 28m², visite fixée ce vendredi..."
                   className="w-full px-3.5 py-2 rounded-xl border border-calve-border text-xs focus:border-calve-slate"
                 />
               </div>

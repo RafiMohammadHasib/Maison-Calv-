@@ -98,11 +98,11 @@ export default function Manifesto({ language, onOpenEnquiry }: ManifestoProps) {
           {/* ---------------------------------------------------- */}
           <div className="lg:col-span-6 space-y-6">
             
-            {/* Primary Hero: The Authentic 25m² Private Suite */}
+            {/* Primary Hero: The Authentic 21m² Private Suite */}
             <div className="relative rounded-3xl overflow-hidden shadow-lg border border-calve-border/80 aspect-4/3 sm:aspect-16/11 group bg-stone-100">
               <img
-                src="/images/spaces/real-office-25m-4k.jpg"
-                alt="Bureau privatif 25 m² Maison Calvé avec mur d'accent bleu cobalt et parquet chaleureux"
+                src="/images/spaces/real-office-21m-4k.jpg"
+                alt="Bureau privatif 21 m² Maison Calvé avec mur d'accent bleu cobalt et parquet chaleureux"
                 className="w-full h-full object-cover group-hover:scale-102 transition-transform duration-700"
               />
               <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/10 to-transparent pointer-events-none" />
@@ -110,7 +110,7 @@ export default function Manifesto({ language, onOpenEnquiry }: ManifestoProps) {
               {/* Minimalist Floating Label */}
               <div className="absolute top-5 left-5 z-10 pointer-events-none">
                 <span className="px-3.5 py-1.5 rounded-full bg-white/95 backdrop-blur-md text-[11px] font-bold uppercase tracking-wider text-calve-charcoal shadow-xs border border-white/60">
-                  {language === "en" ? "Private Suite 25 sqm" : language === "es" ? "Despacho Privado 25 m²" : "Bureau Privatif 25 m²"}
+                  {language === "en" ? "Private Suite 21 sqm" : language === "es" ? "Despacho Privado 21 m²" : "Bureau Privatif 21 m²"}
                 </span>
               </div>
 

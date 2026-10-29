@@ -28,11 +28,11 @@ export default function AudienceSection({
           id: "executives",
           label: "Dirigeants & PME",
           icon: Briefcase,
-          image: "/images/spaces/real-office-25m-4k.jpg",
+          image: "/images/spaces/real-office-21m-4k.jpg",
           heading: "Le prestige d'un siège social avec parking privatif",
           description:
             "Offrez à votre entreprise une adresse de standing au cœur de Bordeaux. Recevez vos clients, partenaires et investisseurs dans un cadre d'exception tout en bénéficiant de places de parking privatives dans la cour sécurisée.",
-          recommendedSpace: "Bureaux privatifs (17–25 m²)",
+          recommendedSpace: "Bureaux privatifs (21–28 m²)",
           recommendedId: "office",
           badge: "Espaces Dirigeants",
           highlights: [
@@ -109,11 +109,11 @@ export default function AudienceSection({
           id: "executives",
           label: "Founders & SMEs",
           icon: Briefcase,
-          image: "/images/spaces/real-office-25m-4k.jpg",
+          image: "/images/spaces/real-office-21m-4k.jpg",
           heading: "The prestige of a private mansion with on-site parking",
           description:
             "Host partners, clients, and board members in an architecturally refined setting while securing on-site courtyard parking in downtown Bordeaux.",
-          recommendedSpace: "Private Offices (17–25 m²)",
+          recommendedSpace: "Private Offices (21–28 m²)",
           recommendedId: "office",
           badge: "Executive Suites",
           highlights: [
@@ -194,7 +194,7 @@ export default function AudienceSection({
           heading: "El prestigio de un palacete con aparcamiento privado",
           description:
             "Reciba a sus clientes e inversores en un entorno distinguido con la ventaja única de aparcar en el patio privado.",
-          recommendedSpace: "Despachos privados (17–25 m²)",
+          recommendedSpace: "Despachos privados (21–28 m²)",
           recommendedId: "office",
           badge: "Despachos de Dirección",
           highlights: [

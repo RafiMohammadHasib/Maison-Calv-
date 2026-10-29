@@ -53,7 +53,7 @@ export default function JsonLd() {
     image: [
       "https://maisoncalve.fr/images/spaces/real-open-space-fixe-4k.jpg",
       "https://maisoncalve.fr/images/real/maison-calve-open-space.jpg",
-      "https://maisoncalve.fr/images/spaces/real-office-17m-4k.jpg",
+      "https://maisoncalve.fr/images/spaces/real-office-21m-4k.jpg",
       "https://maisoncalve.fr/images/real/maison-calve-meeting-room.jpg",
       "https://maisoncalve.fr/images/real/maison-calve-kitchen.jpg",
       "https://maisoncalve.fr/images/calve-parking.jpg"

@@ -478,7 +478,7 @@ export default function ToursPage() {
                         <Building2 className="w-3.5 h-3.5 text-calve-slate shrink-0" />
                         <span>
                           {tour.type === "private-office"
-                            ? tour.officeSize || (language === "fr" ? "Bureau Privatif 17m² / 25m²" : "Private Office 17sqm / 25sqm")
+                            ? tour.officeSize || (language === "fr" ? "Bureau Privatif 21m² / 28m²" : "Private Office 21sqm / 28sqm")
                             : tour.type === "open-space"
                             ? `Open Space (${tour.openSpacePlan === "fixe" ? (language === "fr" ? "Poste Fixe" : "Dedicated Desk") : "Flex"})`
                             : (language === "fr" ? "Salle de Réunion 30m²" : "Meeting Room 30sqm")}

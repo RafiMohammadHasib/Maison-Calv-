@@ -61,7 +61,7 @@ export default function SpacesInventoryPage() {
     period: "par mois",
     status: "available" as "available" | "limited" | "occupied",
     statusText: "Disponible immédiatement",
-    image: "/images/spaces/bureau-privatif-17m.png"
+    image: "/images/spaces/bureau-privatif-21m.png"
   });
 
   const fetchSpaces = async () => {
@@ -213,7 +213,7 @@ export default function SpacesInventoryPage() {
           period: "par mois",
           status: "available",
           statusText: "Disponible immédiatement",
-          image: "/images/spaces/bureau-privatif-17m.png"
+          image: "/images/spaces/bureau-privatif-21m.png"
         });
       }
     } catch (err) {
@@ -289,7 +289,7 @@ export default function SpacesInventoryPage() {
             {metrics?.totalPrivateOffices ?? 5}
           </div>
           <p className="text-xs text-calve-muted">
-            17 m² (750 € HT) · 25 m² (1 000 € HT) · Suite Partenaire
+            21 m² (750 € HT) · 28 m² (1 000 € HT) · Suite Partenaire
           </p>
         </div>
 

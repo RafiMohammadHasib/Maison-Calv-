@@ -100,7 +100,7 @@ export async function POST(request: Request) {
       phone: body.phone,
       company: body.company || "",
       type: body.type || "private-office",
-      officeSize: body.officeSize || "17 m²",
+      officeSize: body.officeSize || "21 m²",
       workstationCount: Number(body.workstationCount) || 3,
       date: body.date || new Date().toISOString().split("T")[0],
       timeSlot: body.timeSlot || "morning",

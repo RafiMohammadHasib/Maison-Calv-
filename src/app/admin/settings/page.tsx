@@ -445,7 +445,7 @@ export default function SettingsPage() {
               <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
                 <div>
                   <label className="block text-[10px] font-bold uppercase tracking-wider text-calve-muted mb-1.5">
-                    Bureau Privatif 17 m²
+                    Bureau Privatif 21 m²
                   </label>
                   <input
                     type="text"
@@ -458,7 +458,7 @@ export default function SettingsPage() {
 
                 <div>
                   <label className="block text-[10px] font-bold uppercase tracking-wider text-calve-muted mb-1.5">
-                    Bureau privatif 25m²
+                    Bureau privatif 28 m²
                   </label>
                   <input
                     type="text"

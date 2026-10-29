@@ -193,7 +193,7 @@ export default function PipelinePage() {
     phone: "",
     company: "",
     type: "private-office" as "private-office" | "open-space" | "meeting-room",
-    officeSize: "17 m² (3-4 postes)",
+    officeSize: "21 m² (3-4 postes)",
     date: "",
     timeSlot: "morning",
     priority: "high" as LeadPriority,
@@ -361,7 +361,7 @@ export default function PipelinePage() {
           phone: "",
           company: "",
           type: "private-office",
-          officeSize: "17 m² (3-4 postes)",
+          officeSize: "21 m² (3-4 postes)",
           date: "",
           timeSlot: "morning",
           priority: "high",
@@ -785,7 +785,7 @@ export default function PipelinePage() {
                             <Home className="w-3 h-3 text-calve-slate shrink-0" />
                             <span className="truncate">
                               {lead.type === "private-office"
-                                ? lead.officeSize || "Bureau 17m²"
+                                ? lead.officeSize || "Bureau 21 m²"
                                 : lead.type === "open-space"
                                 ? `Open Space (${lead.openSpacePlan === "fixe" ? "Poste Fixe" : "Nomade"})`
                                 : "Salle Réunion 30m²"}
@@ -960,7 +960,7 @@ export default function PipelinePage() {
                     <Home className="w-3.5 h-3.5 text-calve-slate" />
                     <span>
                       {selectedLead.type === "private-office"
-                        ? selectedLead.officeSize || "Bureau 17m²"
+                        ? selectedLead.officeSize || "Bureau 21 m²"
                         : selectedLead.type === "open-space"
                         ? `Open Space (${selectedLead.openSpacePlan === "fixe" ? "Poste Fixe" : "Nomade"})`
                         : "Salle Réunion 30m²"}
@@ -1210,7 +1210,7 @@ export default function PipelinePage() {
                     onChange={(e) => setCreateForm({ ...createForm, type: e.target.value as any })}
                     className="w-full px-3 py-2 rounded-xl bg-slate-50 border border-calve-border focus:border-calve-slate font-medium"
                   >
-                    <option value="private-office">Bureau Privatif (17 ou 25m²)</option>
+                    <option value="private-office">Bureau Privatif (17 ou 28 m²)</option>
                     <option value="open-space">Open Space (Poste fixe 250€)</option>
                     <option value="meeting-room">Salle de Réunion (30m²)</option>
                   </select>
@@ -1221,7 +1221,7 @@ export default function PipelinePage() {
                     type="text"
                     value={createForm.officeSize}
                     onChange={(e) => setCreateForm({ ...createForm, officeSize: e.target.value })}
-                    placeholder="17 m² (3-4 postes)"
+                    placeholder="21 m² (3-4 postes)"
                     className="w-full px-3 py-2 rounded-xl bg-slate-50 border border-calve-border focus:border-calve-slate"
                   />
                 </div>

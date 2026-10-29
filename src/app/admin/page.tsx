@@ -812,7 +812,7 @@ export default function AdminDashboardPage() {
                   >
                     <div className="flex items-center justify-between">
                       <span className="text-[11px] font-medium text-calve-muted">
-                        {isEnglish ? "Offices 17-25m²" : "Bureaux 17-25m²"}
+                        {isEnglish ? "Offices 17-28 m²" : "Bureaux 17-28 m²"}
                       </span>
                       <ArrowUpRight className="w-3.5 h-3.5 text-calve-muted/60 group-hover:text-calve-charcoal transition-colors" />
                     </div>

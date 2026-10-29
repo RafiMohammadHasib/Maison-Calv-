@@ -17,10 +17,10 @@ interface EnquiryModalProps {
 const MODAL_STRINGS = {
   fr: {
     closeAria: "Fermer la boîte de dialogue",
-    office17Title: "17 m² (~3 à 4 postes)",
+    office17Title: "Bureau privatif 21 m² (~3 à 4 postes)",
     office17Price: "750€ HT / mois",
     office17Avail: "✓ Disponible immédiatement",
-    office25Title: "Bureau privatif 25m² (~5 à 6 postes)",
+    office25Title: "Bureau privatif 28 m² (~5 à 6 postes)",
     office25Price: "1000€ HT / mois",
     office25Avail: "✓ 1 bureau disponible",
     teamSizeLabel: "Taille de votre équipe (postes)",
@@ -58,10 +58,10 @@ const MODAL_STRINGS = {
   },
   en: {
     closeAria: "Close dialog",
-    office17Title: "17 sqm (~3 to 4 desks)",
+    office17Title: "Private Office 21 sqm (~3 to 4 desks)",
     office17Price: "€750 excl. VAT / mo",
     office17Avail: "✓ Immediately available",
-    office25Title: "Private Office 25 sqm (~5 to 6 desks)",
+    office25Title: "Private Office 28 sqm (~5 to 6 desks)",
     office25Price: "€1,000 excl. VAT / mo",
     office25Avail: "✓ 1 office available",
     teamSizeLabel: "Team size (workstations)",
@@ -99,10 +99,10 @@ const MODAL_STRINGS = {
   },
   es: {
     closeAria: "Cerrar diálogo",
-    office17Title: "17 m² (~3 a 4 puestos)",
+    office17Title: "Despacho Privado 21 m² (~3 a 4 puestos)",
     office17Price: "750€ + IVA / mes",
     office17Avail: "✓ Disponible de inmediato",
-    office25Title: "Despacho Privado 25 m² (~5 a 6 puestos)",
+    office25Title: "Despacho Privado 28 m² (~5 a 6 puestos)",
     office25Price: "1000€ + IVA / mes",
     office25Avail: "✓ 1 despacho disponible",
     teamSizeLabel: "Tamaño de su equipo (puestos)",
@@ -231,7 +231,7 @@ export default function EnquiryModal({
 
     if (tab === "office") {
       payload.type = "private-office";
-      payload.officeSize = officeSize === "17m" ? "17 m² (3-4 postes)" : "25 m² (5-6 postes)";
+      payload.officeSize = officeSize === "17m" ? "21 m² (3-4 postes)" : "28 m² (5-6 postes)";
       payload.workstationCount = officeDesks;
       payload.date = officeDate;
       payload.visitRequested = true;

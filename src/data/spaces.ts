@@ -57,15 +57,15 @@ export interface SpaceItem {
 
 export const SPACES: SpaceItem[] = [
   {
-    id: "office-17m",
-    slug: "bureau-privatif-17m",
+    id: "office-21m",
+    slug: "bureau-privatif-21m",
     name: {
-      fr: "Bureau Privatif 17 m²",
-      en: "Private Office 17 sqm",
-      es: "Oficina Privada 17 m²"
+      fr: "Bureau Privatif 21 m²",
+      en: "Private Office 21 sqm",
+      es: "Oficina Privada 21 m²"
     },
     category: "private-office",
-    area: "17 m²",
+    area: "21 m²",
     capacity: {
       fr: "3 à 4 postes de travail",
       en: "3 to 4 workstations",
@@ -95,7 +95,7 @@ export const SPACES: SpaceItem[] = [
       },
       badgeClass: "bg-emerald-100 text-emerald-800 border-emerald-300"
     },
-    image: "/images/spaces/real-office-17m-4k.jpg",
+    image: "/images/spaces/real-office-21m-4k.jpg",
     features: {
       fr: [
         "Ameublement personnalisé haut de gamme",
@@ -123,8 +123,8 @@ export const SPACES: SpaceItem[] = [
       ]
     },
     highlight: {
-      fr: "Bureau intimiste baigné de lumière naturelle, vue sur cour pavée arborée.",
-      en: "Intimate office flooded with natural light overlooking the private leafy courtyard.",
+      fr: "Bureau de 21 m² avec parquet chaleureux, deux luminaires en rotin et mur d'accent bleu cobalt.",
+      en: "21 sqm private office with warm hardwood floors, dual woven pendant lamps, and cobalt blue accent wall.",
       es: "Oficina íntima bañada de luz natural con vistas al patio arbolado."
     },
     description: {
@@ -134,15 +134,15 @@ export const SPACES: SpaceItem[] = [
     }
   },
   {
-    id: "office-25m",
-    slug: "bureau-privatif-25m",
+    id: "office-28m",
+    slug: "bureau-privatif-28m",
     name: {
-      fr: "Bureau privatif 25m²",
-      en: "Private Office 25 sqm",
-      es: "Oficina Privada 25 m²"
+      fr: "Bureau privatif 28 m²",
+      en: "Private Office 28 sqm",
+      es: "Oficina Privada 28 m²"
     },
     category: "private-office",
-    area: "25 m²",
+    area: "28 m²",
     capacity: {
       fr: "Jusqu'à 5 à 6 postes",
       en: "Up to 5 to 6 workstations",
@@ -172,7 +172,7 @@ export const SPACES: SpaceItem[] = [
       },
       badgeClass: "bg-amber-100 text-amber-800 border-amber-300"
     },
-    image: "/images/spaces/real-office-25m-4k.jpg",
+    image: "/images/spaces/real-office-28m-4k.jpg",
     features: {
       fr: [
         "Ameublement personnalisé haut de gamme",
@@ -200,9 +200,9 @@ export const SPACES: SpaceItem[] = [
       ]
     },
     highlight: {
-      fr: "Spacieux bureau de 25 m² avec mur d'accent bleu cobalt, parquet authentique et double exposition lumineuse.",
-      en: "Spacious 25 sqm private office featuring a cobalt blue accent wall, authentic hardwood floors, and bright dual-window exposure.",
-      es: "Espaciosa oficina de 25 m² con pared azul cobalto, suelo de madera auténtica y luminosa doble orientación."
+      fr: "Spacieux bureau de 28 m² avec lustre moderne, double ouverture lumineuse, parquet authentique et mur d'accent bleu cobalt.",
+      en: "Spacious 28 sqm private office featuring a modern cluster chandelier, bright double window exposure, and authentic parquet.",
+      es: "Espaciosa oficina de 28 m² con lámpara de diseño, doble ventana luminosa y suelo de madera auténtica."
     },
     description: {
       fr: "Conçu pour des équipes de 4 à 6 personnes, recherchant un espace calme avec des services de qualités pour développer leur projet.",
@@ -597,9 +597,9 @@ export const BUILDING_STATS = [
       es: "Oficinas privadas"
     },
     detail: {
-      fr: "de 17 à 25 m² (2 disponibles)",
-      en: "from 17 to 25 sqm (2 available)",
-      es: "de 17 a 25 m² (2 disponibles)"
+      fr: "de 21 à 28 m² (2 disponibles)",
+      en: "from 21 to 28 sqm (2 available)",
+      es: "de 21 a 28 m² (2 disponibles)"
     }
   },
   {

@@ -319,7 +319,7 @@ export const CONTENT: Record<Language, LocaleContent> = {
       items: [
         {
           q: "Combien de bureaux privatifs sont actuellement disponibles ?",
-          a: "Maison Calvé compte 5 bureaux privatifs au total. 3 sont occupés par des entreprises résidentes durables (dont Goizet Gestion). Il reste actuellement 2 bureaux disponibles : un bureau d'environ 17 m² pour 3 à 4 personnes, et un bureau d'environ 25 m² pouvant accueillir confortablement 5 à 6 personnes."
+          a: "Maison Calvé compte 5 bureaux privatifs au total. 3 sont occupés par des entreprises résidentes durables (dont Goizet Gestion). Il reste actuellement 2 bureaux disponibles : un bureau d'environ 21 m² pour 3 à 4 personnes, et un bureau d'environ 28 m² pouvant accueillir confortablement 5 à 6 personnes."
         },
         {
           q: "Comment fonctionne l'accès au parking privé de 9 places ?",
@@ -525,7 +525,7 @@ export const CONTENT: Record<Language, LocaleContent> = {
       items: [
         {
           q: "How many private offices are currently available?",
-          a: "Maison Calvé houses 5 private offices in total. 3 are currently occupied by long-term resident companies (including Goizet Gestion). We currently have 2 private offices available: one of ~17 sqm (suitable for 3 to 4 desks) and one of ~25 sqm (comfortably accommodating 5 to 6 desks)."
+          a: "Maison Calvé houses 5 private offices in total. 3 are currently occupied by long-term resident companies (including Goizet Gestion). We currently have 2 private offices available: one of ~21 sqm (suitable for 3 to 4 desks) and one of ~28 sqm (comfortably accommodating 5 to 6 desks)."
         },
         {
           q: "How does the private 9-space parking work?",
@@ -731,7 +731,7 @@ export const CONTENT: Record<Language, LocaleContent> = {
       items: [
         {
           q: "¿Cuántas oficinas privadas hay disponibles actualmente?",
-          a: "Maison Calvé dispone de 5 oficinas privadas en total. 3 están ocupadas por empresas residentes estables (incluyendo Goizet Gestion). Quedan 2 oficinas disponibles: una de unos 17 m² (adecuada para 3 o 4 personas) y otra de unos 25 m² (para 5 o 6 puestos)."
+          a: "Maison Calvé dispone de 5 oficinas privadas en total. 3 están ocupadas por empresas residentes estables (incluyendo Goizet Gestion). Quedan 2 oficinas disponibles: una de unos 21 m² (adecuada para 3 o 4 personas) y otra de unos 28 m² (para 5 o 6 puestos)."
         },
         {
           q: "¿Cómo funciona el parking privado de 9 plazas?",

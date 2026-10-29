@@ -81,10 +81,10 @@ export default function PricingSection({ language, onOpenEnquiry }: PricingSecti
       tagline: language === "fr" ? "Pour équipes de 3 à 6 collaborateurs" : language === "en" ? "For teams of 3 to 6 members" : "Para equipos de 3 a 6 personas",
       price: "750€ à 1000€",
       tax: "HT",
-      period: language === "fr" ? "par mois (17 m² à 25 m²)" : language === "en" ? "per month (17 sqm to 25 sqm)" : "al mes (17 m² a 25 m²)",
+      period: language === "fr" ? "par mois (21 m² à 28 m²)" : language === "en" ? "per month (21 sqm to 28 sqm)" : "al mes (21 m² a 28 m²)",
       popular: false,
       features: language === "fr" ? [
-        "Bureaux privatifs fermés de 17 à 25 m²",
+        "Bureaux privatifs fermés de 21 à 28 m²",
         "Ameublement personnalisé complet",
         "Accessible 7j/7 et 24h/24",
         "Accès illimité aux espaces communs",
@@ -92,7 +92,7 @@ export default function PricingSection({ language, onOpenEnquiry }: PricingSecti
         "Domiciliation d'entreprise comprise (1ère année)",
         "Accès prioritaire aux 9 places de parking"
       ] : language === "en" ? [
-        "Enclosed private offices 17 to 25 sqm",
+        "Enclosed private offices 21 to 28 sqm",
         "Complete bespoke furniture provided",
         "24/7 keyless secure access",
         "Unlimited access to common areas",
@@ -100,7 +100,7 @@ export default function PricingSection({ language, onOpenEnquiry }: PricingSecti
         "Business domiciliation included (1st year)",
         "Priority access to 9 courtyard parking spaces"
       ] : [
-        "Despachos privados cerrados de 17 a 25 m²",
+        "Despachos privados cerrados de 21 a 28 m²",
         "Mobiliario completo a medida",
         "Acceso seguro 24/7",
         "Acceso ilimitado a zonas comunes",

@@ -21,10 +21,10 @@ interface FloorPlanRoom {
 
 const ROOMS_DATA: FloorPlanRoom[] = [
   {
-    id: "office-17m",
-    name: "Bureau Privatif 17 m²",
+    id: "office-21m",
+    name: "Bureau Privatif 21 m²",
     category: "office",
-    area: "17 m²",
+    area: "21 m²",
     capacity: "3 à 4 postes",
     price: "750€ HT / mois",
     status: "Disponible",
@@ -35,10 +35,10 @@ const ROOMS_DATA: FloorPlanRoom[] = [
     description: "Bureau intimiste baigné de lumière naturelle, vue sur cour pavée arborée."
   },
   {
-    id: "office-25m",
-    name: "Bureau Privatif 25 m²",
+    id: "office-28m",
+    name: "Bureau Privatif 28 m²",
     category: "office",
-    area: "25 m²",
+    area: "28 m²",
     capacity: "5 à 6 postes",
     price: "1000€ HT / mois",
     status: "Disponible",

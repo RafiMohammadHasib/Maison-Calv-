@@ -104,7 +104,7 @@ export default function CMSPage() {
           <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
             <div>
               <label className="block text-[11px] font-bold uppercase tracking-wider text-calve-slate mb-1">
-                {isEnglish ? "Private Office 17 sqm" : "Bureau Privatif 17 m²"}
+                {isEnglish ? "Private Office 21 sqm" : "Bureau Privatif 21 m²"}
               </label>
               <input
                 type="text"
@@ -119,7 +119,7 @@ export default function CMSPage() {
 
             <div>
               <label className="block text-[11px] font-bold uppercase tracking-wider text-calve-slate mb-1">
-                {isEnglish ? "Private Office 25 sqm" : "Bureau privatif 25m²"}
+                {isEnglish ? "Private Office 28 sqm" : "Bureau privatif 28 m²"}
               </label>
               <input
                 type="text"
