@@ -110,6 +110,12 @@ export default function RootLayout({
       suppressHydrationWarning
     >
       <head>
+        {/* Force page scroll to start at the top on initial load and page reloads across all pages */}
+        <script
+          dangerouslySetInnerHTML={{
+            __html: `if(typeof window!=='undefined'){if('scrollRestoration' in history){history.scrollRestoration='manual';}window.scrollTo(0,0);}`
+          }}
+        />
         {/* Anti-extension DOM mutation sanitizer to prevent hydration mismatch errors (e.g. bis_skin_checked injected by Bitdefender) */}
         <script
           dangerouslySetInnerHTML={{

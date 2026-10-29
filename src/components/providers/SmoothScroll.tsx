@@ -1,14 +1,54 @@
 "use client";
 
-import React, { useEffect } from "react";
+import React, { useEffect, useRef } from "react";
+import { usePathname } from "next/navigation";
 import Lenis from "lenis";
 
 export default function SmoothScroll({ children }: { children: React.ReactNode }) {
+  const pathname = usePathname();
+  const lenisRef = useRef<Lenis | null>(null);
+
+  // 1. Prevent browser scroll restoration and ensure reload opens at the top
   useEffect(() => {
-    // Only initialize smooth scroll on desktop / non-touch environments
     if (typeof window === "undefined") return;
 
-    // Check for prefers-reduced-motion
+    if ("scrollRestoration" in window.history) {
+      window.history.scrollRestoration = "manual";
+    }
+
+    // Force instant scroll to top on mount
+    window.scrollTo({ top: 0, left: 0, behavior: "instant" });
+
+    // Handle beforeunload, load, and pageshow (including bfcache back/forward/reload)
+    const resetScroll = () => {
+      window.scrollTo(0, 0);
+      if (lenisRef.current) {
+        lenisRef.current.scrollTo(0, { immediate: true });
+      }
+    };
+
+    window.addEventListener("beforeunload", resetScroll);
+    window.addEventListener("pageshow", resetScroll);
+
+    return () => {
+      window.removeEventListener("beforeunload", resetScroll);
+      window.removeEventListener("pageshow", resetScroll);
+    };
+  }, []);
+
+  // 2. Reset scroll to top on route change across any page in the application
+  useEffect(() => {
+    if (typeof window === "undefined") return;
+    window.scrollTo({ top: 0, left: 0, behavior: "instant" });
+    if (lenisRef.current) {
+      lenisRef.current.scrollTo(0, { immediate: true });
+    }
+  }, [pathname]);
+
+  // 3. Initialize smooth scrolling on non-touch / non-reduced-motion devices
+  useEffect(() => {
+    if (typeof window === "undefined") return;
+
     const mediaQuery = window.matchMedia("(prefers-reduced-motion: reduce)");
     if (mediaQuery.matches) return;
 
@@ -22,6 +62,11 @@ export default function SmoothScroll({ children }: { children: React.ReactNode }
       touchMultiplier: 1.5
     });
 
+    lenisRef.current = lenis;
+
+    // Ensure Lenis starts at scroll position 0
+    lenis.scrollTo(0, { immediate: true });
+
     let rafId: number;
     function raf(time: number) {
       lenis.raf(time);
@@ -32,6 +77,7 @@ export default function SmoothScroll({ children }: { children: React.ReactNode }
     return () => {
       cancelAnimationFrame(rafId);
       lenis.destroy();
+      lenisRef.current = null;
     };
   }, []);
 
