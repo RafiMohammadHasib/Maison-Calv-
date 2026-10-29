@@ -46,46 +46,10 @@ export default function Navbar({
   ];
 
   const mobileSections = [
-    {
-      num: "01",
-      id: "#espaces",
-      title: t.spaces,
-      subtitle: {
-        fr: "Bureaux privatifs, postes calmes & salle de réunion",
-        en: "Private suites, quiet workstations & boardroom",
-        es: "Oficinas privadas, puestos tranquilos y sala"
-      }[language]
-    },
-    {
-      num: "02",
-      id: "#about",
-      title: t.about,
-      subtitle: {
-        fr: "Hôtel particulier bordelais du XIXe & vision feutrée",
-        en: "19th-century bourgeois townhouse & calm sanctuary",
-        es: "Palacete bordelés del s. XIX y santuario de trabajo"
-      }[language]
-    },
-    {
-      num: "03",
-      id: "#tarifs",
-      title: t.pricing,
-      subtitle: {
-        fr: "Transparence totale sans aucun frais caché",
-        en: "All-inclusive transparent rates, zero hidden fees",
-        es: "Tarifas transparentes todo incluido, sin sorpresas"
-      }[language]
-    },
-    {
-      num: "04",
-      id: "#localisation",
-      title: t.location,
-      subtitle: {
-        fr: "Tram D Fondaudège & 9 places de parking privatives",
-        en: "Tram D Fondaudège & 9 private on-site parking spots",
-        es: "Tranvía D Fondaudège y 9 plazas privadas"
-      }[language]
-    }
+    { id: "#espaces", title: t.spaces },
+    { id: "#about", title: t.about },
+    { id: "#tarifs", title: t.pricing },
+    { id: "#localisation", title: t.location }
   ];
 
   const handleMobileNavClick = () => {
@@ -223,39 +187,23 @@ export default function Navbar({
               </div>
             </div>
 
-            {/* Editorial Vertical Navigation Links (Magazine-grade) */}
-              <nav className="pt-4 pb-2 space-y-1">
-                <div className="text-[10px] font-mono uppercase font-bold tracking-[0.25em] text-calve-slate mb-3">
-                  {language === "en" ? "Navigation Index" : language === "es" ? "Índice" : "Sommaire"}
-                </div>
+            {/* Minimal & Modern Navigation Links */}
+            <nav className="py-4 space-y-1">
+              {mobileSections.map((sec) => (
+                <a
+                  key={sec.id}
+                  href={sec.id}
+                  onClick={handleMobileNavClick}
+                  className="group flex items-center justify-between py-4 border-b border-calve-border/60 hover:border-calve-charcoal/40 transition-all cursor-pointer"
+                >
+                  <span className="text-2xl sm:text-3xl font-extrabold tracking-tight text-calve-charcoal group-hover:text-calve-slate group-hover:translate-x-1 transition-all">
+                    {sec.title}
+                  </span>
 
-                {mobileSections.map((sec) => (
-                  <a
-                    key={sec.id}
-                    href={sec.id}
-                    onClick={handleMobileNavClick}
-                    className="group flex items-baseline justify-between py-3.5 border-b border-calve-border/60 transition-all cursor-pointer"
-                  >
-                    <div className="space-y-1">
-                      <div className="flex items-baseline gap-3">
-                        <span className="font-mono text-xs font-bold text-calve-slate/70">
-                          {sec.num}
-                        </span>
-                        <h3 className="text-2xl sm:text-3xl font-extrabold tracking-tight text-calve-charcoal group-hover:text-calve-slate group-hover:translate-x-1 transition-all">
-                          {sec.title}
-                        </h3>
-                      </div>
-                      {sec.subtitle && (
-                        <p className="text-xs text-calve-muted pl-7">
-                          {sec.subtitle}
-                        </p>
-                      )}
-                    </div>
-
-                    <ArrowUpRight className="w-5 h-5 text-calve-muted group-hover:text-calve-charcoal group-hover:translate-x-0.5 group-hover:-translate-y-0.5 transition-all shrink-0 ml-2" />
-                  </a>
-                ))}
-              </nav>
+                  <ArrowUpRight className="w-5 h-5 text-calve-muted group-hover:text-calve-charcoal group-hover:translate-x-0.5 group-hover:-translate-y-0.5 transition-all shrink-0 ml-2" />
+                </a>
+              ))}
+            </nav>
 
                 {/* Action Hub - Flowing directly after Navigation */}
                 <div className="pt-5 border-t border-calve-border/80 space-y-4 shrink-0 pb-6">
