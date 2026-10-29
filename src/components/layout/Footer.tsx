@@ -20,7 +20,7 @@ export default function Footer({
   const t = CONTENT[language].footer;
 
   return (
-    <footer className="relative bg-calve-charcoal text-white pt-20 pb-8 border-t border-calve-slate-deep overflow-hidden">
+    <footer className="relative bg-calve-charcoal text-white pt-20 pb-12 border-t border-calve-slate-deep overflow-hidden">
       {/* Subtle Ambient Background Watermark */}
       <div
         aria-hidden="true"
@@ -247,23 +247,7 @@ export default function Footer({
         </div>
       </div>
 
-      {/* Signature Brand Logo Watermark */}
-      <div
-        aria-hidden="true"
-        className="relative w-full overflow-hidden select-none pointer-events-none mt-14 sm:mt-20 pt-8 border-t border-white/[0.08] flex flex-col items-center justify-center text-center"
-      >
-        <div className="flex flex-col items-center text-center leading-[0.74] font-black tracking-tighter lowercase select-none text-white/[0.08] transition-colors pointer-events-none">
-          <span className="text-[20vw] sm:text-[18vw] lg:text-[15vw] block">maison</span>
-          <span className="text-[20vw] sm:text-[18vw] lg:text-[15vw] block -mt-[3.5vw]">calvé</span>
-        </div>
-        <div className="flex items-center gap-3 text-[10px] sm:text-xs font-mono uppercase tracking-[0.3em] text-white/25 mt-4 mb-2">
-          <span>48 Rue Calvé</span>
-          <span>·</span>
-          <span>Bordeaux Fondaudège</span>
-          <span>·</span>
-          <span>Hôtel Particulier</span>
-        </div>
-      </div>
+
     </footer>
   );
 }

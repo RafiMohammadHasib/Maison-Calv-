@@ -74,7 +74,7 @@ export default function MaisonApp() {
         <LocationMap language={language} />
       </main>
 
-      {/* Footer with Giant Typographic Watermark */}
+      {/* Footer */}
       <Footer
         language={language}
         onLanguageChange={setLanguage}
