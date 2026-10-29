@@ -68,20 +68,6 @@ export default function Navbar({
     },
     {
       num: "03",
-      id: "#positionnement",
-      title: {
-        fr: "Philosophie & Comparatif",
-        en: "Philosophy & Comparison",
-        es: "Filosofía & Comparativa"
-      }[language],
-      subtitle: {
-        fr: "Maison feutrée vs usines de coworking impersonnelles",
-        en: "Boutique calm vs corporate coworking factories",
-        es: "Coworking boutique vs macroespacios"
-      }[language]
-    },
-    {
-      num: "04",
       id: "#tarifs",
       title: t.pricing,
       subtitle: {
@@ -91,7 +77,7 @@ export default function Navbar({
       }[language]
     },
     {
-      num: "05",
+      num: "04",
       id: "#localisation",
       title: t.location,
       subtitle: {
@@ -159,11 +145,10 @@ export default function Navbar({
                 <button
                   key={item.code}
                   onClick={() => onLanguageChange(item.code)}
-                  className={`px-2 py-0.5 rounded-full uppercase transition-all cursor-pointer ${
-                    language === item.code
+                  className={`px-2 py-0.5 rounded-full uppercase transition-all cursor-pointer ${language === item.code
                       ? "bg-white text-calve-charcoal shadow-2xs font-extrabold"
                       : "text-calve-muted hover:text-calve-charcoal"
-                  }`}
+                    }`}
                 >
                   {item.label}
                 </button>
@@ -198,9 +183,9 @@ export default function Navbar({
         {/* EDITORIAL HIGH-END MOBILE NAVIGATION MENU */}
         {/* ======================================================== */}
         {mobileMenuOpen && (
-          <div className="md:hidden fixed inset-0 z-50 bg-[#F9F8F6] text-calve-charcoal flex flex-col justify-between p-6 sm:p-8 overflow-y-auto animate-in fade-in duration-200">
+          <div className="md:hidden fixed inset-0 z-50 bg-[#F9F8F6] text-calve-charcoal flex flex-col p-6 sm:p-8 overflow-y-auto animate-in fade-in duration-200">
             {/* Top Bar inside Menu */}
-            <div className="flex items-center justify-between pb-6 border-b border-calve-border/80 shrink-0">
+            <div className="flex items-center justify-between pb-5 border-b border-calve-border/80 shrink-0">
               <a
                 href="#"
                 onClick={() => setMobileMenuOpen(false)}
@@ -217,11 +202,10 @@ export default function Navbar({
                     <button
                       key={item.code}
                       onClick={() => onLanguageChange(item.code)}
-                      className={`px-3 py-1 rounded-full uppercase transition-all ${
-                        language === item.code
+                      className={`px-3 py-1 rounded-full uppercase transition-all ${language === item.code
                           ? "bg-white text-calve-charcoal font-black shadow-2xs"
                           : "text-calve-muted hover:text-calve-charcoal"
-                      }`}
+                        }`}
                     >
                       {item.label}
                     </button>
@@ -240,80 +224,80 @@ export default function Navbar({
             </div>
 
             {/* Editorial Vertical Navigation Links (Magazine-grade) */}
-            <nav className="my-auto py-8 space-y-2">
-              <div className="text-[10px] font-mono uppercase font-bold tracking-[0.25em] text-calve-slate mb-4">
-                {language === "en" ? "Navigation Index" : language === "es" ? "Índice" : "Sommaire"}
-              </div>
+              <nav className="pt-4 pb-2 space-y-1">
+                <div className="text-[10px] font-mono uppercase font-bold tracking-[0.25em] text-calve-slate mb-3">
+                  {language === "en" ? "Navigation Index" : language === "es" ? "Índice" : "Sommaire"}
+                </div>
 
-              {mobileSections.map((sec) => (
-                <a
-                  key={sec.id}
-                  href={sec.id}
-                  onClick={handleMobileNavClick}
-                  className="group flex items-baseline justify-between py-4 border-b border-calve-border/60 transition-all cursor-pointer"
-                >
-                  <div className="space-y-1">
-                    <div className="flex items-baseline gap-3">
-                      <span className="font-mono text-xs font-bold text-calve-slate/70">
-                        {sec.num}
-                      </span>
-                      <h3 className="text-2xl sm:text-3xl font-extrabold tracking-tight text-calve-charcoal group-hover:text-calve-slate group-hover:translate-x-1 transition-all">
-                        {sec.title}
-                      </h3>
+                {mobileSections.map((sec) => (
+                  <a
+                    key={sec.id}
+                    href={sec.id}
+                    onClick={handleMobileNavClick}
+                    className="group flex items-baseline justify-between py-3.5 border-b border-calve-border/60 transition-all cursor-pointer"
+                  >
+                    <div className="space-y-1">
+                      <div className="flex items-baseline gap-3">
+                        <span className="font-mono text-xs font-bold text-calve-slate/70">
+                          {sec.num}
+                        </span>
+                        <h3 className="text-2xl sm:text-3xl font-extrabold tracking-tight text-calve-charcoal group-hover:text-calve-slate group-hover:translate-x-1 transition-all">
+                          {sec.title}
+                        </h3>
+                      </div>
+                      {sec.subtitle && (
+                        <p className="text-xs text-calve-muted pl-7">
+                          {sec.subtitle}
+                        </p>
+                      )}
                     </div>
-                    {sec.subtitle && (
-                      <p className="text-xs text-calve-muted pl-7">
-                        {sec.subtitle}
-                      </p>
-                    )}
+
+                    <ArrowUpRight className="w-5 h-5 text-calve-muted group-hover:text-calve-charcoal group-hover:translate-x-0.5 group-hover:-translate-y-0.5 transition-all shrink-0 ml-2" />
+                  </a>
+                ))}
+              </nav>
+
+                {/* Action Hub - Flowing directly after Navigation */}
+                <div className="pt-5 border-t border-calve-border/80 space-y-4 shrink-0 pb-6">
+                  {/* Primary Book a Visit CTA */}
+                  <button
+                    onClick={() => {
+                      setMobileMenuOpen(false);
+                      onOpenEnquiry("office", "Mobile Menu CTA");
+                    }}
+                    className="w-full py-4 px-6 rounded-2xl bg-calve-charcoal hover:bg-calve-slate text-white text-xs font-bold uppercase tracking-[0.16em] flex items-center justify-center gap-2 shadow-sm transition-all active:scale-[0.98] cursor-pointer"
+                  >
+                    <span>{t.requestVisit}</span>
+                    <ArrowRight className="w-4 h-4 ml-1" />
+                  </button>
+
+                  {/* Direct Inquiries & Address */}
+                  <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 text-xs text-calve-charcoal/80 pt-1">
+                    <a
+                      href="tel:+33695577033"
+                      className="flex items-center gap-2 hover:text-calve-slate transition-colors font-medium"
+                    >
+                      <Phone className="w-3.5 h-3.5 text-calve-slate" />
+                      <span>+33 6 95 57 70 33</span>
+                    </a>
+
+                    <a
+                      href="mailto:contact@maisoncalve.fr"
+                      className="flex items-center gap-2 hover:text-calve-slate transition-colors font-medium"
+                    >
+                      <Mail className="w-3.5 h-3.5 text-calve-slate" />
+                      <span>contact@maisoncalve.fr</span>
+                    </a>
                   </div>
 
-                  <ArrowUpRight className="w-5 h-5 text-calve-muted group-hover:text-calve-charcoal group-hover:translate-x-0.5 group-hover:-translate-y-0.5 transition-all shrink-0 ml-2" />
-                </a>
-              ))}
-            </nav>
-
-            {/* Bottom Luxury Action Hub */}
-            <div className="pt-6 border-t border-calve-border/80 space-y-4 shrink-0">
-              {/* Primary Book a Visit CTA */}
-              <button
-                onClick={() => {
-                  setMobileMenuOpen(false);
-                  onOpenEnquiry("office", "Mobile Menu CTA");
-                }}
-                className="w-full py-4 px-6 rounded-2xl bg-calve-charcoal hover:bg-calve-slate text-white text-xs font-bold uppercase tracking-[0.16em] flex items-center justify-center gap-2 shadow-sm transition-all active:scale-[0.98] cursor-pointer"
-              >
-                <span>{t.requestVisit}</span>
-                <ArrowRight className="w-4 h-4 ml-1" />
-              </button>
-
-              {/* Direct Inquiries & Address */}
-              <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 text-xs text-calve-charcoal/80 pt-1">
-                <a
-                  href="tel:+33695577033"
-                  className="flex items-center gap-2 hover:text-calve-slate transition-colors font-medium"
-                >
-                  <Phone className="w-3.5 h-3.5 text-calve-slate" />
-                  <span>+33 6 95 57 70 33</span>
-                </a>
-
-                <a
-                  href="mailto:contact@maisoncalve.fr"
-                  className="flex items-center gap-2 hover:text-calve-slate transition-colors font-medium"
-                >
-                  <Mail className="w-3.5 h-3.5 text-calve-slate" />
-                  <span>contact@maisoncalve.fr</span>
-                </a>
+                  <div className="flex items-center gap-2 text-[11px] text-calve-muted pt-1">
+                    <MapPin className="w-3.5 h-3.5 text-calve-slate shrink-0" />
+                    <span>48 Rue Calvé, 33000 Bordeaux · Cour privée & parking 9 places</span>
+                  </div>
+                </div>
               </div>
-
-              <div className="flex items-center gap-2 text-[11px] text-calve-muted pt-1">
-                <MapPin className="w-3.5 h-3.5 text-calve-slate shrink-0" />
-                <span>48 Rue Calvé, 33000 Bordeaux · Cour privée & parking 9 places</span>
-              </div>
-            </div>
-          </div>
         )}
-      </div>
+          </div>
     </header>
   );
 }
