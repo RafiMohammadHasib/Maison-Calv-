@@ -19,12 +19,56 @@ import {
   Download,
   Lock,
   Globe,
-  Share2
+  Share2,
+  Sparkles,
+  Database,
+  Server,
+  RefreshCw,
+  AlertCircle
 } from "lucide-react";
 
 export default function SettingsPage() {
   const { language, t } = useLanguage();
-  const [activeTab, setActiveTab] = useState<"identity" | "rental" | "system" | "profile">("identity");
+  const [activeTab, setActiveTab] = useState<"identity" | "rental" | "database" | "system" | "profile">("identity");
+  const [ovhTesting, setOvhTesting] = useState(false);
+  const [ovhSyncing, setOvhSyncing] = useState(false);
+  const [ovhStatus, setOvhStatus] = useState<any>(null);
+
+  const handleTestOvh = async () => {
+    setOvhTesting(true);
+    setOvhStatus(null);
+    try {
+      const res = await fetch("/api/admin/ovh-sync", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ action: "test" })
+      });
+      const data = await res.json();
+      setOvhStatus(data);
+    } catch (err: any) {
+      setOvhStatus({ success: false, error: err.message || "Failed to reach OVH" });
+    } finally {
+      setOvhTesting(false);
+    }
+  };
+
+  const handleSyncAllOvh = async () => {
+    setOvhSyncing(true);
+    setOvhStatus(null);
+    try {
+      const res = await fetch("/api/admin/ovh-sync", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ action: "sync_all" })
+      });
+      const data = await res.json();
+      setOvhStatus(data);
+    } catch (err: any) {
+      setOvhStatus({ success: false, error: err.message || "Sync failed" });
+    } finally {
+      setOvhSyncing(false);
+    }
+  };
   const [saved, setSaved] = useState(false);
   const [lastSyncTime, setLastSyncTime] = useState("03:00 PM");
 
@@ -156,6 +200,19 @@ export default function SettingsPage() {
           >
             <Percent className="w-4 h-4 text-calve-slate" />
             <span>{t("settings.tab.rental")}</span>
+          </button>
+
+          <button
+            type="button"
+            onClick={() => setActiveTab("database")}
+            className={`flex items-center gap-2 px-4 py-2 rounded-xl transition-all cursor-pointer whitespace-nowrap ${
+              activeTab === "database"
+                ? "bg-white text-calve-charcoal shadow-2xs font-bold"
+                : "text-calve-muted hover:text-calve-charcoal"
+            }`}
+          >
+            <Database className="w-4 h-4 text-calve-slate" />
+            <span>Base MySQL OVH</span>
           </button>
 
           <button
@@ -516,7 +573,177 @@ export default function SettingsPage() {
         )}
 
         {/* ========================================================== */}
+        {/* ========================================================== */}
+        {/* TAB: BASE DE DONNÉES OVH MYSQL (DATA BRIDGE)               */}
+        {/* ========================================================== */}
+        {activeTab === "database" && (
+          <div className="space-y-6 animate-in fade-in">
+            <div className="p-6 sm:p-8 rounded-3xl bg-white border border-calve-border/80 shadow-2xs space-y-6">
+              <div className="flex flex-col sm:flex-row sm:items-center justify-between pb-4 border-b border-calve-border/60 gap-4">
+                <div>
+                  <div className="flex items-center gap-2">
+                    <Database className="w-5 h-5 text-calve-slate" />
+                    <h3 className="text-base font-extrabold text-calve-charcoal">
+                      Passerelle Base de Données OVH Cloud (MySQL v8.4)
+                    </h3>
+                  </div>
+                  <p className="text-xs text-calve-muted mt-0.5">
+                    Synchronisation permanente des prospects, réservations et données Maison Calvé sur votre base OVH dédiée.
+                  </p>
+                </div>
+
+                <div className="flex items-center gap-2">
+                  {ovhStatus?.success || ovhStatus?.status === "healthy" ? (
+                    <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-emerald-50 text-emerald-700 border border-emerald-200 text-xs font-bold">
+                      <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span>
+                      Connecté &amp; Opérationnel
+                    </span>
+                  ) : ovhStatus?.error ? (
+                    <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-rose-50 text-rose-700 border border-rose-200 text-xs font-bold">
+                      <AlertCircle className="w-3.5 h-3.5 text-rose-500" />
+                      Échec de connexion
+                    </span>
+                  ) : (
+                    <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-slate-100 text-slate-600 border border-slate-200 text-xs font-semibold">
+                      <Server className="w-3.5 h-3.5 text-slate-500" />
+                      Prêt pour le test
+                    </span>
+                  )}
+                </div>
+              </div>
+
+              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+                <div className="p-4 rounded-2xl bg-slate-50 border border-slate-200/80">
+                  <div className="text-[10px] font-bold uppercase tracking-wider text-calve-muted mb-1">
+                    Hôte MySQL OVH
+                  </div>
+                  <div className="text-xs font-mono font-bold text-calve-charcoal">
+                    uwenyoimaison.mysql.db
+                  </div>
+                </div>
+
+                <div className="p-4 rounded-2xl bg-slate-50 border border-slate-200/80">
+                  <div className="text-[10px] font-bold uppercase tracking-wider text-calve-muted mb-1">
+                    Nom de la Base
+                  </div>
+                  <div className="text-xs font-mono font-bold text-calve-charcoal">
+                    uwenyoimaison
+                  </div>
+                </div>
+
+                <div className="p-4 rounded-2xl bg-slate-50 border border-slate-200/80">
+                  <div className="text-[10px] font-bold uppercase tracking-wider text-calve-muted mb-1">
+                    Utilisateur MySQL
+                  </div>
+                  <div className="text-xs font-mono font-bold text-calve-charcoal">
+                    uwenyoimaison
+                  </div>
+                </div>
+
+                <div className="p-4 rounded-2xl bg-slate-50 border border-slate-200/80">
+                  <div className="text-[10px] font-bold uppercase tracking-wider text-calve-muted mb-1">
+                    Dossier d&apos;hébergement
+                  </div>
+                  <div className="text-xs font-mono font-bold text-calve-charcoal">
+                    www/maison-api/
+                  </div>
+                </div>
+              </div>
+
+              <div className="space-y-3">
+                <div>
+                  <label className="block text-[10px] font-bold uppercase tracking-wider text-calve-muted mb-1">
+                    URL Passerelle REST API (Next.js &rarr; OVH PHP)
+                  </label>
+                  <div className="p-3 rounded-xl bg-slate-900 text-sky-400 font-mono text-xs break-all border border-slate-800">
+                    https://uwenyoi.cluster131.hosting.ovh.net/maison-api/index.php
+                  </div>
+                </div>
+
+                <div>
+                  <label className="block text-[10px] font-bold uppercase tracking-wider text-calve-muted mb-1">
+                    Clé Secrète de Sécurité (Header X-API-KEY)
+                  </label>
+                  <div className="p-3 rounded-xl bg-slate-900 text-emerald-400 font-mono text-xs break-all border border-slate-800">
+                    mc_sec_ovh_uwenyoimaison_2026
+                  </div>
+                </div>
+              </div>
+
+              {ovhStatus && (
+                <div
+                  className={`p-4 rounded-2xl text-xs font-medium border ${
+                    ovhStatus.success || ovhStatus.status === "healthy"
+                      ? "bg-emerald-50 border-emerald-200 text-emerald-900"
+                      : "bg-rose-50 border-rose-200 text-rose-900"
+                  }`}
+                >
+                  <div className="font-bold flex items-center gap-1.5 mb-1">
+                    {ovhStatus.success || ovhStatus.status === "healthy" ? (
+                      <CheckCircle2 className="w-4 h-4 text-emerald-600" />
+                    ) : (
+                      <AlertCircle className="w-4 h-4 text-rose-600" />
+                    )}
+                    <span>
+                      {ovhStatus.success || ovhStatus.status === "healthy"
+                        ? "Communication avec OVH MySQL réussie !"
+                        : "Erreur lors du contact avec la passerelle OVH"}
+                    </span>
+                  </div>
+                  <p>
+                    {ovhStatus.message || ovhStatus.error || JSON.stringify(ovhStatus)}
+                  </p>
+                  {ovhStatus.total_leads !== undefined && (
+                    <div className="mt-2 font-mono text-[11px] text-emerald-800">
+                      Total leads dans OVH MySQL : <strong>{ovhStatus.total_leads}</strong> | PHP : {ovhStatus.php_version}
+                    </div>
+                  )}
+                  {ovhStatus.syncedCount !== undefined && (
+                    <div className="mt-2 font-mono text-[11px] text-emerald-800">
+                      Leads synchronisés avec succès : <strong>{ovhStatus.syncedCount}</strong>
+                    </div>
+                  )}
+                </div>
+              )}
+
+              <div className="flex flex-wrap items-center gap-3 pt-2">
+                <button
+                  type="button"
+                  onClick={handleTestOvh}
+                  disabled={ovhTesting}
+                  className="flex items-center gap-2 px-5 py-2.5 rounded-xl bg-calve-slate hover:bg-calve-slate-dark text-white text-xs font-bold transition-all cursor-pointer shadow-xs disabled:opacity-50"
+                >
+                  <RefreshCw className={`w-3.5 h-3.5 ${ovhTesting ? "animate-spin" : ""}`} />
+                  <span>{ovhTesting ? "Test en cours..." : "Tester la Connexion OVH"}</span>
+                </button>
+
+                <button
+                  type="button"
+                  onClick={handleSyncAllOvh}
+                  disabled={ovhSyncing}
+                  className="flex items-center gap-2 px-5 py-2.5 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-bold transition-all cursor-pointer shadow-xs disabled:opacity-50"
+                >
+                  <Database className={`w-3.5 h-3.5 ${ovhSyncing ? "animate-spin" : ""}`} />
+                  <span>{ovhSyncing ? "Synchronisation..." : "Migrer tous les Leads vers OVH"}</span>
+                </button>
+
+                <a
+                  href="https://uwenyoi.cluster131.hosting.ovh.net/maison-api/test.php"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="flex items-center gap-1.5 px-4 py-2.5 rounded-xl bg-slate-100 hover:bg-slate-200 text-calve-charcoal text-xs font-semibold transition-all border border-slate-200/80"
+                >
+                  <span>Ouvrir le Diagnostic OVH (test.php)</span>
+                  <ExternalLink className="w-3.5 h-3.5 text-calve-muted" />
+                </a>
+              </div>
+            </div>
+          </div>
+        )}
+
+        {/* ========================================================== */}
         {/* TAB 3: SYSTEM, SEO & SOCIAL                                */}
+        {/* ========================================================== */}
         {/* ========================================================== */}
         {activeTab === "system" && (
           <div className="space-y-6 animate-in fade-in">

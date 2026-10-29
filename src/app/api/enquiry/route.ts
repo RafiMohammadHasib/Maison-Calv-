@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
 import { z } from "zod";
 import { addLead } from "@/lib/leads";
+import { isOvhBridgeConfigured, addOvhLead } from "@/lib/ovhBridge";
 
 const enquirySchema = z.object({
   type: z.enum(["private-office", "open-space", "meeting-room"]),
@@ -50,7 +51,7 @@ export async function POST(request: Request) {
       }
     }
 
-    // Persist directly to CRM Database
+    // 1. Persist directly to local CRM database file
     const savedLead = addLead({
       name: data.name,
       email: data.email,
@@ -71,12 +72,27 @@ export async function POST(request: Request) {
       message: data.message
     });
 
+    // 2. Synchronize to OVH MySQL Database Bridge
+    let ovhSynced = false;
+    if (isOvhBridgeConfigured()) {
+      try {
+        const ovhRes = await addOvhLead(savedLead);
+        ovhSynced = Boolean(ovhRes.success);
+        if (ovhSynced) {
+          console.log(`✅ [OVH DATABASE] Lead synced to uwenyoimaison.mysql.db: ${savedLead.id}`);
+        }
+      } catch (ovhErr) {
+        console.warn("⚠️ [OVH DATABASE] Could not sync lead to OVH bridge:", ovhErr);
+      }
+    }
+
     console.log("=========================================");
     console.log(`🔔 [MAISON CALVÉ CRM] NOUVEAU LEAD ENREGISTRÉ: ${savedLead.id}`);
     console.log(`Source: ${savedLead.source}`);
     console.log(`Contact: ${savedLead.name} (${savedLead.email} | ${savedLead.phone})`);
     console.log(`Entreprise: ${savedLead.company || "Non renseignée"}`);
     console.log(`Espace: ${savedLead.type} ${savedLead.officeSize || ""}`);
+    console.log(`OVH MySQL Sync: ${ovhSynced ? "SUCCESS" : "LOCAL BACKUP ONLY"}`);
     console.log("=========================================");
 
     return NextResponse.json({
@@ -84,6 +100,7 @@ export async function POST(request: Request) {
       message: "Demande enregistrée avec succès. L'équipe Maison Calvé prendra contact très prochainement.",
       lead: savedLead,
       leadId: savedLead.id,
+      ovhSynced,
       receivedAt: savedLead.createdAt
     });
   } catch (error) {
