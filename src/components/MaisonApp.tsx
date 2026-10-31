@@ -59,11 +59,11 @@ export default function MaisonApp() {
         {/* Transparent Pricing Table */}
         <PricingSection language={language} onOpenEnquiry={handleOpenEnquiry} />
 
-        {/* Real Life & Atmosphere from @maisoncalvebordeaux */}
-        <InstagramGallery language={language} />
-
         {/* Location & Fondaudège District Access */}
         <LocationMap language={language} />
+
+        {/* Real Life & Atmosphere from @maisoncalvebordeaux */}
+        <InstagramGallery language={language} />
       </main>
 
       {/* Footer */}
