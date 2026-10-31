@@ -171,11 +171,43 @@ export default function Footer({
               </button>
             </div>
             <div className="text-[11px] text-stone-500 pt-1">
-              {language === "en"
-                ? "Resident partner: Goizet Gestion."
-                : language === "es"
-                ? "Socio residente: Goizet Gestion."
-                : "Partenaire résident : Goizet Gestion."}
+              {language === "en" ? (
+                <>
+                  Resident partner:{" "}
+                  <a
+                    href="https://goizetgestion.fr"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="text-stone-400 hover:text-white underline underline-offset-2 transition-colors"
+                  >
+                    Goizet Gestion
+                  </a>.
+                </>
+              ) : language === "es" ? (
+                <>
+                  Socio residente:{" "}
+                  <a
+                    href="https://goizetgestion.fr"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="text-stone-400 hover:text-white underline underline-offset-2 transition-colors"
+                  >
+                    Goizet Gestion
+                  </a>.
+                </>
+              ) : (
+                <>
+                  Partenaire résident :{" "}
+                  <a
+                    href="https://goizetgestion.fr"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="text-stone-400 hover:text-white underline underline-offset-2 transition-colors"
+                  >
+                    Goizet Gestion
+                  </a>.
+                </>
+              )}
             </div>
           </div>
         </div>
