@@ -1,9 +1,20 @@
 import { Lead, LeadNote } from "./leads";
 import { SpaceInventoryRecord, TenantRecord } from "./inventorySync";
 
-const OVH_API_BRIDGE_URL =
-  process.env.OVH_API_BRIDGE_URL ||
-  "https://uwenyoi.cluster131.hosting.ovh.net/maison-api/index.php";
+function getNormalizedBridgeUrl(): string {
+  const envUrl = process.env.OVH_API_BRIDGE_URL?.trim();
+  const rawUrl = envUrl || "http://uwenyoi.cluster131.hosting.ovh.net/maison-api/index.php";
+
+  // OVH cluster free domains (cluster*.hosting.ovh.net) have wildcard SSL mismatches for custom subdomains (uwenyoi.*)
+  // Converting https -> http ensures serverless/Node.js fetch connects seamlessly without ERR_TLS_CERT_ALTNAME_INVALID
+  if (rawUrl.includes("cluster131.hosting.ovh.net") && rawUrl.startsWith("https://")) {
+    return rawUrl.replace("https://", "http://");
+  }
+
+  return rawUrl;
+}
+
+const OVH_API_BRIDGE_URL = getNormalizedBridgeUrl();
 
 const OVH_API_SECRET_KEY =
   process.env.OVH_API_SECRET_KEY || "mc_sec_ovh_uwenyoimaison_2026";
