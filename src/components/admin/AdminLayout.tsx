@@ -26,6 +26,7 @@ import {
 } from "lucide-react";
 import { Lead, LeadPriority } from "@/lib/leads";
 import { useLanguage } from "@/lib/languageContext";
+import SessionVerificationLoader from "./SessionVerificationLoader";
 
 interface AdminLayoutProps {
   children: React.ReactNode;
@@ -77,6 +78,23 @@ export default function AdminLayout({
 
   // Client-side authentication guard & dynamic session validation
   const [authVerified, setAuthVerified] = useState(false);
+  const [currentUser, setCurrentUser] = useState<{ name: string; email: string; role: string }>({
+    name: "Paul (Directeur d'exploitation)",
+    email: "admin@maisoncalve.fr",
+    role: "Super Admin"
+  });
+
+  useEffect(() => {
+    if (typeof window !== "undefined") {
+      try {
+        const saved = localStorage.getItem("mc_admin_user");
+        if (saved) {
+          const parsed = JSON.parse(saved);
+          if (parsed?.email) setCurrentUser(parsed);
+        }
+      } catch {}
+    }
+  }, []);
 
   useEffect(() => {
     let isMounted = true;
@@ -88,6 +106,12 @@ export default function AdminLayout({
         if (isMounted) {
           if (data.authenticated) {
             setAuthVerified(true);
+            if (data.user) {
+              setCurrentUser(data.user);
+              if (typeof window !== "undefined") {
+                localStorage.setItem("mc_admin_user", JSON.stringify(data.user));
+              }
+            }
           } else {
             document.cookie = "mc_admin_session=; path=/; expires=Thu, 01 Jan 1970 00:00:00 GMT; max-age=0";
             localStorage.removeItem("mc_admin_logged");
@@ -237,14 +261,7 @@ export default function AdminLayout({
   ];
 
   if (!authVerified) {
-    return (
-      <div className="min-h-screen bg-slate-900 flex flex-col items-center justify-center p-4">
-        <div className="w-10 h-10 border-2 border-white/20 border-t-emerald-400 rounded-full animate-spin mb-3" />
-        <span className="text-xs uppercase font-mono tracking-widest text-slate-400">
-          {language === "fr" ? "Vérification de session..." : "Verifying session..."}
-        </span>
-      </div>
-    );
+    return <SessionVerificationLoader />;
   }
 
   return (
@@ -385,16 +402,16 @@ export default function AdminLayout({
           </Link>
 
           <div className="flex items-center justify-between px-2 pt-1">
-            <div className="flex items-center gap-2.5">
-              <div className="w-8 h-8 rounded-full bg-calve-slate text-white text-xs font-bold flex items-center justify-center">
-                P
+            <div className="flex items-center gap-2.5 min-w-0">
+              <div className="w-8 h-8 rounded-full bg-calve-slate text-white text-xs font-bold flex items-center justify-center shrink-0">
+                {(currentUser.name || "A").charAt(0).toUpperCase()}
               </div>
-              <div className="text-left">
-                <div className="text-xs font-bold text-calve-charcoal leading-none">
-                  {t("nav.admin_user")}
+              <div className="text-left min-w-0">
+                <div className="text-xs font-bold text-calve-charcoal leading-none truncate">
+                  {currentUser.name || t("nav.admin_user")}
                 </div>
-                <div className="text-[10px] text-calve-muted mt-0.5 font-mono">
-                  admin@maisoncalve.fr
+                <div className="text-[10px] text-calve-muted mt-0.5 font-mono truncate">
+                  {currentUser.email || "admin@maisoncalve.fr"}
                 </div>
               </div>
             </div>
@@ -444,6 +461,9 @@ export default function AdminLayout({
             <div className="relative flex-1 min-w-0">
               <Search className="w-4 h-4 text-calve-muted absolute left-3 top-1/2 -translate-y-1/2 pointer-events-none" />
               <input
+                id="admin-global-search"
+                name="adminGlobalSearch"
+                aria-label={language === "fr" ? "Recherche globale" : "Global search"}
                 type="text"
                 value={searchVal}
                 onChange={handleSearchChange}

@@ -409,7 +409,7 @@ export default function InstagramGallery({ language }: InstagramGalleryProps) {
 
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 space-y-8 sm:space-y-10 relative z-10">
         {/* Section Header Badge */}
-        <div className="text-center max-w-2xl mx-auto">
+        <div className="text-center max-w-2xl mx-auto" data-reveal="fade-up">
           <div className="text-xs font-bold tracking-[0.2em] uppercase text-calve-slate mb-3">
             {t.tag}
           </div>
@@ -424,7 +424,7 @@ export default function InstagramGallery({ language }: InstagramGalleryProps) {
         {/* ========================================================== */}
         {/* OFFICIAL INSTAGRAM PROFILE HEADER (LIKE GOIZET GESTION)    */}
         {/* ========================================================== */}
-        <div className="bg-calve-cream/60 backdrop-blur-md rounded-3xl p-6 sm:p-8 md:p-10 border border-calve-border shadow-sm">
+        <div className="bg-calve-cream/60 backdrop-blur-md rounded-3xl p-6 sm:p-8 md:p-10 border border-calve-border shadow-sm" data-reveal="fade-up">
           <div className="flex flex-col md:flex-row items-center md:items-start gap-6 sm:gap-8 lg:gap-10">
             {/* Profile Avatar with Story Gradient Ring */}
             <div className="relative shrink-0">
@@ -548,7 +548,7 @@ export default function InstagramGallery({ language }: InstagramGalleryProps) {
           </div>
 
           {/* 10-Grid Responsive Instagram Mosaic (2 x 5 on Desktop) */}
-          <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-3 sm:gap-4 lg:gap-5">
+          <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-3 sm:gap-4 lg:gap-5" data-reveal="stagger">
             {INSTAGRAM_POSTS.map((post) => {
               const isLiked = !!likedPosts[post.id];
               const likes = likeCounts[post.id] ?? post.likes;

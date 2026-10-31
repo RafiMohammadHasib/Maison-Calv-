@@ -25,14 +25,14 @@ export default function Hero({ language, onOpenEnquiry }: HeroProps) {
 
       <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
         {/* Top Heritage Overline */}
-        <div className="flex justify-center mb-6">
+        <div className="flex justify-center mb-6" data-reveal="fade-up">
           <span className="text-[11px] sm:text-xs font-bold tracking-[0.22em] uppercase text-calve-slate/90">
             {t.badge}
           </span>
         </div>
 
         {/* Authentic Brand Wordmark in Center */}
-        <div className="text-center space-y-3 mb-8">
+        <div className="text-center space-y-3 mb-8" data-reveal="fade-up">
           <div className="flex flex-col items-center justify-center font-extrabold tracking-tighter lowercase leading-[0.82] text-5xl sm:text-7xl md:text-8xl lg:text-9xl">
             <span className="text-calve-slate">maison</span>
             <span className="text-calve-slate">calvé</span>
@@ -51,12 +51,12 @@ export default function Hero({ language, onOpenEnquiry }: HeroProps) {
         </div>
 
         {/* Narrative Description */}
-        <p className="max-w-2xl mx-auto text-center text-sm sm:text-base text-calve-charcoal/80 font-normal leading-relaxed mb-10">
+        <p className="max-w-2xl mx-auto text-center text-sm sm:text-base text-calve-charcoal/80 font-normal leading-relaxed mb-10" data-reveal="fade-up">
           {t.description}
         </p>
 
         {/* Action Buttons & Direct Connection Touchpoint */}
-        <div className="flex flex-col items-center mb-14">
+        <div className="flex flex-col items-center mb-14" data-reveal="fade-up">
           <div className="flex flex-wrap items-center justify-center gap-3 sm:gap-4 mb-4">
             <button
               onClick={() => onOpenEnquiry("office", "Book a Private Tour (Hero)")}
@@ -88,7 +88,7 @@ export default function Hero({ language, onOpenEnquiry }: HeroProps) {
         </div>
 
         {/* Grand Architectural Showcase: 3 Authentic 4K Photographs */}
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-4 sm:gap-6">
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-4 sm:gap-6" data-reveal="stagger">
           {/* Photo 1: Authentic Exposed Blonde Stone Open Space */}
           <div className="relative rounded-2xl sm:rounded-3xl overflow-hidden border border-calve-border shadow-md aspect-4/3 bg-calve-stone group">
             <img
@@ -151,7 +151,7 @@ export default function Hero({ language, onOpenEnquiry }: HeroProps) {
         </div>
 
         {/* Clean Key Stats Grid */}
-        <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mt-8">
+        <div data-reveal="stagger" className="grid grid-cols-2 md:grid-cols-4 gap-4 mt-8">
           {BUILDING_STATS.map((stat, idx) => (
             <div
               key={idx}

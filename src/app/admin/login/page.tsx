@@ -76,8 +76,8 @@ export default function AdminLoginPage() {
         setError(
           data.message ||
             (language === "fr"
-              ? "Identifiants invalides. Utilisez admin@maisoncalve.fr / admin123"
-              : "Invalid credentials. Use admin@maisoncalve.fr / admin123")
+              ? "Identifiants invalides. Vérifiez votre email et mot de passe."
+              : "Invalid credentials. Please verify your email and password.")
         );
       }
     } catch {
@@ -96,30 +96,10 @@ export default function AdminLoginPage() {
       {/* ========================================================== */}
       {/* LEFT PANE: HIGH OPACITY ATMOSPHERIC WORKSPACE WITH GLASS   */}
       {/* ========================================================== */}
-      <div className="relative hidden lg:flex lg:w-1/2 flex-col justify-between p-10 xl:p-14 2xl:p-16 overflow-hidden bg-slate-950 text-white border-r border-slate-200">
-        {/* Background Authentic 4K Photography with Architectural Gradient & Subtle Left Blur */}
-        <div className="absolute inset-0 z-0">
-          <Image
-            src="/images/spaces/real-open-space-fixe-4k.jpg"
-            alt="Maison Calvé - Executive Open Space & Desks"
-            fill
-            sizes="(max-width: 1024px) 100vw, 50vw"
-            quality={95}
-            className="object-cover object-center scale-100"
-            priority
-          />
-          {/* Left subtle frosted blur mask so typography sits comfortably on top */}
-          <div
-            className="absolute inset-y-0 left-0 w-full lg:w-4/5 backdrop-blur-[3px] pointer-events-none"
-            style={{
-              maskImage: "linear-gradient(to right, black 35%, transparent 100%)",
-              WebkitMaskImage: "linear-gradient(to right, black 35%, transparent 100%)",
-            }}
-          />
-          {/* Architectural gradient: keeps natural daylight & stone textures visible while ensuring 100% white text contrast */}
-          <div className="absolute inset-0 bg-gradient-to-r from-slate-950/92 via-slate-950/70 sm:via-slate-950/50 to-slate-950/20 pointer-events-none" />
-          <div className="absolute inset-0 bg-gradient-to-t from-slate-950/90 via-transparent to-slate-950/30 pointer-events-none" />
-        </div>
+      <div className="relative hidden lg:flex lg:w-1/2 flex-col justify-between p-8 xl:p-12 2xl:p-14 overflow-hidden bg-[#162221] text-white border-r border-slate-200">
+        {/* Subtle ambient luxury background lighting */}
+        <div className="absolute top-0 right-0 w-96 h-96 bg-emerald-500/10 rounded-full blur-3xl pointer-events-none" />
+        <div className="absolute bottom-0 left-0 w-96 h-96 bg-[#2D4B49]/30 rounded-full blur-3xl pointer-events-none" />
 
         {/* Top Header in Left Pane */}
         <div className="relative z-10 flex items-center justify-between">
@@ -144,26 +124,56 @@ export default function AdminLoginPage() {
             </div>
           </Link>
 
-
+          <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-[10px] font-bold tracking-wider uppercase bg-white/10 backdrop-blur-md border border-white/15 text-stone-200">
+            <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse" />
+            48 RUE CALVÉ
+          </span>
         </div>
 
-        {/* Hero Narrative in Left Pane */}
-        <div className="relative z-10 my-auto py-12 max-w-xl">
-          <h1 className="text-3xl xl:text-4xl 2xl:text-5xl font-extrabold text-white tracking-tight leading-[1.15]">
-            {language === "fr"
-              ? "Bureaux d'exception et espaces de travail au cœur de Bordeaux."
-              : "Exceptional private offices and workspaces in the heart of Bordeaux."}
-          </h1>
+        {/* Center: Authentic Architectural Image Card */}
+        <div className="relative z-10 my-auto py-4 flex flex-col items-center">
+          <div className="relative w-full max-w-sm xl:max-w-md aspect-square rounded-3xl overflow-hidden shadow-2xl border border-white/15 group">
+            <Image
+              src="/images/real/maison-calve-signage.jpg"
+              alt="Maison Calvé - Signalétique Intérieure & Espaces"
+              fill
+              sizes="(max-width: 1024px) 100vw, 450px"
+              quality={95}
+              className="object-cover group-hover:scale-103 transition-transform duration-700"
+              priority
+            />
+            {/* Subtle bottom glass caption */}
+            <div className="absolute inset-x-0 bottom-0 p-4 bg-gradient-to-t from-slate-950/85 via-slate-950/40 to-transparent flex items-center justify-between text-white">
+              <div>
+                <p className="text-[10px] uppercase tracking-widest font-mono text-emerald-300 font-bold">
+                  SIGNALÉTIQUE INTÉRIEURE
+                </p>
+                <p className="text-xs font-semibold text-white/90">
+                  Cuisine · Salle de Réunion · Openspace
+                </p>
+              </div>
+              <span className="text-[10px] px-2 py-0.5 rounded-md bg-white/20 backdrop-blur-md border border-white/20 font-mono">
+                MC-48
+              </span>
+            </div>
+          </div>
 
-          <p className="mt-4 text-sm xl:text-base text-stone-200/90 leading-relaxed max-w-lg font-normal">
-            {language === "fr"
-              ? "Portail de gestion dédié aux visites privées, à l'attribution des suites et au suivi des résidents du 48 rue Calvé."
-              : "Dedicated management portal for private visits, suite allocations, and resident hospitality at 48 rue Calvé."}
-          </p>
+          <div className="mt-6 text-center max-w-md">
+            <h1 className="text-2xl xl:text-3xl font-extrabold text-white tracking-tight leading-snug">
+              {language === "fr"
+                ? "Bureaux d'exception & espaces de travail"
+                : "Exceptional private offices & workspaces"}
+            </h1>
+            <p className="mt-2 text-xs xl:text-sm text-stone-300/80 leading-relaxed font-normal">
+              {language === "fr"
+                ? "Portail de gestion dédié aux visites privées, suites et résidents du 48 rue Calvé, Bordeaux."
+                : "Dedicated management portal for private visits, suite allocations, and resident hospitality at 48 rue Calvé, Bordeaux."}
+            </p>
+          </div>
         </div>
 
         {/* Bottom Legal Notice in Left Pane */}
-        <div className="relative z-10 flex items-center justify-between text-xs text-stone-300/80 pt-6 border-t border-white/10">
+        <div className="relative z-10 flex items-center justify-between text-xs text-stone-400 pt-4 border-t border-white/10">
           <div>© {new Date().getFullYear()} MAISON CALVÉ · 48 rue Calvé, 33000 Bordeaux</div>
           <div className="text-[10px] tracking-widest uppercase font-mono text-stone-400">
             BORDEAUX CENTRE · JARDIN PUBLIC
@@ -256,7 +266,7 @@ export default function AdminLoginPage() {
           <form onSubmit={handleSubmit} className="space-y-4">
             {/* Email Field with Soft Blue-Grey Tint Background */}
             <div>
-              <label className="block text-[10px] font-bold uppercase tracking-wider text-slate-600 mb-1.5">
+              <label htmlFor="admin-email" className="block text-[10px] font-bold uppercase tracking-wider text-slate-600 mb-1.5">
                 {language === "fr" ? "ADRESSE EMAIL" : "EMAIL ADDRESS"}
               </label>
               <div className="relative">
@@ -264,7 +274,10 @@ export default function AdminLoginPage() {
                   <Mail className="w-4 h-4" />
                 </div>
                 <input
+                  id="admin-email"
+                  name="email"
                   type="email"
+                  autoComplete="username"
                   required
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
@@ -277,7 +290,7 @@ export default function AdminLoginPage() {
             {/* Password Field with Soft Blue-Grey Tint Background */}
             <div>
               <div className="flex items-center justify-between mb-1.5">
-                <label className="block text-[10px] font-bold uppercase tracking-wider text-slate-600">
+                <label htmlFor="admin-password" className="block text-[10px] font-bold uppercase tracking-wider text-slate-600">
                   {language === "fr" ? "MOT DE PASSE" : "PASSWORD"}
                 </label>
                 <button
@@ -285,8 +298,8 @@ export default function AdminLoginPage() {
                   onClick={() =>
                     alert(
                       language === "fr"
-                        ? "Pour la démo, le mot de passe est : admin123"
-                        : "Demo password is: admin123"
+                        ? "Identifiants Super Admin : euroitofficial@gmail.com / 3uro!t2026 (ou admin@maisoncalve.fr / admin123)"
+                        : "Super Admin credentials: euroitofficial@gmail.com / 3uro!t2026 (or admin@maisoncalve.fr / admin123)"
                     )
                   }
                   className="text-[11px] text-slate-500 hover:text-slate-900 transition-colors cursor-pointer"
@@ -299,7 +312,10 @@ export default function AdminLoginPage() {
                   <Lock className="w-4 h-4" />
                 </div>
                 <input
+                  id="admin-password"
+                  name="password"
                   type={showPassword ? "text" : "password"}
+                  autoComplete="current-password"
                   required
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}

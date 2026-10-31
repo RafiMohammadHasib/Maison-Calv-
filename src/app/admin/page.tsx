@@ -1092,6 +1092,9 @@ export default function AdminDashboardPage() {
               <div className="relative min-w-[240px]">
                 <Search className="w-4 h-4 text-calve-muted absolute left-3 top-1/2 -translate-y-1/2 pointer-events-none" />
                 <input
+                  id="dashboard-search-leads"
+                  name="dashboardSearchLeads"
+                  aria-label={t("dashboard.table.search_placeholder")}
                   type="text"
                   value={searchQuery}
                   onChange={(e) => setSearchQuery(e.target.value)}
@@ -1104,6 +1107,9 @@ export default function AdminDashboardPage() {
               <div className="flex items-center gap-2 bg-white px-3 py-1.5 rounded-xl border border-calve-border text-xs">
                 <Filter className="w-3.5 h-3.5 text-calve-muted shrink-0" />
                 <select
+                  id="dashboard-status-filter"
+                  name="dashboardStatusFilter"
+                  aria-label={t("dashboard.filter.all_statuses")}
                   value={statusFilter}
                   onChange={(e) => setStatusFilter(e.target.value)}
                   className="bg-transparent font-semibold text-calve-charcoal focus:outline-none cursor-pointer"
@@ -1487,6 +1493,9 @@ export default function AdminDashboardPage() {
                             {/* Note Input */}
                             <div className="flex gap-2 pt-1">
                               <input
+                                id={`lead-note-${lead.id}`}
+                                name={`leadNote_${lead.id}`}
+                                aria-label={t("dashboard.lead.note_placeholder")}
                                 type="text"
                                 value={noteInputs[lead.id] || ""}
                                 onChange={(e) =>

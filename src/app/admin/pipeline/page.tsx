@@ -609,6 +609,9 @@ export default function PipelinePage() {
             <div className="relative flex-1 xl:w-80">
               <Search className="w-3.5 h-3.5 text-slate-400 absolute left-3 top-1/2 -translate-y-1/2 pointer-events-none" />
               <input
+                id="pipeline-filter-search"
+                name="pipelineFilterSearch"
+                aria-label={t("pipeline.search")}
                 type="text"
                 value={search}
                 onChange={(e) => setSearch(e.target.value)}

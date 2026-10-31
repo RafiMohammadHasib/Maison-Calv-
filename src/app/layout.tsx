@@ -111,20 +111,7 @@ export default function RootLayout({
       className={`${jakartaSans.variable} font-sans h-full antialiased scroll-smooth`}
       suppressHydrationWarning
     >
-      <head>
-        {/* Force page scroll to start at the top on initial load and page reloads across all pages */}
-        <script
-          dangerouslySetInnerHTML={{
-            __html: `if(typeof window!=='undefined'){if('scrollRestoration' in history){history.scrollRestoration='manual';}window.scrollTo(0,0);}`
-          }}
-        />
-        {/* Anti-extension DOM mutation sanitizer to prevent hydration mismatch errors (e.g. bis_skin_checked injected by Bitdefender) */}
-        <script
-          dangerouslySetInnerHTML={{
-            __html: `(function(){var A=['bis_skin_checked','bis_register','data-gramm','cz-shortcut-listen'];function C(n){if(!n)return;try{if(n.nodeType===1){for(var i=0;i<A.length;i++){if(n.hasAttribute(A[i]))n.removeAttribute(A[i])}}if(n.querySelectorAll){for(var i=0;i<A.length;i++){var els=n.querySelectorAll('['+A[i]+']');for(var j=0;j<els.length;j++)els[j].removeAttribute(A[i])}}}catch(e){}}C(document.documentElement);if(typeof MutationObserver!=='undefined'){var obs=null;function O(){if(obs&&document.documentElement){obs.observe(document.documentElement,{attributes:true,subtree:true,attributeFilter:A})}}obs=new MutationObserver(function(m){var hit=false;for(var i=0;i<m.length;i++){if(A.indexOf(m[i].attributeName)!==-1){hit=true;break}}if(hit){obs.disconnect();C(document.documentElement);O()}});O();if(typeof window!=='undefined'){window.addEventListener('load',function(){C(document.documentElement);setTimeout(function(){if(obs)obs.disconnect()},2000)})}}})();`
-          }}
-        />
-      </head>
+      <head />
       <body
         className="min-h-full flex flex-col font-sans bg-calve-cream text-calve-charcoal"
         suppressHydrationWarning

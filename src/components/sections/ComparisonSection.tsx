@@ -171,7 +171,7 @@ export default function ComparisonSection({
       <span id="positionnement" className="sr-only" />
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         {/* Header */}
-        <ScrollReveal>
+        <div data-reveal="fade-up">
           <div className="text-center max-w-3xl mx-auto mb-10 sm:mb-14">
             <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-calve-slate/10 border border-calve-slate/20 text-calve-slate text-[11px] font-bold tracking-widest uppercase mb-4">
               <Sparkles className="w-3.5 h-3.5 text-calve-slate" />
@@ -184,7 +184,7 @@ export default function ComparisonSection({
               {content.subtitle}
             </p>
           </div>
-        </ScrollReveal>
+        </div>
 
         {/* ============================================================ */}
         {/* MOBILE VIEW (< md) - Modern Executive Comparison Cards       */}
@@ -229,7 +229,7 @@ export default function ComparisonSection({
           </div>
 
           {/* Cards Stack */}
-          <div className="space-y-4">
+          <div data-reveal="stagger" className="space-y-4">
             {content.rows.map((row, idx) => {
               const Icon = row.icon;
               const indexStr = String(idx + 1).padStart(2, "0");
@@ -298,7 +298,7 @@ export default function ComparisonSection({
         {/* ============================================================ */}
         {/* DESKTOP VIEW (>= md) - Refined 12-Column Comparison Matrix   */}
         {/* ============================================================ */}
-        <div className="hidden md:block rounded-3xl border border-calve-border/90 bg-white shadow-xs overflow-hidden">
+        <div data-reveal="fade-up" className="hidden md:block rounded-3xl border border-calve-border/90 bg-white shadow-xs overflow-hidden">
           {/* Header Row */}
           <div className="grid grid-cols-12 border-b border-calve-border/90">
             {/* Col 1: Criterion */}
@@ -385,7 +385,7 @@ export default function ComparisonSection({
         </div>
 
         {/* Bottom CTA Box */}
-        <div className="mt-8 sm:mt-12 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-6 p-6 sm:p-8 rounded-3xl bg-white border border-calve-border/90 shadow-xs">
+        <div data-reveal="fade-up" className="mt-8 sm:mt-12 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-6 p-6 sm:p-8 rounded-3xl bg-white border border-calve-border/90 shadow-xs">
           <div className="space-y-1">
             <h4 className="text-base sm:text-lg font-extrabold text-calve-charcoal">
               {content.ctaTitle}

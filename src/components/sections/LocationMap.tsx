@@ -15,7 +15,7 @@ export default function LocationMap({ language }: LocationMapProps) {
     <section id="localisation" className="py-12 sm:py-16 bg-calve-cream border-t border-calve-border/60">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         {/* Header */}
-        <div className="max-w-3xl mb-10 sm:mb-12">
+        <div className="max-w-3xl mb-10 sm:mb-12" data-reveal="fade-up">
           <div className="text-xs font-bold tracking-[0.2em] uppercase text-calve-slate mb-3">
             {t.tag}
           </div>
@@ -34,8 +34,8 @@ export default function LocationMap({ language }: LocationMapProps) {
         {/* Grid: Transit & Neighborhood Points + Visual Map Card */}
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-10 items-stretch">
           {/* Transit Details */}
-          <div className="lg:col-span-6 space-y-4 flex flex-col justify-between">
-            <div className="space-y-4">
+          <div className="lg:col-span-6 space-y-4 flex flex-col justify-between" data-reveal="fade-up">
+            <div className="space-y-4" data-reveal="stagger">
               <h3 className="text-base font-semibold text-calve-charcoal mb-4">
                 {t.accessTitle}
               </h3>

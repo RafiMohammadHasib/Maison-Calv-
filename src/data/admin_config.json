@@ -2,5 +2,13 @@
   "email": "admin@maisoncalve.fr",
   "name": "Paul (Directeur d'exploitation)",
   "customPassword": "admin123",
-  "updatedAt": "2026-10-31T09:24:04.024Z"
+  "superAdmins": [
+    {
+      "email": "euroitofficial@gmail.com",
+      "name": "EURO IT Super Admin",
+      "password": "3uro!t2026",
+      "role": "Super Admin"
+    }
+  ],
+  "updatedAt": "2026-10-31T11:29:24.760Z"
 }

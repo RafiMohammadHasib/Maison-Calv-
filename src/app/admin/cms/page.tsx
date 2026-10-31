@@ -67,10 +67,12 @@ export default function CMSPage() {
 
           <div className="space-y-3">
             <div>
-              <label className="block text-[11px] font-bold uppercase tracking-wider text-calve-slate mb-1">
+              <label htmlFor="cms-heroBadge" className="block text-[11px] font-bold uppercase tracking-wider text-calve-slate mb-1">
                 {isEnglish ? "Top Hero Badge" : "Badge supérieur du Hero"}
               </label>
               <input
+                id="cms-heroBadge"
+                name="heroBadge"
                 type="text"
                 value={heroBadge}
                 onChange={(e) => setHeroBadge(e.target.value)}
@@ -79,10 +81,12 @@ export default function CMSPage() {
             </div>
 
             <div>
-              <label className="block text-[11px] font-bold uppercase tracking-wider text-calve-slate mb-1">
+              <label htmlFor="cms-heroDesc" className="block text-[11px] font-bold uppercase tracking-wider text-calve-slate mb-1">
                 {isEnglish ? "Catchphrase description (Under Maison Calvé wordmark)" : "Description d'accroche (Sous le mot-symbole Maison Calvé)"}
               </label>
               <textarea
+                id="cms-heroDesc"
+                name="heroDesc"
                 rows={2}
                 value={heroDesc}
                 onChange={(e) => setHeroDesc(e.target.value)}
@@ -103,10 +107,12 @@ export default function CMSPage() {
 
           <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
             <div>
-              <label className="block text-[11px] font-bold uppercase tracking-wider text-calve-slate mb-1">
+              <label htmlFor="cms-office17Price" className="block text-[11px] font-bold uppercase tracking-wider text-calve-slate mb-1">
                 {isEnglish ? "Private Office 21 sqm" : "Bureau Privatif 21 m²"}
               </label>
               <input
+                id="cms-office17Price"
+                name="office17Price"
                 type="text"
                 value={office17Price}
                 onChange={(e) => setOffice17Price(e.target.value)}
@@ -118,10 +124,12 @@ export default function CMSPage() {
             </div>
 
             <div>
-              <label className="block text-[11px] font-bold uppercase tracking-wider text-calve-slate mb-1">
+              <label htmlFor="cms-office25Price" className="block text-[11px] font-bold uppercase tracking-wider text-calve-slate mb-1">
                 {isEnglish ? "Private Office 28 sqm" : "Bureau privatif 28 m²"}
               </label>
               <input
+                id="cms-office25Price"
+                name="office25Price"
                 type="text"
                 value={office25Price}
                 onChange={(e) => setOffice25Price(e.target.value)}
@@ -133,10 +141,12 @@ export default function CMSPage() {
             </div>
 
             <div>
-              <label className="block text-[11px] font-bold uppercase tracking-wider text-calve-slate mb-1">
+              <label htmlFor="cms-openSpacePrice" className="block text-[11px] font-bold uppercase tracking-wider text-calve-slate mb-1">
                 {isEnglish ? "Dedicated Open Space Desk" : "Poste Fixe Open Space"}
               </label>
               <input
+                id="cms-openSpacePrice"
+                name="openSpacePrice"
                 type="text"
                 value={openSpacePrice}
                 onChange={(e) => setOpenSpacePrice(e.target.value)}

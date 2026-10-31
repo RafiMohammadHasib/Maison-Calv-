@@ -203,6 +203,44 @@ export default function TenantsPage() {
     return true;
   });
 
+  // Helper to extract clean Company and Contact Person without duplicate parentheses
+  const getResidentIdentity = (tenant: TenantRecord) => {
+    const rawCompany = (tenant.company || "").trim();
+    const rawName = (tenant.name || "").trim();
+
+    let company = rawCompany;
+    let contactPerson = rawName;
+
+    if (rawName.includes("(") && rawName.includes(")")) {
+      const match = rawName.match(/^(.*?)\s*\((.*?)\)$/);
+      if (match) {
+        if (!company || company.toLowerCase() === match[1].toLowerCase().trim()) {
+          company = match[1].trim();
+        }
+        contactPerson = match[2].trim();
+      }
+    }
+
+    if (company && contactPerson.toLowerCase().startsWith(company.toLowerCase())) {
+      contactPerson = contactPerson.slice(company.length).replace(/^[(\s-]+|[)\s-]+$/g, "").trim();
+    }
+
+    if (company && contactPerson && company.toLowerCase() === contactPerson.toLowerCase()) {
+      contactPerson = "";
+    }
+
+    const title = company || contactPerson || (isEnglish ? "Resident Occupant" : "Résident Occupant");
+    const subtitle = contactPerson && contactPerson !== company ? contactPerson : null;
+
+    const initials = (company || contactPerson || "MC")
+      .split(/\s+/)
+      .slice(0, 2)
+      .map((w) => w[0]?.toUpperCase())
+      .join("") || "MC";
+
+    return { title, subtitle, initials };
+  };
+
   return (
     <AdminLayout
       title={isEnglish ? "Tenants & Residents Directory" : "Annuaire des Résidents & Locataires"}
@@ -243,7 +281,7 @@ export default function TenantsPage() {
             className="flex-1 sm:flex-initial inline-flex items-center justify-center gap-1.5 px-4 py-2.5 rounded-xl bg-calve-slate hover:bg-calve-slate-dark text-xs font-bold text-white transition-all shadow-xs cursor-pointer active:scale-95"
           >
             <Plus className="w-3.5 h-3.5" />
-            <span>{isEnglish ? "+ New Resident" : "+ Nouveau Résident"}</span>
+            <span>{isEnglish ? "New Resident" : "Nouveau Résident"}</span>
           </button>
           <button
             onClick={fetchTenants}
@@ -392,156 +430,216 @@ export default function TenantsPage() {
           </div>
         ) : (
           <div className="divide-y divide-calve-border/60">
-            {filtered.map((tenant) => (
-              <div key={tenant.id} className="p-5 sm:p-6 hover:bg-slate-50/80 transition-colors space-y-4">
-                <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-4">
-                  {/* Left: Avatar & Identity */}
-                  <div className="flex items-start gap-4">
-                    <div className="w-12 h-12 rounded-2xl bg-calve-slate text-white font-extrabold text-sm flex items-center justify-center shrink-0 shadow-xs">
-                      {tenant.company ? tenant.company.slice(0, 2).toUpperCase() : tenant.name.slice(0, 2).toUpperCase()}
-                    </div>
-                    <div>
-                      <div className="flex items-center gap-2 flex-wrap">
-                        <h4 className="font-extrabold text-base text-calve-charcoal">
-                          {tenant.company || tenant.name}
-                        </h4>
-                        <span className="text-xs text-calve-muted">({tenant.name})</span>
+            {filtered.map((tenant) => {
+              const { title, subtitle, initials } = getResidentIdentity(tenant);
+              const formattedLeaseDate = tenant.leaseStart
+                ? new Date(tenant.leaseStart).toLocaleDateString(isEnglish ? "en-US" : "fr-FR", {
+                    day: "numeric",
+                    month: "short",
+                    year: "numeric"
+                  })
+                : (isEnglish ? "Permanent Partner Agreement" : "Convention Partenaire Permanente");
 
-                        {/* CRM Won Badge or Foundation Partner */}
-                        {tenant.isFromWonLead ? (
-                          <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-[10px] font-extrabold bg-emerald-50 text-emerald-800 border border-emerald-200">
-                            <CheckCircle2 className="w-3 h-3 text-emerald-600" />
-                            {isEnglish ? "Won CRM Lead" : "Lead Signé CRM"}
-                          </span>
-                        ) : (
-                          <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-[10px] font-extrabold bg-amber-50 text-amber-900 border border-amber-200">
-                            <Building2 className="w-3 h-3 text-amber-700" />
-                            {isEnglish ? "Property Partner" : "Partenaire Résident"}
-                          </span>
-                        )}
-
-                        <span
-                          className={`px-2 py-0.5 rounded-full text-[10px] font-bold ${
-                            tenant.status === "active"
-                              ? "bg-emerald-100 text-emerald-800"
-                              : "bg-blue-100 text-blue-800"
-                          }`}
-                        >
-                          {tenant.status === "active"
-                            ? isEnglish
-                              ? "Active"
-                              : "Actif"
-                            : isEnglish
-                            ? "Onboarding"
-                            : "En installation"}
-                        </span>
+              return (
+                <div
+                  key={tenant.id}
+                  className="p-5 sm:p-6 hover:bg-slate-50/70 transition-all duration-200 space-y-4 group"
+                >
+                  {/* 1. TOP HEADER: Resident Identity & Anchored Action Controls */}
+                  <div className="flex flex-col sm:flex-row sm:items-start justify-between gap-4">
+                    {/* Left: Avatar + Company + Contact Person + Badges */}
+                    <div className="flex items-start gap-3.5 sm:gap-4 min-w-0">
+                      <div className="w-12 h-12 rounded-2xl bg-gradient-to-br from-[#2D4B49] via-[#1E3331] to-[#111F1E] text-white font-extrabold text-sm flex items-center justify-center shrink-0 shadow-xs border border-white/10">
+                        {initials}
                       </div>
+                      <div className="min-w-0">
+                        {/* Company Title & Status Badges */}
+                        <div className="flex items-center gap-2 flex-wrap">
+                          <h4 className="font-bold text-base sm:text-lg text-calve-charcoal tracking-tight truncate">
+                            {title}
+                          </h4>
 
-                      <p className="text-xs text-calve-muted mt-0.5">{tenant.role}</p>
+                          {/* CRM Won Badge or Foundation Partner */}
+                          {tenant.isFromWonLead ? (
+                            <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-[10px] font-bold bg-emerald-50 text-emerald-800 border border-emerald-200 shadow-2xs">
+                              <CheckCircle2 className="w-3 h-3 text-emerald-600" />
+                              <span>{isEnglish ? "Signed Lead" : "Lead Signé CRM"}</span>
+                            </span>
+                          ) : (
+                            <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-[10px] font-bold bg-amber-50 text-amber-900 border border-amber-200 shadow-2xs">
+                              <Building2 className="w-3 h-3 text-amber-700" />
+                              <span>{isEnglish ? "Property Partner" : "Partenaire Résident"}</span>
+                            </span>
+                          )}
 
-                      <div className="flex items-center gap-4 text-xs text-calve-muted mt-2 flex-wrap">
-                        <a
-                          href={`mailto:${tenant.email}`}
-                          className="flex items-center gap-1 text-calve-slate hover:text-calve-slate-dark hover:underline font-medium"
-                        >
-                          <Mail className="w-3.5 h-3.5" />
-                          <span>{tenant.email}</span>
-                        </a>
-                        <a
-                          href={`tel:${tenant.phone}`}
-                          className="flex items-center gap-1 hover:text-calve-slate font-mono"
-                        >
-                          <Phone className="w-3.5 h-3.5" />
-                          <span>{tenant.phone}</span>
-                        </a>
-                        {tenant.leadId && (
-                          <Link
-                            href={`/admin/pipeline?filter=won`}
-                            className="inline-flex items-center gap-1 text-[11px] text-calve-muted hover:text-calve-charcoal font-semibold underline decoration-dotted"
+                          {/* Status Pill */}
+                          <span
+                            className={`inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-[10px] font-bold ${
+                              tenant.status === "active"
+                                ? "bg-emerald-100/80 text-emerald-900 border border-emerald-200"
+                                : "bg-blue-50 text-blue-800 border border-blue-200"
+                            }`}
                           >
-                            <span>Dossier {tenant.leadId}</span>
-                            <ExternalLink className="w-3 h-3" />
-                          </Link>
-                        )}
+                            <span className="w-1.5 h-1.5 rounded-full bg-emerald-600 animate-pulse" />
+                            <span>
+                              {tenant.status === "active"
+                                ? isEnglish
+                                  ? "Active"
+                                  : "Actif"
+                                : isEnglish
+                                ? "Onboarding"
+                                : "En installation"}
+                            </span>
+                          </span>
+                        </div>
+
+                        {/* Subtitle / Contact Person & Role (NO duplicate company, NO nested parentheses) */}
+                        <div className="flex items-center gap-2 text-xs text-calve-muted mt-1 flex-wrap">
+                          {subtitle && (
+                            <span className="font-semibold text-slate-700">
+                              {subtitle}
+                            </span>
+                          )}
+                          {subtitle && tenant.role && <span className="text-slate-300">•</span>}
+                          {tenant.role && (
+                            <span className="text-slate-500 font-medium">
+                              {tenant.role}
+                            </span>
+                          )}
+                        </div>
+
+                        {/* Contact Methods & CRM Dossier Link */}
+                        <div className="flex items-center gap-4 text-xs text-calve-muted mt-2.5 flex-wrap">
+                          <a
+                            href={`mailto:${tenant.email}`}
+                            className="flex items-center gap-1.5 text-calve-slate hover:text-calve-charcoal hover:underline font-medium transition-colors"
+                          >
+                            <Mail className="w-3.5 h-3.5 text-calve-slate/80" />
+                            <span>{tenant.email}</span>
+                          </a>
+                          {tenant.phone && (
+                            <a
+                              href={`tel:${tenant.phone}`}
+                              className="flex items-center gap-1.5 hover:text-calve-charcoal font-mono transition-colors"
+                            >
+                              <Phone className="w-3.5 h-3.5 text-calve-slate/80" />
+                              <span>{tenant.phone}</span>
+                            </a>
+                          )}
+                          {tenant.leadId && (
+                            <Link
+                              href={`/admin/pipeline?filter=won`}
+                              className="inline-flex items-center gap-1 text-[11px] text-calve-slate hover:text-calve-charcoal font-semibold underline decoration-dotted"
+                            >
+                              <span>Dossier {tenant.leadId}</span>
+                              <ExternalLink className="w-3 h-3" />
+                            </Link>
+                          )}
+                        </div>
                       </div>
                     </div>
-                  </div>
 
-                  {/* Right Details: Space, Parking, Rent & Actions */}
-                  <div className="flex flex-wrap items-center gap-3 text-xs">
-                    <div className="p-3 rounded-xl bg-slate-50 border border-slate-200 min-w-[200px]">
-                      <div className="text-[10px] uppercase font-bold text-slate-400">
-                        {isEnglish ? "Assigned space" : "Espace occupé"}
-                      </div>
-                      <div className="font-extrabold text-calve-charcoal mt-0.5 truncate">
-                        {tenant.spaceAssigned}
-                      </div>
-                    </div>
-
-                    <div className="p-3 rounded-xl bg-slate-50 border border-slate-200">
-                      <div className="text-[10px] uppercase font-bold text-slate-400">
-                        {isEnglish ? "Parking" : "Stationnement"}
-                      </div>
-                      <div className="font-extrabold text-calve-slate mt-0.5 flex items-center gap-1">
-                        <Car className="w-3.5 h-3.5 text-calve-slate" />
-                        <span>{tenant.parkingBays}</span>
-                      </div>
-                    </div>
-
-                    <div className="p-3 rounded-xl bg-calve-stone/40 border border-calve-border">
-                      <div className="text-[10px] uppercase font-bold text-slate-400">
-                        {isEnglish ? "Monthly Rent" : "Loyer Mensuel"}
-                      </div>
-                      <div className="font-extrabold text-calve-slate mt-0.5">
-                        {tenant.monthlyRent}
-                      </div>
-                    </div>
-
-                    {/* Action buttons (Edit & Delete) */}
-                    <div className="flex items-center gap-1.5 pl-2">
+                    {/* Right: Firmly Anchored Action Controls */}
+                    <div className="flex items-center gap-2 self-end sm:self-start shrink-0">
                       <button
                         onClick={() => openEditModal(tenant)}
-                        title={isEnglish ? "Edit resident" : "Modifier résident"}
-                        className="p-2 rounded-xl border border-slate-200 bg-white hover:bg-slate-50 text-slate-600 hover:text-slate-900 transition-colors cursor-pointer shadow-2xs"
+                        title={isEnglish ? "Edit resident details" : "Modifier les détails"}
+                        className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl border border-slate-200/90 bg-white hover:bg-slate-50 text-slate-700 text-xs font-semibold shadow-2xs transition-all cursor-pointer active:scale-95"
                       >
-                        <Edit className="w-4 h-4" />
+                        <Edit className="w-3.5 h-3.5 text-calve-slate" />
+                        <span className="hidden sm:inline">{isEnglish ? "Edit" : "Modifier"}</span>
                       </button>
                       <button
                         onClick={() => handleDeleteTenant(tenant.id, tenant.company || tenant.name)}
-                        title={isEnglish ? "Delete resident from DB" : "Supprimer de la base"}
-                        className="p-2 rounded-xl border border-slate-200 bg-white hover:bg-rose-50 text-slate-400 hover:text-rose-600 transition-colors cursor-pointer shadow-2xs"
+                        title={isEnglish ? "Remove resident from directory" : "Supprimer de l'annuaire"}
+                        className="p-1.5 sm:px-2.5 sm:py-1.5 rounded-xl border border-slate-200/90 bg-white hover:bg-rose-50 hover:border-rose-200 text-slate-400 hover:text-rose-600 text-xs font-semibold shadow-2xs transition-all cursor-pointer active:scale-95"
                       >
-                        <Trash2 className="w-4 h-4" />
+                        <Trash2 className="w-3.5 h-3.5" />
                       </button>
                     </div>
                   </div>
-                </div>
 
-                {/* Badges and lease dates */}
-                <div className="pt-2 border-t border-slate-100 flex flex-wrap items-center justify-between gap-3 text-xs text-calve-muted">
-                  <div className="flex items-center gap-2">
-                    <Key className="w-3.5 h-3.5 text-calve-slate" />
-                    <span className="font-medium">{isEnglish ? "24/7 RFID Badges:" : "Badges RFID 24/7 :"}</span>
-                    {tenant.badgeIds.map((b) => (
-                      <span
-                        key={b}
-                        className="font-mono text-[11px] bg-slate-100 px-2 py-0.5 rounded border border-slate-200 font-bold text-slate-700"
-                      >
-                        {b}
+                  {/* 2. STRUCTURED 3-COLUMN TELEMETRY GRID (Clean, balanced, zero wrapping artifacts) */}
+                  <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 pt-1">
+                    {/* Tile 1: Assigned Space */}
+                    <div className="p-3.5 rounded-2xl bg-slate-50/80 border border-slate-200/70 hover:border-slate-300 transition-colors">
+                      <div className="flex items-center gap-1.5 text-[10px] uppercase font-bold tracking-wider text-slate-400">
+                        <Building2 className="w-3.5 h-3.5 text-calve-slate" />
+                        <span>{isEnglish ? "Assigned Space" : "Espace Attribué"}</span>
+                      </div>
+                      <div className="font-bold text-sm text-calve-charcoal mt-1 truncate" title={tenant.spaceAssigned}>
+                        {tenant.spaceAssigned}
+                      </div>
+                      <div className="text-[11px] text-slate-500 mt-0.5">
+                        {tenant.workstations} {isEnglish ? "workstation" : "poste"}{tenant.workstations > 1 ? "s" : ""}
+                      </div>
+                    </div>
+
+                    {/* Tile 2: Courtyard Parking */}
+                    <div className="p-3.5 rounded-2xl bg-slate-50/80 border border-slate-200/70 hover:border-slate-300 transition-colors">
+                      <div className="flex items-center gap-1.5 text-[10px] uppercase font-bold tracking-wider text-slate-400">
+                        <Car className="w-3.5 h-3.5 text-calve-slate" />
+                        <span>{isEnglish ? "Courtyard Parking" : "Stationnement Cour"}</span>
+                      </div>
+                      <div className="font-bold text-sm text-calve-charcoal mt-1 truncate">
+                        {tenant.parkingBays || (isEnglish ? "Pedestrian / Bike access" : "Accès piéton & vélo")}
+                      </div>
+                      <div className="text-[11px] text-slate-500 mt-0.5">
+                        {isEnglish ? "Secured private courtyard" : "Cour privative sécurisée"}
+                      </div>
+                    </div>
+
+                    {/* Tile 3: Monthly Rent / Rate */}
+                    <div className="p-3.5 rounded-2xl bg-slate-50/80 border border-slate-200/70 hover:border-slate-300 transition-colors">
+                      <div className="flex items-center gap-1.5 text-[10px] uppercase font-bold tracking-wider text-slate-400">
+                        <CreditCard className="w-3.5 h-3.5 text-calve-slate" />
+                        <span>{isEnglish ? "Rate & Billing" : "Tarif & Facturation"}</span>
+                      </div>
+                      <div className="font-extrabold text-sm text-calve-slate mt-1 truncate">
+                        {tenant.monthlyRent}
+                      </div>
+                      <div className="text-[11px] text-slate-500 mt-0.5">
+                        {isEnglish ? "Direct resident contract" : "Bail & convention active"}
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* 3. FOOTER ROW: Security Badges & Lease Timeline */}
+                  <div className="pt-3 border-t border-slate-100 flex flex-col sm:flex-row sm:items-center justify-between gap-2.5 text-xs text-calve-muted">
+                    {/* RFID Badges */}
+                    <div className="flex items-center gap-2 flex-wrap">
+                      <ShieldCheck className="w-3.5 h-3.5 text-emerald-600 shrink-0" />
+                      <span className="font-semibold text-slate-600 text-[11px]">
+                        {isEnglish ? "24/7 RFID Badges:" : "Badges RFID 24/7 :"}
                       </span>
-                    ))}
-                  </div>
+                      {tenant.badgeIds && tenant.badgeIds.length > 0 ? (
+                        tenant.badgeIds.map((b) => (
+                          <span
+                            key={b}
+                            className="font-mono text-[10px] font-bold tracking-wider bg-white px-2 py-0.5 rounded-md border border-slate-200 text-slate-700 shadow-2xs"
+                          >
+                            {b}
+                          </span>
+                        ))
+                      ) : (
+                        <span className="text-[11px] text-slate-400 italic">
+                          {isEnglish ? "Pending issuance" : "En cours d'attribution"}
+                        </span>
+                      )}
+                    </div>
 
-                  <div className="flex items-center gap-1.5 text-[11px]">
-                    <Calendar className="w-3.5 h-3.5 text-calve-muted" />
-                    <span>
-                      {isEnglish ? "Lease started on: " : "Bail débuté le : "}
-                      {tenant.leaseStart ? new Date(tenant.leaseStart).toLocaleDateString(isEnglish ? "en-US" : "fr-FR") : "Convention"}
-                    </span>
+                    {/* Lease Start Date */}
+                    <div className="flex items-center gap-1.5 text-[11px] font-medium text-slate-500">
+                      <Calendar className="w-3.5 h-3.5 text-slate-400 shrink-0" />
+                      <span>
+                        {isEnglish ? "Lease commenced: " : "Début du contrat : "}
+                        <strong className="text-slate-700 font-semibold">{formattedLeaseDate}</strong>
+                      </span>
+                    </div>
                   </div>
                 </div>
-              </div>
-            ))}
+              );
+            })}
           </div>
         )}
       </div>
@@ -571,7 +669,7 @@ export default function TenantsPage() {
               <div className="grid grid-cols-2 gap-3">
                 <div>
                   <label className="block text-[10px] font-bold uppercase text-slate-500 mb-1">
-                    Entreprise / Société
+                    {isEnglish ? "Company / Organization" : "Entreprise / Société"}
                   </label>
                   <input
                     type="text"
@@ -583,7 +681,7 @@ export default function TenantsPage() {
                 </div>
                 <div>
                   <label className="block text-[10px] font-bold uppercase text-slate-500 mb-1">
-                    Nom du Contact
+                    {isEnglish ? "Contact Name" : "Nom du Contact"}
                   </label>
                   <input
                     type="text"
@@ -598,7 +696,7 @@ export default function TenantsPage() {
               <div className="grid grid-cols-2 gap-3">
                 <div>
                   <label className="block text-[10px] font-bold uppercase text-slate-500 mb-1">
-                    Email
+                    {isEnglish ? "Email Address" : "Email"}
                   </label>
                   <input
                     type="email"
@@ -610,7 +708,7 @@ export default function TenantsPage() {
                 </div>
                 <div>
                   <label className="block text-[10px] font-bold uppercase text-slate-500 mb-1">
-                    Téléphone
+                    {isEnglish ? "Phone Number" : "Téléphone"}
                   </label>
                   <input
                     type="text"
@@ -623,7 +721,7 @@ export default function TenantsPage() {
 
               <div>
                 <label className="block text-[10px] font-bold uppercase text-slate-500 mb-1">
-                  Espace Assigné
+                  {isEnglish ? "Assigned Space" : "Espace Assigné"}
                 </label>
                 <input
                   type="text"
@@ -636,7 +734,7 @@ export default function TenantsPage() {
               <div className="grid grid-cols-2 gap-3">
                 <div>
                   <label className="block text-[10px] font-bold uppercase text-slate-500 mb-1">
-                    Loyer Mensuel
+                    {isEnglish ? "Monthly Rent" : "Loyer Mensuel"}
                   </label>
                   <input
                     type="text"
@@ -647,7 +745,7 @@ export default function TenantsPage() {
                 </div>
                 <div>
                   <label className="block text-[10px] font-bold uppercase text-slate-500 mb-1">
-                    Statut
+                    {isEnglish ? "Status" : "Statut"}
                   </label>
                   <select
                     value={editForm.status}
@@ -659,9 +757,9 @@ export default function TenantsPage() {
                     }
                     className="w-full px-3 py-2 rounded-xl border border-slate-200 text-xs font-bold text-slate-900 bg-white"
                   >
-                    <option value="active">Actif (Active)</option>
-                    <option value="onboarding">En installation (Onboarding)</option>
-                    <option value="notice">Préavis de sortie (Notice)</option>
+                    <option value="active">{isEnglish ? "Active" : "Actif"}</option>
+                    <option value="onboarding">{isEnglish ? "Onboarding" : "En installation"}</option>
+                    <option value="notice">{isEnglish ? "Notice Period" : "Préavis de sortie"}</option>
                   </select>
                 </div>
               </div>
@@ -670,16 +768,16 @@ export default function TenantsPage() {
                 <button
                   type="button"
                   onClick={() => setEditingTenant(null)}
-                  className="px-4 py-2 rounded-xl border border-slate-200 text-xs font-semibold text-slate-600 hover:bg-slate-50"
+                  className="px-4 py-2 rounded-xl border border-slate-200 text-xs font-semibold text-slate-600 hover:bg-slate-50 cursor-pointer"
                 >
-                  Annuler
+                  {isEnglish ? "Cancel" : "Annuler"}
                 </button>
                 <button
                   type="submit"
                   className="flex items-center gap-1.5 px-5 py-2 rounded-xl bg-calve-slate hover:bg-calve-slate-dark text-white text-xs font-bold shadow-xs cursor-pointer"
                 >
                   <Save className="w-3.5 h-3.5" />
-                  <span>Enregistrer dans OVH MySQL</span>
+                  <span>{isEnglish ? "Save Changes" : "Enregistrer les modifications"}</span>
                 </button>
               </div>
             </form>
@@ -709,12 +807,12 @@ export default function TenantsPage() {
               <div className="grid grid-cols-2 gap-3">
                 <div>
                   <label className="block text-[10px] font-bold uppercase text-slate-500 mb-1">
-                    Entreprise / Société *
+                    {isEnglish ? "Company / Organization *" : "Entreprise / Société *"}
                   </label>
                   <input
                     type="text"
                     required
-                    placeholder="Ex: Aquitaine Tech SAS"
+                    placeholder={isEnglish ? "e.g. Bordeaux Tech SAS" : "Ex: Aquitaine Tech SAS"}
                     value={createForm.company}
                     onChange={(e) => setCreateForm({ ...createForm, company: e.target.value })}
                     className="w-full px-3 py-2 rounded-xl border border-slate-200 text-xs font-bold text-slate-900"
@@ -722,12 +820,12 @@ export default function TenantsPage() {
                 </div>
                 <div>
                   <label className="block text-[10px] font-bold uppercase text-slate-500 mb-1">
-                    Nom du Contact *
+                    {isEnglish ? "Contact Name *" : "Nom du Contact *"}
                   </label>
                   <input
                     type="text"
                     required
-                    placeholder="Ex: Jean Dupont"
+                    placeholder={isEnglish ? "e.g. Jean Dupont" : "Ex: Jean Dupont"}
                     value={createForm.name}
                     onChange={(e) => setCreateForm({ ...createForm, name: e.target.value })}
                     className="w-full px-3 py-2 rounded-xl border border-slate-200 text-xs font-bold text-slate-900"
@@ -738,12 +836,12 @@ export default function TenantsPage() {
               <div className="grid grid-cols-2 gap-3">
                 <div>
                   <label className="block text-[10px] font-bold uppercase text-slate-500 mb-1">
-                    Email *
+                    {isEnglish ? "Email Address *" : "Email *"}
                   </label>
                   <input
                     type="email"
                     required
-                    placeholder="jean@aquitaine-tech.com"
+                    placeholder="contact@company.fr"
                     value={createForm.email}
                     onChange={(e) => setCreateForm({ ...createForm, email: e.target.value })}
                     className="w-full px-3 py-2 rounded-xl border border-slate-200 text-xs text-slate-900"
@@ -751,11 +849,11 @@ export default function TenantsPage() {
                 </div>
                 <div>
                   <label className="block text-[10px] font-bold uppercase text-slate-500 mb-1">
-                    Téléphone
+                    {isEnglish ? "Phone Number" : "Téléphone"}
                   </label>
                   <input
                     type="text"
-                    placeholder="06 12 34 56 78"
+                    placeholder="+33 6 12 34 56 78"
                     value={createForm.phone}
                     onChange={(e) => setCreateForm({ ...createForm, phone: e.target.value })}
                     className="w-full px-3 py-2 rounded-xl border border-slate-200 text-xs text-slate-900 font-mono"
@@ -765,10 +863,11 @@ export default function TenantsPage() {
 
               <div>
                 <label className="block text-[10px] font-bold uppercase text-slate-500 mb-1">
-                  Espace Assigné
+                  {isEnglish ? "Assigned Space" : "Espace Assigné"}
                 </label>
                 <input
                   type="text"
+                  placeholder={isEnglish ? "e.g. Private Office Resident (East Wing)" : "Ex: Bureau Privatif Résident (Aile Est)"}
                   value={createForm.spaceAssigned}
                   onChange={(e) => setCreateForm({ ...createForm, spaceAssigned: e.target.value })}
                   className="w-full px-3 py-2 rounded-xl border border-slate-200 text-xs text-slate-900"
@@ -778,10 +877,11 @@ export default function TenantsPage() {
               <div className="grid grid-cols-2 gap-3">
                 <div>
                   <label className="block text-[10px] font-bold uppercase text-slate-500 mb-1">
-                    Loyer Mensuel
+                    {isEnglish ? "Monthly Rent" : "Loyer Mensuel"}
                   </label>
                   <input
                     type="text"
+                    placeholder="850 € HT"
                     value={createForm.monthlyRent}
                     onChange={(e) => setCreateForm({ ...createForm, monthlyRent: e.target.value })}
                     className="w-full px-3 py-2 rounded-xl border border-slate-200 text-xs font-bold text-slate-900"
@@ -789,10 +889,11 @@ export default function TenantsPage() {
                 </div>
                 <div>
                   <label className="block text-[10px] font-bold uppercase text-slate-500 mb-1">
-                    Places de Parking
+                    {isEnglish ? "Parking Spaces" : "Places de Parking"}
                   </label>
                   <input
                     type="text"
+                    placeholder={isEnglish ? "e.g. Bays #1 & #2" : "Ex: Places #1 & #2"}
                     value={createForm.parkingBays}
                     onChange={(e) => setCreateForm({ ...createForm, parkingBays: e.target.value })}
                     className="w-full px-3 py-2 rounded-xl border border-slate-200 text-xs text-slate-900"
@@ -804,16 +905,16 @@ export default function TenantsPage() {
                 <button
                   type="button"
                   onClick={() => setIsCreateOpen(false)}
-                  className="px-4 py-2 rounded-xl border border-slate-200 text-xs font-semibold text-slate-600 hover:bg-slate-50"
+                  className="px-4 py-2 rounded-xl border border-slate-200 text-xs font-semibold text-slate-600 hover:bg-slate-50 cursor-pointer"
                 >
-                  Annuler
+                  {isEnglish ? "Cancel" : "Annuler"}
                 </button>
                 <button
                   type="submit"
                   className="flex items-center gap-1.5 px-5 py-2 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-bold shadow-xs cursor-pointer"
                 >
                   <Plus className="w-3.5 h-3.5" />
-                  <span>Ajouter dans la Base de Données</span>
+                  <span>{isEnglish ? "Create Resident" : "Ajouter dans la Base de Données"}</span>
                 </button>
               </div>
             </form>

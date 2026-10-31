@@ -126,7 +126,7 @@ export default function SpacesSection({ language, onOpenEnquiry }: SpacesSection
         {/* ======================================================== */}
         {/* SECTION HEADER: Pure Architectural Typography */}
         {/* ======================================================== */}
-        <div className="flex flex-col md:flex-row md:items-end justify-between mb-10 sm:mb-14 gap-6">
+        <div className="flex flex-col md:flex-row md:items-end justify-between mb-10 sm:mb-14 gap-6" data-reveal="fade-up">
           <div className="max-w-2xl">
             <div className="text-xs font-bold tracking-[0.25em] uppercase text-calve-slate mb-3">
               {t.tag}
@@ -203,7 +203,7 @@ export default function SpacesSection({ language, onOpenEnquiry }: SpacesSection
             onTouchMove={handleTouchMove}
             onTouchEnd={handleTouchEnd}
           >
-            <article className="bg-white rounded-3xl lg:rounded-[2rem] overflow-hidden border border-calve-border/90 shadow-[0_16px_40px_rgba(23,33,35,0.05)] transition-all duration-500">
+            <article className="bg-white rounded-3xl lg:rounded-[2rem] overflow-hidden border border-calve-border/90 shadow-[0_16px_40px_rgba(23,33,35,0.05)] transition-all duration-500" data-reveal="fade-up">
               <div className="grid grid-cols-1 lg:grid-cols-12 items-stretch min-h-[580px]">
                 
                 {/* ---------------------------------------------------- */}

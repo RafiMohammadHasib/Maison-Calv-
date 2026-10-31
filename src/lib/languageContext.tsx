@@ -25,7 +25,7 @@ export const ADMIN_TRANSLATIONS: Record<AdminLanguage, Record<string, string>> =
     // Header & Global
     "search.placeholder": "Rechercher un lead, contact, espace, résident...",
     "realtime.live": "Realtime Live",
-    "btn.new": "+ Nouveau",
+    "btn.new": "Nouveau",
     "tooltip.notifications": "Notifications système",
     "tooltip.refresh": "Rafraîchir les données",
     "tooltip.logout": "Déconnexion",
@@ -279,7 +279,7 @@ export const ADMIN_TRANSLATIONS: Record<AdminLanguage, Record<string, string>> =
     // Header & Global
     "search.placeholder": "Search leads, owners, spaces, residents...",
     "realtime.live": "Realtime Live",
-    "btn.new": "+ New",
+    "btn.new": "New",
     "tooltip.notifications": "System notifications",
     "tooltip.refresh": "Refresh data",
     "tooltip.logout": "Sign out",

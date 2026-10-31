@@ -13,6 +13,24 @@ export const SESSION_COOKIE_NAME = "mc_admin_session";
 // Server-side set of revoked session IDs (in-memory for active process)
 const revokedSessionIds = new Set<string>();
 
+export interface SessionUserData {
+  email: string;
+  name: string;
+  role: string;
+}
+
+// In-memory mapping of active session IDs to user profiles
+const sessionUserMap = new Map<string, SessionUserData>();
+
+export function setSessionUser(sessionId: string, user: SessionUserData): void {
+  sessionUserMap.set(sessionId, user);
+}
+
+export function getSessionUser(sessionId?: string): SessionUserData | null {
+  if (!sessionId) return null;
+  return sessionUserMap.get(sessionId) || null;
+}
+
 async function getHmacKey(): Promise<CryptoKey> {
   const enc = new TextEncoder();
   return await crypto.subtle.importKey(
@@ -112,13 +130,10 @@ export async function verifySession(token?: string | null): Promise<{
 export function revokeSession(tokenOrSessionId?: string | null): void {
   if (!tokenOrSessionId) return;
 
-  if (tokenOrSessionId.includes(".")) {
-    const parts = tokenOrSessionId.split(".");
-    if (parts[0]) {
-      revokedSessionIds.add(parts[0]);
-    }
-  } else {
-    revokedSessionIds.add(tokenOrSessionId);
+  const sessionId = tokenOrSessionId.includes(".") ? tokenOrSessionId.split(".")[0] : tokenOrSessionId;
+  if (sessionId) {
+    revokedSessionIds.add(sessionId);
+    sessionUserMap.delete(sessionId);
   }
 }
 

@@ -1,7 +1,7 @@
 import { NextResponse } from "next/server";
 import { cookies } from "next/headers";
-import { createSession, verifySession, revokeSession, SESSION_COOKIE_NAME } from "@/lib/session";
-import { getAdminConfig, saveAdminConfig, verifyAdminPassword } from "@/lib/adminConfig";
+import { createSession, verifySession, revokeSession, SESSION_COOKIE_NAME, setSessionUser, getSessionUser } from "@/lib/session";
+import { getAdminConfig, saveAdminConfig, verifyAdminPassword, findAdminUser } from "@/lib/adminConfig";
 
 const ADMIN_EMAIL = process.env.ADMIN_EMAIL || "admin@maisoncalve.fr";
 
@@ -9,18 +9,9 @@ export async function POST(request: Request) {
   try {
     const { email, password, rememberMe } = await request.json();
 
-    const config = getAdminConfig();
-    const effectiveAdminEmail = config.email || ADMIN_EMAIL;
+    const user = findAdminUser(email, password);
 
-    const normalizedEmail = (email || "").trim().toLowerCase();
-    const isEmailValid =
-      normalizedEmail === effectiveAdminEmail.toLowerCase() ||
-      normalizedEmail === ADMIN_EMAIL.toLowerCase() ||
-      normalizedEmail === "admin@gg.fr" ||
-      normalizedEmail === "admin@maisoncalve.com";
-    const isPasswordValid = verifyAdminPassword(password);
-
-    if (!isEmailValid || !isPasswordValid) {
+    if (!user) {
       return NextResponse.json(
         {
           success: false,
@@ -32,6 +23,13 @@ export async function POST(request: Request) {
 
     // Generate unique cryptographic session
     const { token, sessionId, expiresAt, maxAgeSeconds } = await createSession(rememberMe);
+
+    // Save authenticated user profile to active session
+    setSessionUser(sessionId, {
+      name: user.name,
+      email: user.email,
+      role: user.role
+    });
 
     const cookieStore = await cookies();
     cookieStore.set(SESSION_COOKIE_NAME, token, {
@@ -48,9 +46,9 @@ export async function POST(request: Request) {
       sessionId,
       expiresAt,
       user: {
-        name: config.name || "Administrateur Maison Calvé",
-        email: effectiveAdminEmail,
-        role: "Super Admin",
+        name: user.name,
+        email: user.email,
+        role: user.role,
         workspace: "Maison Calvé - Bordeaux Fondaudège"
       }
     });
@@ -69,14 +67,22 @@ export async function GET() {
     const authResult = await verifySession(sessionCookie?.value);
 
     if (authResult.valid) {
+      const sessionUser = getSessionUser(authResult.sessionId);
       const config = getAdminConfig();
+
+      const user = sessionUser || {
+        name: config.name || "Administrateur Maison Calvé",
+        email: config.email || ADMIN_EMAIL,
+        role: "Super Admin"
+      };
+
       return NextResponse.json({
         authenticated: true,
         sessionId: authResult.sessionId,
         user: {
-          name: config.name || "Administrateur Maison Calvé",
-          email: config.email || ADMIN_EMAIL,
-          role: "Super Admin",
+          name: user.name,
+          email: user.email,
+          role: user.role || "Super Admin",
           workspace: "Maison Calvé - Bordeaux Fondaudège"
         }
       });

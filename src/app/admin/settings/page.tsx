@@ -302,10 +302,12 @@ export default function SettingsPage() {
               <div className="space-y-4">
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                   <div>
-                    <label className="block text-[10px] font-bold uppercase tracking-wider text-calve-muted mb-1.5">
+                    <label htmlFor="setting-agencyName" className="block text-[10px] font-bold uppercase tracking-wider text-calve-muted mb-1.5">
                       {isEnglish ? "OFFICIAL AGENCY NAME" : "NOM OFFICIEL DE L'AGENCE"}
                     </label>
                     <input
+                      id="setting-agencyName"
+                      name="agencyName"
                       type="text"
                       value={agencyName}
                       onChange={(e) => setAgencyName(e.target.value)}
@@ -314,10 +316,12 @@ export default function SettingsPage() {
                   </div>
 
                   <div>
-                    <label className="block text-[10px] font-bold uppercase tracking-wider text-calve-muted mb-1.5">
+                    <label htmlFor="setting-tagline" className="block text-[10px] font-bold uppercase tracking-wider text-calve-muted mb-1.5">
                       {isEnglish ? "OFFICIAL TAGLINE / SUBTITLE" : "SLOGAN / SOUS-TITRE OFFICIEL"}
                     </label>
                     <input
+                      id="setting-tagline"
+                      name="tagline"
                       type="text"
                       value={tagline || (isEnglish ? "High-End Real Estate & Coworking in Bordeaux" : "Immobilier & Coworking Haut de Gamme à Bordeaux")}
                       onChange={(e) => setTagline(e.target.value)}
@@ -328,12 +332,14 @@ export default function SettingsPage() {
 
                 <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                   <div>
-                    <label className="block text-[10px] font-bold uppercase tracking-wider text-calve-muted mb-1.5">
+                    <label htmlFor="setting-paulPhone" className="block text-[10px] font-bold uppercase tracking-wider text-calve-muted mb-1.5">
                       {isEnglish ? "PAUL GOIZET PHONE" : "TÉLÉPHONE PAUL GOIZET"}
                     </label>
                     <div className="relative">
                       <Phone className="w-3.5 h-3.5 text-calve-muted absolute left-3.5 top-1/2 -translate-y-1/2" />
                       <input
+                        id="setting-paulPhone"
+                        name="paulPhone"
                         type="text"
                         value={paulPhone}
                         onChange={(e) => setPaulPhone(e.target.value)}
@@ -343,12 +349,14 @@ export default function SettingsPage() {
                   </div>
 
                   <div>
-                    <label className="block text-[10px] font-bold uppercase tracking-wider text-calve-muted mb-1.5">
+                    <label htmlFor="setting-edgarPhone" className="block text-[10px] font-bold uppercase tracking-wider text-calve-muted mb-1.5">
                       {isEnglish ? "EDGAR GOIZET PHONE" : "TÉLÉPHONE EDGAR GOIZET"}
                     </label>
                     <div className="relative">
                       <Phone className="w-3.5 h-3.5 text-calve-muted absolute left-3.5 top-1/2 -translate-y-1/2" />
                       <input
+                        id="setting-edgarPhone"
+                        name="edgarPhone"
                         type="text"
                         value={edgarPhone}
                         onChange={(e) => setEdgarPhone(e.target.value)}
@@ -358,12 +366,14 @@ export default function SettingsPage() {
                   </div>
 
                   <div>
-                    <label className="block text-[10px] font-bold uppercase tracking-wider text-calve-muted mb-1.5">
+                    <label htmlFor="setting-agencyEmail" className="block text-[10px] font-bold uppercase tracking-wider text-calve-muted mb-1.5">
                       {isEnglish ? "PRIMARY AGENCY EMAIL" : "EMAIL PRINCIPAL DE L'AGENCE"}
                     </label>
                     <div className="relative">
                       <Mail className="w-3.5 h-3.5 text-calve-muted absolute left-3.5 top-1/2 -translate-y-1/2" />
                       <input
+                        id="setting-agencyEmail"
+                        name="agencyEmail"
                         type="email"
                         value={agencyEmail}
                         onChange={(e) => setAgencyEmail(e.target.value)}
@@ -375,12 +385,14 @@ export default function SettingsPage() {
 
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                   <div>
-                    <label className="block text-[10px] font-bold uppercase tracking-wider text-calve-muted mb-1.5">
+                    <label htmlFor="setting-officeAddress" className="block text-[10px] font-bold uppercase tracking-wider text-calve-muted mb-1.5">
                       {isEnglish ? "BORDEAUX OFFICE ADDRESS" : "ADRESSE DU SIÈGE BORDEAUX"}
                     </label>
                     <div className="relative">
                       <MapPin className="w-3.5 h-3.5 text-calve-muted absolute left-3.5 top-1/2 -translate-y-1/2" />
                       <input
+                        id="setting-officeAddress"
+                        name="officeAddress"
                         type="text"
                         value={officeAddress}
                         onChange={(e) => setOfficeAddress(e.target.value)}
@@ -390,12 +402,14 @@ export default function SettingsPage() {
                   </div>
 
                   <div>
-                    <label className="block text-[10px] font-bold uppercase tracking-wider text-calve-muted mb-1.5">
+                    <label htmlFor="setting-officeHours" className="block text-[10px] font-bold uppercase tracking-wider text-calve-muted mb-1.5">
                       {isEnglish ? "OFFICE OPENING HOURS" : "HORAIRES D'OUVERTURE"}
                     </label>
                     <div className="relative">
                       <Clock className="w-3.5 h-3.5 text-calve-muted absolute left-3.5 top-1/2 -translate-y-1/2" />
                       <input
+                        id="setting-officeHours"
+                        name="officeHours"
                         type="text"
                         value={officeHours || (isEnglish ? "Monday - Friday: 08:30 AM - 07:00 PM | Saturday: By Appointment (Residents 24/7)" : "Lundi - Vendredi : 08h30 - 19h00 | Samedi : Sur rendez-vous (Résidents 24/7)")}
                         onChange={(e) => setOfficeHours(e.target.value)}
@@ -417,10 +431,12 @@ export default function SettingsPage() {
 
               <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                 <div>
-                  <label className="block text-[10px] font-bold uppercase tracking-wider text-calve-muted mb-1.5">
+                  <label htmlFor="setting-siret" className="block text-[10px] font-bold uppercase tracking-wider text-calve-muted mb-1.5">
                     {isEnglish ? "SIRET NUMBER" : "NUMÉRO SIRET"}
                   </label>
                   <input
+                    id="setting-siret"
+                    name="siret"
                     type="text"
                     value={siret}
                     onChange={(e) => setSiret(e.target.value)}
@@ -429,10 +445,12 @@ export default function SettingsPage() {
                 </div>
 
                 <div>
-                  <label className="block text-[10px] font-bold uppercase tracking-wider text-calve-muted mb-1.5">
+                  <label htmlFor="setting-licenseCPI" className="block text-[10px] font-bold uppercase tracking-wider text-calve-muted mb-1.5">
                     {isEnglish ? "PROFESSIONAL LICENSE CPI (CCI BORDEAUX)" : "CARTE PROFESSIONNELLE CPI (CCI BORDEAUX)"}
                   </label>
                   <input
+                    id="setting-licenseCPI"
+                    name="licenseCPI"
                     type="text"
                     value={licenseCPI}
                     onChange={(e) => setLicenseCPI(e.target.value)}
@@ -441,10 +459,12 @@ export default function SettingsPage() {
                 </div>
 
                 <div>
-                  <label className="block text-[10px] font-bold uppercase tracking-wider text-calve-muted mb-1.5">
+                  <label htmlFor="setting-guarantee" className="block text-[10px] font-bold uppercase tracking-wider text-calve-muted mb-1.5">
                     {isEnglish ? "FINANCIAL GUARANTEE & PROVIDER" : "GARANTIE FINANCIÈRE & ASSURANCE"}
                   </label>
                   <input
+                    id="setting-guarantee"
+                    name="guarantee"
                     type="text"
                     value={guarantee}
                     onChange={(e) => setGuarantee(e.target.value)}
