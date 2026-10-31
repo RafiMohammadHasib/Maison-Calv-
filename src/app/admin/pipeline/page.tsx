@@ -870,33 +870,70 @@ export default function PipelinePage() {
               </button>
             </div>
 
-            {/* Quick Interactive Stage Progression Stepper */}
-            <div className="p-4 rounded-2xl bg-slate-50 border border-slate-200/90 space-y-2">
-              <label className="text-[10px] font-bold uppercase tracking-wider text-calve-slate flex items-center justify-between">
-                <span>{t("pipeline.modal.change_stage")}</span>
-                <span className="text-[10px] font-mono text-slate-400">
-                  {language === "fr" ? "Cliquez pour changer d'étape" : "Click step to advance"}
+            {/* Executive Pipeline Stage Progress Tracker */}
+            <div className="space-y-2">
+              <div className="flex items-center justify-between text-xs px-0.5">
+                <span className="text-[11px] font-bold uppercase tracking-wider text-calve-muted">
+                  {language === "fr" ? "Étape du pipeline" : "Pipeline Stage"}
                 </span>
-              </label>
-              <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-1.5 pt-1">
+                <span className="text-xs font-semibold text-calve-charcoal flex items-center gap-1.5">
+                  <span className="w-1.5 h-1.5 rounded-full bg-calve-slate" />
+                  <span className="text-calve-muted font-normal">
+                    {language === "fr" ? "Statut actuel :" : "Current status:"}
+                  </span>
+                  <span className="font-bold">
+                    {stages.find((s) => s.key === normalizeStatus(selectedLead.status))?.label || selectedLead.status}
+                  </span>
+                </span>
+              </div>
+
+              {/* Seamless Segmented Stage Rail */}
+              <div className="flex items-center p-1 bg-stone-100/90 rounded-2xl border border-stone-200/80 gap-1 overflow-x-auto scrollbar-none">
                 {stages.map((stage, idx) => {
-                  const isActive = normalizeStatus(selectedLead.status) === stage.key;
+                  const currentNorm = normalizeStatus(selectedLead.status);
+                  const currentIdx = stages.findIndex((s) => s.key === currentNorm);
+                  const isCurrent = currentNorm === stage.key;
+                  const isPast = currentIdx > idx;
+
+                  // Clean concise labels preventing truncation
+                  const stageShortLabel =
+                    stage.key === "tour_scheduled"
+                      ? language === "fr"
+                        ? "Visite"
+                        : "Viewing"
+                      : stage.key === "new"
+                      ? language === "fr"
+                        ? "Nouveau"
+                        : "New"
+                      : stage.key === "won"
+                      ? language === "fr"
+                        ? "Signé"
+                        : "Won"
+                      : stage.label;
+
                   return (
                     <button
                       key={stage.key}
                       type="button"
                       onClick={() => handleStatusChange(selectedLead.id, stage.key)}
-                      className={`p-2 rounded-xl text-left border text-xs transition-all cursor-pointer flex flex-col justify-between ${
-                        isActive
-                          ? "bg-calve-slate text-white border-calve-slate shadow-sm font-bold ring-2 ring-calve-slate/30"
-                          : "bg-white text-slate-700 border-slate-200 hover:border-slate-300 hover:bg-slate-100/60"
+                      title={stage.label}
+                      className={`flex-1 min-w-[78px] py-2 px-2 rounded-xl text-center transition-all cursor-pointer flex items-center justify-center gap-1.5 ${
+                        isCurrent
+                          ? "bg-calve-charcoal text-white shadow-xs font-bold"
+                          : isPast
+                          ? "bg-white/80 text-calve-charcoal hover:bg-white hover:shadow-2xs font-semibold"
+                          : "text-stone-400 hover:text-stone-700 hover:bg-white/50 font-medium"
                       }`}
                     >
-                      <div className="flex items-center justify-between">
-                        <span className="text-[9px] font-mono opacity-60">0{idx + 1}</span>
-                        <span className={`w-2 h-2 rounded-full ${stage.dotColor}`} />
-                      </div>
-                      <span className="text-[11px] font-bold mt-1 truncate">{stage.label}</span>
+                      {isPast && (
+                        <Check className="w-3 h-3 text-emerald-600 shrink-0" strokeWidth={2.5} />
+                      )}
+                      {isCurrent && (
+                        <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 shrink-0" />
+                      )}
+                      <span className="text-[11px] tracking-tight whitespace-nowrap">
+                        {stageShortLabel}
+                      </span>
                     </button>
                   );
                 })}
