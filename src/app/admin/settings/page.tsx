@@ -98,7 +98,7 @@ export default function SettingsPage() {
   const [parkingPolicy, setParkingPolicy] = useState("Inclus avec bureaux privatifs (9 places cour sécurisée au total)");
 
   // Form State: 4. System & SEO
-  const [metaTitle, setMetaTitle] = useState("Maison Calvé — Peaceful Coworking Bordeaux Fondaudège avec Parking");
+  const [metaTitle, setMetaTitle] = useState("Maison Calvé — Coworking Bordeaux Fondaudège avec Parking");
   const [instagramAccount, setInstagramAccount] = useState("@maisoncalvebordeaux");
   const [gpsCoordinates, setGpsCoordinates] = useState("44.8488° N, 0.5843° W (Tram D Croix-de-Seguey)");
   const [leadDispatcherEmail, setLeadDispatcherEmail] = useState("admin@maisoncalve.fr");

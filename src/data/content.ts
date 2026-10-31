@@ -150,7 +150,7 @@ export interface LocaleContent {
 export const CONTENT: Record<Language, LocaleContent> = {
   fr: {
     nav: {
-      brandSubtitle: "Peaceful Coworking",
+      brandSubtitle: "Coworking",
       spaces: "Espaces",
       about: "À Propos",
       floorPlan: "Plan 3D",
@@ -356,7 +356,7 @@ export const CONTENT: Record<Language, LocaleContent> = {
   },
   en: {
     nav: {
-      brandSubtitle: "Peaceful Coworking",
+      brandSubtitle: "Coworking",
       spaces: "Spaces",
       about: "About Us",
       floorPlan: "3D Plan",
@@ -562,7 +562,7 @@ export const CONTENT: Record<Language, LocaleContent> = {
   },
   es: {
     nav: {
-      brandSubtitle: "Peaceful Coworking",
+      brandSubtitle: "Coworking",
       spaces: "Espacios",
       about: "Sobre Nosotros",
       floorPlan: "Plano 3D",

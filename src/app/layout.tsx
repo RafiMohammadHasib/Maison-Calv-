@@ -19,7 +19,7 @@ export const viewport: Viewport = {
 
 export const metadata: Metadata = {
   metadataBase: new URL("https://maisoncalve.fr"),
-  title: "Maison Calvé — Peaceful Coworking Bordeaux Fondaudège avec Parking",
+  title: "Maison Calvé — Coworking Bordeaux Fondaudège avec Parking",
   description:
     "Maison Calvé : espace de coworking haut de gamme à Bordeaux Fondaudège (48 rue Calvé). 5 bureaux privatifs, open space feutré, salle de réunion 30m² et 9 places de parking privatives sécurisées.",
   icons: {
@@ -63,7 +63,7 @@ export const metadata: Metadata = {
     }
   },
   openGraph: {
-    title: "Maison Calvé — Peaceful Coworking Bordeaux Fondaudège",
+    title: "Maison Calvé — Coworking Bordeaux Fondaudège",
     description:
       "Bureaux privatifs, open space feutré et salle de réunion au 48 rue Calvé avec 9 places de parking privatives.",
     url: "https://maisoncalve.fr",
