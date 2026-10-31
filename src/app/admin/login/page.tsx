@@ -11,7 +11,6 @@ import {
   EyeOff,
   ArrowRight,
   ArrowLeft,
-  X,
   AlertCircle
 } from "lucide-react";
 import { useLanguage } from "@/lib/languageContext";
@@ -42,32 +41,10 @@ export default function AdminLoginPage() {
   const handleClose = (e?: React.MouseEvent) => {
     if (e) e.preventDefault();
     if (typeof window !== "undefined") {
-      const returnUrl = sessionStorage.getItem("mc_login_return_url");
-      // Clean up stored return url
       sessionStorage.removeItem("mc_login_return_url");
-
-      if (returnUrl && !returnUrl.startsWith("/admin")) {
-        router.push(returnUrl);
-        return;
-      }
-
-      // Check document.referrer for same-origin non-admin return
-      if (document.referrer && document.referrer.includes(window.location.host)) {
-        try {
-          const ref = new URL(document.referrer);
-          if (!ref.pathname.startsWith("/admin")) {
-            router.push(ref.pathname + ref.search + ref.hash);
-            return;
-          }
-        } catch {}
-      }
-
-      // If user arrived via an unauthenticated redirect to /admin, going back would loop
-      const searchRedirect = new URLSearchParams(window.location.search).get("redirect");
-      if (!searchRedirect && window.history.length > 1) {
-        router.back();
-        return;
-      }
+      // Always safely navigate back to public website home page
+      window.location.href = "/";
+      return;
     }
     router.push("/");
   };
@@ -94,7 +71,7 @@ export default function AdminLoginPage() {
         const destination = typeof window !== "undefined"
           ? new URLSearchParams(window.location.search).get("redirect") || "/admin/pipeline"
           : "/admin/pipeline";
-        router.push(destination);
+        window.location.replace(destination);
       } else {
         setError(
           data.message ||
@@ -126,6 +103,7 @@ export default function AdminLoginPage() {
             src="/images/spaces/real-open-space-fixe-4k.jpg"
             alt="Maison Calvé - Executive Open Space & Desks"
             fill
+            sizes="(max-width: 1024px) 100vw, 50vw"
             quality={95}
             className="object-cover object-center scale-100"
             priority
@@ -151,6 +129,7 @@ export default function AdminLoginPage() {
                 src="/images/brand/maison-calve-logo.png"
                 alt="Maison Calvé"
                 fill
+                sizes="40px"
                 className="object-cover"
                 priority
               />
@@ -165,15 +144,7 @@ export default function AdminLoginPage() {
             </div>
           </Link>
 
-          <button
-            type="button"
-            onClick={handleClose}
-            className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-white/10 hover:bg-white/20 backdrop-blur-md border border-white/20 text-xs font-semibold text-white transition-all shadow-sm cursor-pointer"
-            title={language === "fr" ? "Retour au site public" : "Return to website"}
-          >
-            <ArrowLeft className="w-3.5 h-3.5" />
-            <span>{language === "fr" ? "Retour au site" : "Back to website"}</span>
-          </button>
+
         </div>
 
         {/* Hero Narrative in Left Pane */}
@@ -243,16 +214,7 @@ export default function AdminLoginPage() {
               </button>
             </div>
 
-            {/* Circular Cross / Close Button */}
-            <button
-              type="button"
-              onClick={handleClose}
-              className="w-9 h-9 rounded-full bg-slate-100 hover:bg-slate-200 border border-slate-200 flex items-center justify-center text-slate-600 hover:text-slate-900 transition-colors shadow-2xs cursor-pointer"
-              aria-label={language === "fr" ? "Fermer et retourner" : "Close and return"}
-              title={language === "fr" ? "Fermer et retourner" : "Close and return"}
-            >
-              <X className="w-4 h-4" />
-            </button>
+
           </div>
         </div>
 
@@ -266,6 +228,7 @@ export default function AdminLoginPage() {
                   src="/images/brand/maison-calve-logo.png"
                   alt="Maison Calvé"
                   fill
+                  sizes="48px"
                   className="object-cover"
                 />
               </div>

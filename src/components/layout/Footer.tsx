@@ -24,10 +24,10 @@ export default function Footer({
       {/* Subtle Ambient Background Watermark */}
       <div
         aria-hidden="true"
-        className="absolute -right-10 top-1/3 -translate-y-1/2 select-none pointer-events-none text-right opacity-[0.035] hidden xl:block leading-[0.76] font-black tracking-tighter lowercase text-white"
+        className="absolute -right-6 sm:-right-8 xl:-right-10 top-[40%] sm:top-1/3 -translate-y-1/2 select-none pointer-events-none text-right opacity-[0.05] sm:opacity-[0.035] leading-[0.76] font-black tracking-tighter lowercase text-white block"
       >
-        <span className="text-[14rem] block">maison</span>
-        <span className="text-[14rem] block -mt-12">calvé</span>
+        <span className="text-[6rem] sm:text-[9rem] md:text-[11rem] xl:text-[14rem] block">maison</span>
+        <span className="text-[6rem] sm:text-[9rem] md:text-[11rem] xl:text-[14rem] block -mt-5 sm:-mt-8 xl:-mt-12">calvé</span>
       </div>
 
       <div className="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -259,7 +259,7 @@ export default function Footer({
             <span className="text-stone-400">
               {language === "en" ? "Language:" : language === "es" ? "Idioma:" : "Langue :"}
             </span>
-            {(["fr", "en", "es"] as Language[]).map((lang) => (
+            {(["fr", "en"] as Language[]).map((lang) => (
               <button
                 key={lang}
                 onClick={() => onLanguageChange(lang)}

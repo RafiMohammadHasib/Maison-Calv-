@@ -69,6 +69,7 @@ export default function Navbar({
                 src="/images/brand/maison-calve-logo.png"
                 alt="Maison Calvé"
                 fill
+                sizes="32px"
                 className="object-cover"
                 priority
               />
@@ -170,6 +171,7 @@ export default function Navbar({
                     src="/images/brand/maison-calve-logo.png"
                     alt="Maison Calvé"
                     fill
+                    sizes="36px"
                     className="object-cover"
                   />
                 </div>

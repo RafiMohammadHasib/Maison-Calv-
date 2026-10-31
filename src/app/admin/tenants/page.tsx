@@ -213,20 +213,22 @@ export default function TenantsPage() {
       }
       onSearch={setSearch}
     >
-      {/* Top Banner & Quick Navigation */}
-      <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 p-4 rounded-2xl bg-gradient-to-r from-calve-charcoal to-[#1a2332] text-white shadow-xs">
-        <div className="flex items-center gap-3">
-          <div className="w-10 h-10 rounded-xl bg-calve-gold/20 border border-calve-gold/40 flex items-center justify-center shrink-0">
-            <BadgeCheck className="w-5 h-5 text-calve-gold" />
+      {/* Executive Quick Actions & Real-Time Sync Bar */}
+      <div className="bg-white border border-calve-border/90 rounded-2xl p-4 sm:p-5 shadow-xs flex flex-col md:flex-row md:items-center justify-between gap-4">
+        {/* Left Info & Live Sync Status */}
+        <div className="flex items-start sm:items-center gap-3.5 min-w-0">
+          <div className="w-10 h-10 rounded-xl bg-calve-stone/80 border border-calve-border/70 flex items-center justify-center text-calve-slate shrink-0">
+            <BadgeCheck className="w-5 h-5" />
           </div>
-          <div>
-            <div className="text-sm font-bold flex items-center gap-2">
+          <div className="min-w-0">
+            <div className="text-sm font-extrabold text-calve-charcoal flex items-center gap-2 flex-wrap">
               <span>{isEnglish ? "Automated Resident Onboarding" : "Intégration Automatisée des Résidents"}</span>
-              <span className="text-[10px] uppercase font-bold tracking-wider px-2 py-0.5 rounded-full bg-emerald-500/20 text-emerald-300 border border-emerald-500/30">
+              <span className="inline-flex items-center gap-1.5 text-[10px] uppercase font-bold tracking-wider px-2 py-0.5 rounded-full bg-emerald-50 text-emerald-800 border border-emerald-200">
+                <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse" />
                 {isEnglish ? "Live Sync Active" : "Synchro Active"}
               </span>
             </div>
-            <p className="text-xs text-white/70">
+            <p className="text-xs text-calve-muted mt-0.5 leading-relaxed">
               {isEnglish
                 ? "Every opportunity marked as 'Won / Signed' in the CRM automatically appears here with assigned space, badges and rent."
                 : "Chaque lead marqué 'Gagné / Signé' dans le CRM apparaît automatiquement ici avec espace assigné, badges et loyer."}
@@ -234,10 +236,11 @@ export default function TenantsPage() {
           </div>
         </div>
 
-        <div className="flex items-center gap-2 w-full sm:w-auto">
+        {/* Right Actions */}
+        <div className="flex items-center gap-2 w-full md:w-auto shrink-0 pt-2 sm:pt-0 border-t sm:border-t-0 border-calve-stone">
           <button
             onClick={() => setIsCreateOpen(true)}
-            className="flex-1 sm:flex-initial inline-flex items-center justify-center gap-1.5 px-3 py-2 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-xs font-bold text-white transition-all cursor-pointer shadow-xs"
+            className="flex-1 sm:flex-initial inline-flex items-center justify-center gap-1.5 px-4 py-2.5 rounded-xl bg-calve-slate hover:bg-calve-slate-dark text-xs font-bold text-white transition-all shadow-xs cursor-pointer active:scale-95"
           >
             <Plus className="w-3.5 h-3.5" />
             <span>{isEnglish ? "+ New Resident" : "+ Nouveau Résident"}</span>
@@ -245,17 +248,18 @@ export default function TenantsPage() {
           <button
             onClick={fetchTenants}
             disabled={refreshing}
-            className="flex-1 sm:flex-initial inline-flex items-center justify-center gap-1.5 px-3 py-2 rounded-xl bg-white/10 hover:bg-white/15 border border-white/20 text-xs font-semibold text-white transition-all cursor-pointer disabled:opacity-50"
+            className="inline-flex items-center justify-center gap-1.5 px-3 py-2.5 rounded-xl bg-white hover:bg-calve-stone/60 border border-calve-border/80 text-xs font-semibold text-calve-slate transition-all shadow-2xs cursor-pointer disabled:opacity-50 active:scale-95"
+            title={isEnglish ? "Refresh database" : "Actualiser la base"}
           >
             <RefreshCw className={`w-3.5 h-3.5 ${refreshing ? "animate-spin" : ""}`} />
-            <span>{isEnglish ? "Refresh" : "Actualiser"}</span>
+            <span className="hidden sm:inline">{isEnglish ? "Refresh" : "Actualiser"}</span>
           </button>
           <Link
             href="/admin/spaces"
-            className="flex-1 sm:flex-initial inline-flex items-center justify-center gap-1.5 px-3 py-2 rounded-xl bg-white/10 hover:bg-white/15 border border-white/20 text-xs font-semibold text-white transition-all cursor-pointer"
+            className="flex-1 sm:flex-initial inline-flex items-center justify-center gap-1.5 px-3.5 py-2.5 rounded-xl bg-white hover:bg-calve-stone/60 border border-calve-border/80 text-xs font-semibold text-calve-charcoal transition-all shadow-2xs cursor-pointer active:scale-95"
           >
             <span>{isEnglish ? "View Spaces" : "Voir Espaces"}</span>
-            <ArrowUpRight className="w-3.5 h-3.5" />
+            <ArrowUpRight className="w-3.5 h-3.5 text-calve-muted" />
           </Link>
         </div>
       </div>

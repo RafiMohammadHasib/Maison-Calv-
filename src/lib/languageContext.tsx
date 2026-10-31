@@ -92,16 +92,16 @@ export const ADMIN_TRANSLATIONS: Record<AdminLanguage, Record<string, string>> =
 
     // Settings
     "settings.breadcrumb": "CONFIGURATION DU SYSTÈME MAISON CALVÉ",
-    "settings.title": "Settings & System Rules",
+    "settings.title": "Paramètres & Règles Système",
     "settings.subtitle": "Gérer l'identité de l'agence, les règles locatives, intégrations et sécurité du compte.",
     "settings.last_sync": "Dernière synchro :",
-    "settings.save_btn": "Save Settings",
+    "settings.save_btn": "Enregistrer",
     "settings.saved_banner": "Paramètres et règles système enregistrés avec succès dans le cache de production !",
-    "settings.tab.identity": "Identity & Agency",
-    "settings.tab.rental": "Rental Rules & Rates",
+    "settings.tab.identity": "Identité & Agence",
+    "settings.tab.rental": "Tarifs & Règles Locatives",
     "settings.tab.database": "Base MySQL OVH",
-    "settings.tab.system": "System, SEO & Social",
-    "settings.tab.profile": "Profile & Security",
+    "settings.tab.system": "Système, SEO & Réseaux",
+    "settings.tab.profile": "Profil & Sécurité",
     "settings.identity.title": "1. Identité & Image de l'Agence",
     "settings.identity.subtitle": "Informations affichées publiquement sur le site et les mandats de location.",
     "settings.identity.public_portal": "Public Portal",
@@ -111,9 +111,17 @@ export const ADMIN_TRANSLATIONS: Record<AdminLanguage, Record<string, string>> =
     "settings.lease.title": "2. Conditions de Bail & Politiques Résidents",
     "settings.seo.title": "1. Référencement Naturel (SEO) & Canaux Sociaux",
     "settings.profile.title": "1. Compte Administrateur & Chiffrement Sécurisé",
-    "settings.backup.title": "2. Sauvegarde & Export JSON de la Base CRM",
+    "settings.backup.title": "3. Sauvegarde & Export JSON de la Base CRM",
     "settings.backup.subtitle": "Téléchargez un instantané complet de tous les leads, baux, et visites privées.",
     "settings.backup.btn": "Télécharger Sauvegarde (.json)",
+    "settings.password.title": "2. Modifier le Mot de Passe Administrateur",
+    "settings.password.subtitle": "Mettez à jour le mot de passe d'accès au portail de gestion Maison Calvé.",
+    "settings.password.current": "MOT DE PASSE ACTUEL *",
+    "settings.password.new": "NOUVEAU MOT DE PASSE *",
+    "settings.password.confirm": "CONFIRMER LE NOUVEAU MOT DE PASSE *",
+    "settings.password.btn": "Mettre à jour le mot de passe",
+    "settings.password.hint": "Le mot de passe doit comporter au moins 6 caractères.",
+    "settings.password.success": "Mot de passe administrateur modifié avec succès !",
 
     // Tours & Visits
     "tours.breadcrumb": "MAISON CALVÉ CRM & PROTOCOL",
@@ -345,21 +353,29 @@ export const ADMIN_TRANSLATIONS: Record<AdminLanguage, Record<string, string>> =
     "settings.saved_banner": "Settings & system rules successfully saved in production cache!",
     "settings.tab.identity": "Identity & Agency",
     "settings.tab.rental": "Rental Rules & Rates",
-    "settings.tab.database": "Base MySQL OVH",
+    "settings.tab.database": "OVH MySQL Database",
     "settings.tab.system": "System, SEO & Social",
     "settings.tab.profile": "Profile & Security",
     "settings.identity.title": "1. Agency Identity & Branding",
     "settings.identity.subtitle": "Information displayed publicly on the website and mandate agreements.",
     "settings.identity.public_portal": "Public Portal",
     "settings.legal.title": "2. Legal Notice & Professional Licenses (Hoguet Law)",
-    "settings.rental.title": "1. Official Rental Pricing (Prices in € HT)",
+    "settings.rental.title": "1. Official Rental Pricing (Prices excl. VAT)",
     "settings.rental.subtitle": "Rates displayed live on Maison Calvé public portal and CRM quotes.",
     "settings.lease.title": "2. Lease Conditions & Resident Policies",
     "settings.seo.title": "1. Search Engine Optimization (SEO) & Social Channels",
-    "settings.profile.title": "1. Administrator Account & Secure Encryption",
-    "settings.backup.title": "2. Database JSON Backup & Export",
-    "settings.backup.subtitle": "Download a full JSON snapshot of all leads, leases, and private tours.",
+    "settings.profile.title": "1. Administrator Account & Cryptographic Security",
+    "settings.backup.title": "3. CRM Database JSON Snapshot & Backup",
+    "settings.backup.subtitle": "Download a full JSON snapshot of all leads, leases, and scheduled private tours.",
     "settings.backup.btn": "Download Backup (.json)",
+    "settings.password.title": "2. Change Administrator Password",
+    "settings.password.subtitle": "Update your access credentials for the Maison Calvé admin management portal.",
+    "settings.password.current": "CURRENT PASSWORD *",
+    "settings.password.new": "NEW PASSWORD *",
+    "settings.password.confirm": "CONFIRM NEW PASSWORD *",
+    "settings.password.btn": "Update Password",
+    "settings.password.hint": "Password must be at least 6 characters.",
+    "settings.password.success": "Administrator password updated successfully!",
 
     // Tours & Visits
     "tours.breadcrumb": "MAISON CALVÉ CRM & PROTOCOL",
@@ -541,9 +557,17 @@ export function LanguageProvider({ children }: { children: React.ReactNode }) {
       }
     };
 
+    const handleWindowStorage = (e: StorageEvent) => {
+      if (e.key === "mc_language" && (e.newValue === "fr" || e.newValue === "en")) {
+        setLanguageState(e.newValue as AdminLanguage);
+      }
+    };
+
     window.addEventListener("mc_language_change" as any, handleStorageChange);
+    window.addEventListener("storage", handleWindowStorage);
     return () => {
       window.removeEventListener("mc_language_change" as any, handleStorageChange);
+      window.removeEventListener("storage", handleWindowStorage);
     };
   }, []);
 

@@ -14,7 +14,6 @@ import {
   FolderOpen,
   Settings,
   Search,
-  Bell,
   RefreshCw,
   Plus,
   ExternalLink,
@@ -23,8 +22,7 @@ import {
   X,
   Menu,
   CheckCircle2,
-  Clock,
-  Globe
+  Clock
 } from "lucide-react";
 import { Lead, LeadPriority } from "@/lib/leads";
 import { useLanguage } from "@/lib/languageContext";
@@ -58,6 +56,7 @@ export default function AdminLayout({
   const [leadsCount, setLeadsCount] = useState<number>(7);
   const [toursCount, setToursCount] = useState<number>(6);
   const [refreshing, setRefreshing] = useState(false);
+  const [loggingOut, setLoggingOut] = useState(false);
 
   // New Lead Modal
   const [modalOpen, setModalOpen] = useState(false);
@@ -75,6 +74,40 @@ export default function AdminLayout({
     message: "",
     initialNote: ""
   });
+
+  // Client-side authentication guard & dynamic session validation
+  const [authVerified, setAuthVerified] = useState(false);
+
+  useEffect(() => {
+    let isMounted = true;
+    const verifyAuth = async () => {
+      try {
+        const res = await fetch("/api/admin/auth");
+        if (!res.ok) throw new Error("Unauthorized");
+        const data = await res.json();
+        if (isMounted) {
+          if (data.authenticated) {
+            setAuthVerified(true);
+          } else {
+            document.cookie = "mc_admin_session=; path=/; expires=Thu, 01 Jan 1970 00:00:00 GMT; max-age=0";
+            localStorage.removeItem("mc_admin_logged");
+            window.location.replace("/admin/login");
+          }
+        }
+      } catch {
+        if (isMounted) {
+          document.cookie = "mc_admin_session=; path=/; expires=Thu, 01 Jan 1970 00:00:00 GMT; max-age=0";
+          localStorage.removeItem("mc_admin_logged");
+          window.location.replace("/admin/login");
+        }
+      }
+    };
+
+    verifyAuth();
+    return () => {
+      isMounted = false;
+    };
+  }, [pathname]);
 
   // Fetch count stats
   const fetchCounts = async () => {
@@ -103,12 +136,20 @@ export default function AdminLayout({
 
   const handleLogout = async () => {
     try {
+      setLoggingOut(true);
       await fetch("/api/admin/auth", { method: "DELETE" });
+    } catch (err) {
+      console.error("Logout network error:", err);
+    } finally {
+      // 1. Purge client cookie with path=/
+      document.cookie = "mc_admin_session=; path=/; expires=Thu, 01 Jan 1970 00:00:00 GMT; max-age=0";
+      // 2. Clear client storage
       localStorage.removeItem("mc_admin_logged");
       localStorage.removeItem("mc_admin_user");
-      router.push("/admin/login");
-    } catch {
-      router.push("/admin/login");
+      localStorage.removeItem("mc_admin_session_id");
+      sessionStorage.clear();
+      // 3. Hard replace navigation to purge browser history & Next.js client router cache
+      window.location.replace("/admin/login");
     }
   };
 
@@ -190,11 +231,21 @@ export default function AdminLayout({
     {
       group: t("nav.system"),
       items: [
-        { label: t("nav.seo"), href: "/admin/settings?tab=seo", icon: Globe },
         { label: t("nav.settings"), href: "/admin/settings", icon: Settings }
       ]
     }
   ];
+
+  if (!authVerified) {
+    return (
+      <div className="min-h-screen bg-slate-900 flex flex-col items-center justify-center p-4">
+        <div className="w-10 h-10 border-2 border-white/20 border-t-emerald-400 rounded-full animate-spin mb-3" />
+        <span className="text-xs uppercase font-mono tracking-widest text-slate-400">
+          {language === "fr" ? "Vérification de session..." : "Verifying session..."}
+        </span>
+      </div>
+    );
+  }
 
   return (
     <div className="min-h-screen flex bg-slate-50/70 text-calve-charcoal font-sans selection:bg-calve-slate selection:text-white">
@@ -202,9 +253,8 @@ export default function AdminLayout({
       {/* 1. PERSISTENT LEFT SIDEBAR                                 */}
       {/* ========================================================== */}
       <aside
-        className={`fixed inset-y-0 left-0 z-40 w-64 bg-white border-r border-calve-border/80 flex flex-col justify-between transition-transform duration-300 ease-in-out lg:translate-x-0 ${
-          sidebarOpen ? "translate-x-0 shadow-2xl" : "-translate-x-full"
-        }`}
+        className={`fixed inset-y-0 left-0 z-40 w-64 bg-white border-r border-calve-border/80 flex flex-col justify-between transition-transform duration-300 ease-in-out lg:translate-x-0 ${sidebarOpen ? "translate-x-0 shadow-2xl" : "-translate-x-full"
+          }`}
       >
         <div>
           {/* Brand Header */}
@@ -215,6 +265,7 @@ export default function AdminLayout({
                   src="/images/brand/maison-calve-logo.png"
                   alt="Maison Calvé"
                   fill
+                  sizes="40px"
                   className="object-cover"
                 />
               </div>
@@ -236,6 +287,40 @@ export default function AdminLayout({
             </button>
           </div>
 
+          {/* Mobile Quick Utility Bar inside Sidebar Drawer */}
+          <div className="lg:hidden px-4 py-3 bg-calve-stone/40 border-b border-calve-border/60 flex items-center justify-between gap-2">
+            <div className="flex items-center p-0.5 rounded-xl bg-white border border-calve-border/70 text-[11px] font-bold shadow-2xs">
+              <button
+                type="button"
+                onClick={() => setLanguage("fr")}
+                className={`px-3 py-1 rounded-lg transition-all cursor-pointer ${language === "fr" ? "bg-calve-slate text-white shadow-2xs font-extrabold" : "text-calve-muted hover:text-calve-charcoal"
+                  }`}
+              >
+                FR
+              </button>
+              <button
+                type="button"
+                onClick={() => setLanguage("en")}
+                className={`px-3 py-1 rounded-lg transition-all cursor-pointer ${language === "en" ? "bg-calve-slate text-white shadow-2xs font-extrabold" : "text-calve-muted hover:text-calve-charcoal"
+                  }`}
+              >
+                EN
+              </button>
+            </div>
+
+            <button
+              type="button"
+              onClick={() => {
+                fetchCounts();
+                setSidebarOpen(false);
+              }}
+              className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-white border border-calve-border/70 text-xs font-semibold text-calve-charcoal hover:bg-calve-stone transition-all shadow-2xs cursor-pointer"
+            >
+              <RefreshCw className={`w-3.5 h-3.5 text-calve-slate ${refreshing ? "animate-spin" : ""}`} />
+              <span>{language === "fr" ? "Actualiser" : "Refresh"}</span>
+            </button>
+          </div>
+
           {/* Navigation Links */}
           <div className="p-4 space-y-5 overflow-y-auto max-h-[calc(100vh-180px)]">
             {navItems.map((group, gIdx) => (
@@ -252,11 +337,10 @@ export default function AdminLayout({
                         key={item.href}
                         href={item.href}
                         onClick={() => setSidebarOpen(false)}
-                        className={`w-full flex items-center justify-between px-3 py-2 rounded-xl text-xs font-semibold transition-all ${
-                          isActive
+                        className={`w-full flex items-center justify-between px-3 py-2 rounded-xl text-xs font-semibold transition-all ${isActive
                             ? "bg-calve-slate text-white shadow-xs font-bold"
                             : "text-calve-charcoal hover:bg-calve-stone/60"
-                        }`}
+                          }`}
                       >
                         <div className="flex items-center gap-3">
                           <Icon className={`w-4 h-4 shrink-0 ${isActive ? "text-white" : "text-calve-slate"}`} />
@@ -264,11 +348,10 @@ export default function AdminLayout({
                         </div>
                         {item.badge !== undefined && (
                           <span
-                            className={`px-1.5 py-0.5 rounded-full text-[10px] font-bold ${
-                              isActive
+                            className={`px-1.5 py-0.5 rounded-full text-[10px] font-bold ${isActive
                                 ? "bg-white/20 text-white"
                                 : item.badgeColor || "bg-calve-stone text-calve-slate"
-                            }`}
+                              }`}
                           >
                             {item.badge}
                           </span>
@@ -318,10 +401,16 @@ export default function AdminLayout({
 
             <button
               onClick={handleLogout}
+              disabled={loggingOut}
               title={t("tooltip.logout")}
-              className="p-1.5 rounded-lg hover:bg-rose-50 text-calve-muted hover:text-rose-600 transition-colors cursor-pointer"
+              aria-label={t("tooltip.logout")}
+              className="p-1.5 rounded-lg hover:bg-rose-50 text-calve-muted hover:text-rose-600 transition-colors cursor-pointer disabled:opacity-50"
             >
-              <LogOut className="w-4 h-4" />
+              {loggingOut ? (
+                <RefreshCw className="w-4 h-4 animate-spin text-rose-600" />
+              ) : (
+                <LogOut className="w-4 h-4" />
+              )}
             </button>
           </div>
         </div>
@@ -340,87 +429,74 @@ export default function AdminLayout({
       {/* ========================================================== */}
       <div className="flex-1 lg:pl-64 flex flex-col min-w-0">
         {/* Top Floating App Bar */}
-        <header className="sticky top-0 z-20 h-16 bg-white/90 backdrop-blur-md border-b border-calve-border/80 px-4 sm:px-8 flex items-center justify-between gap-4">
-          <div className="flex items-center gap-3 flex-1 max-w-xl">
+        <header className="sticky top-0 z-20 h-16 bg-white/95 backdrop-blur-md border-b border-calve-border/80 px-3 sm:px-6 lg:px-8 flex items-center justify-between gap-2 sm:gap-4">
+          <div className="flex items-center gap-2 sm:gap-3 flex-1 min-w-0 max-w-xl">
             <button
+              type="button"
               onClick={() => setSidebarOpen(true)}
-              className="lg:hidden p-2 rounded-xl hover:bg-calve-stone text-calve-charcoal"
+              aria-label="Open sidebar menu"
+              className="lg:hidden p-2 rounded-xl border border-calve-border/70 hover:bg-calve-stone text-calve-charcoal bg-white shadow-2xs shrink-0 cursor-pointer"
             >
-              <Menu className="w-5 h-5" />
+              <Menu className="w-4.5 h-4.5" />
             </button>
 
-            {/* Global Search Input with ⌘K Badge */}
-            <div className="relative flex-1">
-              <Search className="w-4 h-4 text-calve-muted absolute left-3.5 top-1/2 -translate-y-1/2 pointer-events-none" />
+            {/* Global Search Input */}
+            <div className="relative flex-1 min-w-0">
+              <Search className="w-4 h-4 text-calve-muted absolute left-3 top-1/2 -translate-y-1/2 pointer-events-none" />
               <input
                 type="text"
                 value={searchVal}
                 onChange={handleSearchChange}
-                placeholder={t("search.placeholder")}
-                className="w-full pl-9 pr-12 py-2 rounded-xl bg-slate-100/90 border border-transparent focus:border-calve-slate focus:bg-white text-xs text-calve-charcoal transition-all placeholder:text-calve-muted/70"
+                placeholder={language === "fr" ? "Rechercher..." : "Search..."}
+                className="w-full pl-8.5 pr-3 sm:pr-12 py-2 rounded-xl bg-slate-100/90 border border-transparent focus:border-calve-slate focus:bg-white text-xs text-calve-charcoal transition-all placeholder:text-calve-muted/70 truncate"
               />
-              <div className="absolute right-2.5 top-1/2 -translate-y-1/2 pointer-events-none px-1.5 py-0.5 rounded-md bg-white border border-slate-200/80 text-[10px] font-mono text-slate-400 font-bold shadow-2xs">
+              <div className="hidden sm:flex absolute right-2.5 top-1/2 -translate-y-1/2 pointer-events-none px-1.5 py-0.5 rounded-md bg-white border border-slate-200/80 text-[10px] font-mono text-slate-400 font-bold shadow-2xs">
                 ⌘K
               </div>
             </div>
           </div>
 
-          <div className="flex items-center gap-2 sm:gap-3 shrink-0">
-            {/* Refresh Button */}
+          <div className="flex items-center gap-1.5 sm:gap-2.5 shrink-0">
+            {/* Refresh Button (visible on tablet and desktop) */}
             <button
+              type="button"
               onClick={fetchCounts}
               disabled={refreshing}
               title={t("tooltip.refresh")}
-              className="p-2 rounded-xl hover:bg-calve-stone text-calve-slate transition-colors cursor-pointer border border-calve-border/60 bg-white shadow-2xs"
+              className="hidden md:flex p-2 rounded-xl hover:bg-calve-stone text-calve-slate transition-colors cursor-pointer border border-calve-border/60 bg-white shadow-2xs items-center justify-center"
             >
               <RefreshCw className={`w-3.5 h-3.5 ${refreshing ? "animate-spin" : ""}`} />
             </button>
 
-            {/* Language Switcher */}
-            <div className="flex items-center p-0.5 rounded-xl bg-slate-100 text-[11px] font-bold border border-slate-200/60">
+            {/* Language Switcher (visible on tablet and desktop) */}
+            <div className="hidden md:flex items-center p-0.5 rounded-xl bg-slate-100 text-[11px] font-bold border border-slate-200/60">
               <button
+                type="button"
                 onClick={() => setLanguage("fr")}
-                className={`px-2.5 py-1 rounded-lg transition-all ${
-                  language === "fr" ? "bg-white text-calve-charcoal shadow-2xs" : "text-calve-muted hover:text-calve-charcoal"
-                }`}
+                className={`px-2.5 py-1 rounded-lg transition-all cursor-pointer ${language === "fr" ? "bg-white text-calve-charcoal shadow-2xs font-extrabold" : "text-calve-muted hover:text-calve-charcoal"
+                  }`}
               >
                 FR
               </button>
               <button
+                type="button"
                 onClick={() => setLanguage("en")}
-                className={`px-2.5 py-1 rounded-lg transition-all ${
-                  language === "en" ? "bg-white text-calve-charcoal shadow-2xs" : "text-calve-muted hover:text-calve-charcoal"
-                }`}
+                className={`px-2.5 py-1 rounded-lg transition-all cursor-pointer ${language === "en" ? "bg-white text-calve-charcoal shadow-2xs font-extrabold" : "text-calve-muted hover:text-calve-charcoal"
+                  }`}
               >
                 EN
               </button>
             </div>
 
-            {/* + New Button */}
+            {/* + New Button (Icon-only on mobile, full button on sm+) */}
             <button
+              type="button"
               onClick={() => setModalOpen(true)}
-              className="flex items-center gap-1.5 px-3.5 py-2 rounded-xl bg-calve-slate hover:bg-calve-slate-dark text-white text-xs font-bold transition-all shadow-xs hover:shadow-sm cursor-pointer"
+              title={t("btn.new")}
+              className="flex items-center justify-center gap-1.5 p-2 sm:px-3.5 sm:py-2 rounded-xl bg-calve-slate hover:bg-calve-slate-dark text-white text-xs font-bold transition-all shadow-xs hover:shadow-sm cursor-pointer shrink-0"
             >
-              <Plus className="w-3.5 h-3.5" />
-              <span>{t("btn.new")}</span>
-            </button>
-
-            {/* Notification Bell */}
-            <button
-              title={t("tooltip.notifications")}
-              className="p-2 rounded-xl text-slate-500 hover:text-calve-charcoal hover:bg-slate-100 transition-colors relative cursor-pointer"
-            >
-              <Bell className="w-4 h-4" />
-              <span className="absolute top-1.5 right-1.5 w-2 h-2 rounded-full bg-emerald-500 ring-2 ring-white" />
-            </button>
-
-            {/* Logout Icon */}
-            <button
-              onClick={handleLogout}
-              title={t("tooltip.logout")}
-              className="p-2 rounded-xl text-slate-500 hover:text-rose-600 hover:bg-rose-50 transition-colors cursor-pointer"
-            >
-              <LogOut className="w-4 h-4" />
+              <Plus className="w-4 h-4 sm:w-3.5 sm:h-3.5" />
+              <span className="hidden sm:inline">{t("btn.new")}</span>
             </button>
           </div>
         </header>
@@ -490,7 +566,7 @@ export default function AdminLayout({
                   required
                   value={modalForm.name}
                   onChange={(e) => setModalForm({ ...modalForm, name: e.target.value })}
-                  placeholder="Jean Dupont"
+                  placeholder={language === "fr" ? "Jean Dupont" : "John Doe"}
                   className="w-full px-3.5 py-2.5 rounded-xl border border-calve-border text-xs focus:border-calve-slate"
                 />
               </div>
@@ -505,7 +581,7 @@ export default function AdminLayout({
                     required
                     value={modalForm.email}
                     onChange={(e) => setModalForm({ ...modalForm, email: e.target.value })}
-                    placeholder="contact@entreprise.com"
+                    placeholder={language === "fr" ? "contact@entreprise.com" : "contact@company.com"}
                     className="w-full px-3.5 py-2.5 rounded-xl border border-calve-border text-xs focus:border-calve-slate"
                   />
                 </div>
@@ -518,7 +594,7 @@ export default function AdminLayout({
                     required
                     value={modalForm.phone}
                     onChange={(e) => setModalForm({ ...modalForm, phone: e.target.value })}
-                    placeholder="06 12 34 56 78"
+                    placeholder={language === "fr" ? "06 12 34 56 78" : "+33 6 12 34 56 78"}
                     className="w-full px-3.5 py-2.5 rounded-xl border border-calve-border text-xs focus:border-calve-slate"
                   />
                 </div>
@@ -532,7 +608,7 @@ export default function AdminLayout({
                   type="text"
                   value={modalForm.company}
                   onChange={(e) => setModalForm({ ...modalForm, company: e.target.value })}
-                  placeholder="Cabinet / Société"
+                  placeholder={language === "fr" ? "Cabinet / Société" : "Company / Firm"}
                   className="w-full px-3.5 py-2.5 rounded-xl border border-calve-border text-xs focus:border-calve-slate"
                 />
               </div>
@@ -547,9 +623,9 @@ export default function AdminLayout({
                     onChange={(e: any) => setModalForm({ ...modalForm, type: e.target.value })}
                     className="w-full px-3.5 py-2.5 rounded-xl border border-calve-border text-xs focus:border-calve-slate font-medium"
                   >
-                    <option value="private-office">Bureau Privatif (21 ou 28m²)</option>
-                    <option value="open-space">Open Space (Fixe ou Nomade)</option>
-                    <option value="meeting-room">Salle de Réunion 30 m²</option>
+                    <option value="private-office">{language === "fr" ? "Bureau Privatif (21 ou 28m²)" : "Private Office (21 or 28 sqm)"}</option>
+                    <option value="open-space">{language === "fr" ? "Open Space (Fixe ou Nomade)" : "Open Space (Dedicated or Hot Desk)"}</option>
+                    <option value="meeting-room">{language === "fr" ? "Salle de Réunion 30 m²" : "Meeting Room 30 sqm"}</option>
                   </select>
                 </div>
 
@@ -564,8 +640,8 @@ export default function AdminLayout({
                   >
                     <option value="Book a Private Tour (Admin)">Book a Private Tour</option>
                     <option value="Book a Visit (Admin)">Book a Visit</option>
-                    <option value="Appel téléphonique direct">Appel téléphonique direct</option>
-                    <option value="Recommandation / Partenaire">Recommandation</option>
+                    <option value="Appel téléphonique direct">{language === "fr" ? "Appel téléphonique direct" : "Direct phone call"}</option>
+                    <option value="Recommandation / Partenaire">{language === "fr" ? "Recommandation / Partenaire" : "Referral / Partner"}</option>
                   </select>
                 </div>
               </div>
@@ -590,7 +666,7 @@ export default function AdminLayout({
                   rows={2}
                   value={modalForm.initialNote}
                   onChange={(e) => setModalForm({ ...modalForm, initialNote: e.target.value })}
-                  placeholder="Ex: Intéressé par le bureau 28m², visite fixée ce vendredi..."
+                  placeholder={language === "fr" ? "Ex: Intéressé par le bureau 28m², visite fixée ce vendredi..." : "Ex: Interested in 28sqm suite, tour scheduled this Friday..."}
                   className="w-full px-3.5 py-2 rounded-xl border border-calve-border text-xs focus:border-calve-slate"
                 />
               </div>

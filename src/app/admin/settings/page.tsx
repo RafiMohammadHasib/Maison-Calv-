@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import AdminLayout from "@/components/admin/AdminLayout";
 import { useLanguage } from "@/lib/languageContext";
 import {
@@ -15,71 +15,46 @@ import {
   MapPin,
   Clock,
   CheckCircle2,
-  FileText,
   Download,
   Lock,
-  Globe,
   Share2,
-  Sparkles,
-  Database,
-  Server,
-  RefreshCw,
-  AlertCircle
+  AlertCircle,
+  KeyRound,
+  Eye,
+  EyeOff
 } from "lucide-react";
 
 export default function SettingsPage() {
-  const { language, t } = useLanguage();
-  const [activeTab, setActiveTab] = useState<"identity" | "rental" | "database" | "system" | "profile">("identity");
-  const [ovhTesting, setOvhTesting] = useState(false);
-  const [ovhSyncing, setOvhSyncing] = useState(false);
-  const [ovhStatus, setOvhStatus] = useState<any>(null);
+  const { language, t, isEnglish } = useLanguage();
+  const [activeTab, setActiveTab] = useState<"identity" | "rental" | "system" | "profile">("identity");
 
-  const handleTestOvh = async () => {
-    setOvhTesting(true);
-    setOvhStatus(null);
-    try {
-      const res = await fetch("/api/admin/ovh-sync", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ action: "test" })
-      });
-      const data = await res.json();
-      setOvhStatus(data);
-    } catch (err: any) {
-      setOvhStatus({ success: false, error: err.message || "Failed to reach OVH" });
-    } finally {
-      setOvhTesting(false);
+  useEffect(() => {
+    if (typeof window !== "undefined") {
+      const params = new URLSearchParams(window.location.search);
+      const tab = params.get("tab");
+      if (tab === "seo" || tab === "system") {
+        setActiveTab("system");
+      } else if (tab === "profile") {
+        setActiveTab("profile");
+      } else if (tab === "rental") {
+        setActiveTab("rental");
+      } else if (tab === "identity") {
+        setActiveTab("identity");
+      }
     }
-  };
+  }, []);
 
-  const handleSyncAllOvh = async () => {
-    setOvhSyncing(true);
-    setOvhStatus(null);
-    try {
-      const res = await fetch("/api/admin/ovh-sync", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ action: "sync_all" })
-      });
-      const data = await res.json();
-      setOvhStatus(data);
-    } catch (err: any) {
-      setOvhStatus({ success: false, error: err.message || "Sync failed" });
-    } finally {
-      setOvhSyncing(false);
-    }
-  };
   const [saved, setSaved] = useState(false);
   const [lastSyncTime, setLastSyncTime] = useState("03:00 PM");
 
   // Form State: 1. Identity & Agency
   const [agencyName, setAgencyName] = useState("MAISON CALVÉ");
-  const [tagline, setTagline] = useState("Immobilier & Coworking Haut de Gamme à Bordeaux");
+  const [tagline, setTagline] = useState("");
   const [paulPhone, setPaulPhone] = useState("+33 5 56 00 22 10");
   const [edgarPhone, setEdgarPhone] = useState("+33 7 81 96 83 95");
   const [agencyEmail, setAgencyEmail] = useState("contact@maisoncalve.fr");
   const [officeAddress, setOfficeAddress] = useState("48 rue Calvé, 33000 Bordeaux");
-  const [officeHours, setOfficeHours] = useState("Lundi - Vendredi : 08h30 - 19h00 | Samedi : Sur rendez-vous (Résidents 24/7)");
+  const [officeHours, setOfficeHours] = useState("");
 
   // Form State: 2. Legal Notice
   const [siret, setSiret] = useState("944 393 487 00011");
@@ -88,28 +63,96 @@ export default function SettingsPage() {
 
   // Form State: 3. Rental Rules & Rates
   const [vatRate, setVatRate] = useState("20%");
-  const [office17Rate, setOffice17Rate] = useState("750 € HT / mois");
-  const [office25Rate, setOffice25Rate] = useState("1 200 € HT / mois");
-  const [openSpaceRate, setOpenSpaceRate] = useState("250 € HT / mois");
-  const [nomadRate, setNomadRate] = useState("20 € HT journée / 10 € HT demi-journée");
-  const [meetingRate, setMeetingRate] = useState("120 € HT demi-j / 200 € HT journée");
-  const [depositRule, setDepositRule] = useState("2 mois de loyer HT");
-  const [noticePeriod, setNoticePeriod] = useState("3 mois pour bureaux privatifs · 1 mois pour open space");
-  const [parkingPolicy, setParkingPolicy] = useState("Inclus avec bureaux privatifs (9 places cour sécurisée au total)");
+  const [office17Rate, setOffice17Rate] = useState("");
+  const [office25Rate, setOffice25Rate] = useState("");
+  const [openSpaceRate, setOpenSpaceRate] = useState("");
+  const [nomadRate, setNomadRate] = useState("");
+  const [meetingRate, setMeetingRate] = useState("");
+  const [depositRule, setDepositRule] = useState("");
+  const [noticePeriod, setNoticePeriod] = useState("");
+  const [parkingPolicy, setParkingPolicy] = useState("");
 
   // Form State: 4. System & SEO
-  const [metaTitle, setMetaTitle] = useState("Maison Calvé — Coworking Bordeaux Fondaudège avec Parking");
+  const [metaTitle, setMetaTitle] = useState("");
   const [instagramAccount, setInstagramAccount] = useState("@maisoncalvebordeaux");
   const [gpsCoordinates, setGpsCoordinates] = useState("44.8488° N, 0.5843° W (Tram D Croix-de-Seguey)");
   const [leadDispatcherEmail, setLeadDispatcherEmail] = useState("admin@maisoncalve.fr");
 
   // Form State: 5. Profile & Security
-  const [adminName, setAdminName] = useState("Paul (Directeur d'exploitation)");
+  const [adminName, setAdminName] = useState("");
   const [adminEmail, setAdminEmail] = useState("admin@maisoncalve.fr");
+
+  // Password Change State
+  const [currentPassword, setCurrentPassword] = useState("");
+  const [newPassword, setNewPassword] = useState("");
+  const [confirmPassword, setConfirmPassword] = useState("");
+  const [showCurrentPass, setShowCurrentPass] = useState(false);
+  const [showNewPass, setShowNewPass] = useState(false);
+  const [showConfirmPass, setShowConfirmPass] = useState(false);
+  const [passwordLoading, setPasswordLoading] = useState(false);
+  const [passwordStatus, setPasswordStatus] = useState<{ success: boolean; message: string } | null>(null);
+
+  const handleUpdatePassword = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setPasswordStatus(null);
+
+    if (newPassword.length < 6) {
+      setPasswordStatus({
+        success: false,
+        message: isEnglish
+          ? "The new password must be at least 6 characters long."
+          : "Le nouveau mot de passe doit comporter au moins 6 caractères."
+      });
+      return;
+    }
+
+    if (newPassword !== confirmPassword) {
+      setPasswordStatus({
+        success: false,
+        message: isEnglish
+          ? "The new password and confirmation do not match."
+          : "Le nouveau mot de passe et sa confirmation ne correspondent pas."
+      });
+      return;
+    }
+
+    try {
+      setPasswordLoading(true);
+      const res = await fetch("/api/admin/auth", {
+        method: "PATCH",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ currentPassword, newPassword, confirmPassword })
+      });
+      const data = await res.json();
+      if (res.ok && data.success) {
+        setPasswordStatus({
+          success: true,
+          message: isEnglish
+            ? "Administrator password updated successfully!"
+            : "Mot de passe administrateur modifié avec succès !"
+        });
+        setCurrentPassword("");
+        setNewPassword("");
+        setConfirmPassword("");
+      } else {
+        setPasswordStatus({
+          success: false,
+          message: data.message || (isEnglish ? "Failed to update password." : "Échec de la mise à jour du mot de passe.")
+        });
+      }
+    } catch (err: any) {
+      setPasswordStatus({
+        success: false,
+        message: err.message || (isEnglish ? "Server connection error." : "Erreur de connexion au serveur.")
+      });
+    } finally {
+      setPasswordLoading(false);
+    }
+  };
 
   const handleSave = (e: React.FormEvent) => {
     e.preventDefault();
-    const now = new Date().toLocaleTimeString("en-US", { hour: "2-digit", minute: "2-digit" });
+    const now = new Date().toLocaleTimeString(isEnglish ? "en-US" : "fr-FR", { hour: "2-digit", minute: "2-digit" });
     setLastSyncTime(now);
     setSaved(true);
     setTimeout(() => setSaved(false), 3000);
@@ -134,7 +177,7 @@ export default function SettingsPage() {
     <AdminLayout>
       <form onSubmit={handleSave} className="space-y-6">
         {/* ========================================================== */}
-        {/* 1. TOP HEADER STRIP (MATCHING REFERENCE IMAGE 2)           */}
+        {/* 1. TOP HEADER STRIP                                        */}
         {/* ========================================================== */}
         <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-4">
           <div>
@@ -173,7 +216,7 @@ export default function SettingsPage() {
         )}
 
         {/* ========================================================== */}
-        {/* 2. SEGMENTED NAVIGATION TABS CAPSULE (MATCHING IMAGE 2)    */}
+        {/* 2. SEGMENTED NAVIGATION TABS CAPSULE                       */}
         {/* ========================================================== */}
         <div className="flex items-center gap-1.5 p-1.5 bg-slate-100/90 border border-slate-200/80 rounded-2xl overflow-x-auto text-xs font-semibold">
           <button
@@ -204,19 +247,6 @@ export default function SettingsPage() {
 
           <button
             type="button"
-            onClick={() => setActiveTab("database")}
-            className={`flex items-center gap-2 px-4 py-2 rounded-xl transition-all cursor-pointer whitespace-nowrap ${
-              activeTab === "database"
-                ? "bg-white text-calve-charcoal shadow-2xs font-bold"
-                : "text-calve-muted hover:text-calve-charcoal"
-            }`}
-          >
-            <Database className="w-4 h-4 text-calve-slate" />
-            <span>Base MySQL OVH</span>
-          </button>
-
-          <button
-            type="button"
             onClick={() => setActiveTab("system")}
             className={`flex items-center gap-2 px-4 py-2 rounded-xl transition-all cursor-pointer whitespace-nowrap ${
               activeTab === "system"
@@ -243,7 +273,7 @@ export default function SettingsPage() {
         </div>
 
         {/* ========================================================== */}
-        {/* TAB 1: IDENTITY & AGENCY (MATCHING IMAGE 2 PRECISELY)      */}
+        {/* TAB 1: IDENTITY & AGENCY                                   */}
         {/* ========================================================== */}
         {activeTab === "identity" && (
           <div className="space-y-6 animate-in fade-in">
@@ -273,7 +303,7 @@ export default function SettingsPage() {
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                   <div>
                     <label className="block text-[10px] font-bold uppercase tracking-wider text-calve-muted mb-1.5">
-                      {language === "fr" ? "NOM OFFICIEL DE L'AGENCE" : "OFFICIAL AGENCY NAME"}
+                      {isEnglish ? "OFFICIAL AGENCY NAME" : "NOM OFFICIEL DE L'AGENCE"}
                     </label>
                     <input
                       type="text"
@@ -285,11 +315,11 @@ export default function SettingsPage() {
 
                   <div>
                     <label className="block text-[10px] font-bold uppercase tracking-wider text-calve-muted mb-1.5">
-                      OFFICIAL TAGLINE / SUBTITLE
+                      {isEnglish ? "OFFICIAL TAGLINE / SUBTITLE" : "SLOGAN / SOUS-TITRE OFFICIEL"}
                     </label>
                     <input
                       type="text"
-                      value={tagline}
+                      value={tagline || (isEnglish ? "High-End Real Estate & Coworking in Bordeaux" : "Immobilier & Coworking Haut de Gamme à Bordeaux")}
                       onChange={(e) => setTagline(e.target.value)}
                       className="w-full px-4 py-2.5 rounded-xl border border-calve-border bg-white text-xs text-calve-charcoal focus:border-calve-slate shadow-2xs"
                     />
@@ -299,7 +329,7 @@ export default function SettingsPage() {
                 <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                   <div>
                     <label className="block text-[10px] font-bold uppercase tracking-wider text-calve-muted mb-1.5">
-                      PAUL GOIZET PHONE
+                      {isEnglish ? "PAUL GOIZET PHONE" : "TÉLÉPHONE PAUL GOIZET"}
                     </label>
                     <div className="relative">
                       <Phone className="w-3.5 h-3.5 text-calve-muted absolute left-3.5 top-1/2 -translate-y-1/2" />
@@ -314,7 +344,7 @@ export default function SettingsPage() {
 
                   <div>
                     <label className="block text-[10px] font-bold uppercase tracking-wider text-calve-muted mb-1.5">
-                      EDGAR GOIZET PHONE
+                      {isEnglish ? "EDGAR GOIZET PHONE" : "TÉLÉPHONE EDGAR GOIZET"}
                     </label>
                     <div className="relative">
                       <Phone className="w-3.5 h-3.5 text-calve-muted absolute left-3.5 top-1/2 -translate-y-1/2" />
@@ -329,7 +359,7 @@ export default function SettingsPage() {
 
                   <div>
                     <label className="block text-[10px] font-bold uppercase tracking-wider text-calve-muted mb-1.5">
-                      PRIMARY AGENCY EMAIL
+                      {isEnglish ? "PRIMARY AGENCY EMAIL" : "EMAIL PRINCIPAL DE L'AGENCE"}
                     </label>
                     <div className="relative">
                       <Mail className="w-3.5 h-3.5 text-calve-muted absolute left-3.5 top-1/2 -translate-y-1/2" />
@@ -346,7 +376,7 @@ export default function SettingsPage() {
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                   <div>
                     <label className="block text-[10px] font-bold uppercase tracking-wider text-calve-muted mb-1.5">
-                      BORDEAUX OFFICE ADDRESS
+                      {isEnglish ? "BORDEAUX OFFICE ADDRESS" : "ADRESSE DU SIÈGE BORDEAUX"}
                     </label>
                     <div className="relative">
                       <MapPin className="w-3.5 h-3.5 text-calve-muted absolute left-3.5 top-1/2 -translate-y-1/2" />
@@ -361,13 +391,13 @@ export default function SettingsPage() {
 
                   <div>
                     <label className="block text-[10px] font-bold uppercase tracking-wider text-calve-muted mb-1.5">
-                      OFFICE OPENING HOURS
+                      {isEnglish ? "OFFICE OPENING HOURS" : "HORAIRES D'OUVERTURE"}
                     </label>
                     <div className="relative">
                       <Clock className="w-3.5 h-3.5 text-calve-muted absolute left-3.5 top-1/2 -translate-y-1/2" />
                       <input
                         type="text"
-                        value={officeHours}
+                        value={officeHours || (isEnglish ? "Monday - Friday: 08:30 AM - 07:00 PM | Saturday: By Appointment (Residents 24/7)" : "Lundi - Vendredi : 08h30 - 19h00 | Samedi : Sur rendez-vous (Résidents 24/7)")}
                         onChange={(e) => setOfficeHours(e.target.value)}
                         className="w-full pl-9 pr-3 py-2.5 rounded-xl border border-calve-border bg-white text-xs text-calve-charcoal focus:border-calve-slate shadow-2xs"
                       />
@@ -381,14 +411,14 @@ export default function SettingsPage() {
             <div className="p-6 sm:p-8 rounded-3xl bg-white border border-calve-border/80 shadow-2xs space-y-5">
               <div className="border-b border-calve-border/60 pb-3">
                 <h3 className="text-base font-extrabold text-calve-charcoal">
-                  2. Legal Notice &amp; Professional Licenses (Hoguet Law)
+                  {t("settings.legal.title")}
                 </h3>
               </div>
 
               <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                 <div>
                   <label className="block text-[10px] font-bold uppercase tracking-wider text-calve-muted mb-1.5">
-                    SIRET NUMBER
+                    {isEnglish ? "SIRET NUMBER" : "NUMÉRO SIRET"}
                   </label>
                   <input
                     type="text"
@@ -400,7 +430,7 @@ export default function SettingsPage() {
 
                 <div>
                   <label className="block text-[10px] font-bold uppercase tracking-wider text-calve-muted mb-1.5">
-                    PROFESSIONAL LICENSE CPI (CCI BORDEAUX)
+                    {isEnglish ? "PROFESSIONAL LICENSE CPI (CCI BORDEAUX)" : "CARTE PROFESSIONNELLE CPI (CCI BORDEAUX)"}
                   </label>
                   <input
                     type="text"
@@ -412,7 +442,7 @@ export default function SettingsPage() {
 
                 <div>
                   <label className="block text-[10px] font-bold uppercase tracking-wider text-calve-muted mb-1.5">
-                    FINANCIAL GUARANTEE &amp; PROVIDER
+                    {isEnglish ? "FINANCIAL GUARANTEE & PROVIDER" : "GARANTIE FINANCIÈRE & ASSURANCE"}
                   </label>
                   <input
                     type="text"
@@ -435,82 +465,92 @@ export default function SettingsPage() {
             <div className="p-6 sm:p-8 rounded-3xl bg-white border border-calve-border/80 shadow-2xs space-y-5">
               <div className="border-b border-calve-border/60 pb-3">
                 <h3 className="text-base font-extrabold text-calve-charcoal">
-                  1. Grille Tarifaire Officielle (Prix en € HT)
+                  {t("settings.rental.title")}
                 </h3>
                 <p className="text-xs text-calve-muted mt-0.5">
-                  Tarifs affichés en direct sur le site public de Maison Calvé et les devis CRM.
+                  {t("settings.rental.subtitle")}
                 </p>
               </div>
 
               <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
                 <div>
                   <label className="block text-[10px] font-bold uppercase tracking-wider text-calve-muted mb-1.5">
-                    Bureau Privatif 21 m²
+                    {isEnglish ? "Private Office 21 sqm" : "Bureau Privatif 21 m²"}
                   </label>
                   <input
                     type="text"
-                    value={office17Rate}
+                    value={office17Rate || (isEnglish ? "€750 excl. VAT / month" : "750 € HT / mois")}
                     onChange={(e) => setOffice17Rate(e.target.value)}
                     className="w-full px-4 py-2.5 rounded-xl border border-calve-border text-xs font-bold text-calve-charcoal"
                   />
-                  <span className="text-[10px] text-calve-muted mt-1 block">3 à 4 postes de travail</span>
+                  <span className="text-[10px] text-calve-muted mt-1 block">
+                    {isEnglish ? "3 to 4 workstations" : "3 à 4 postes de travail"}
+                  </span>
                 </div>
 
                 <div>
                   <label className="block text-[10px] font-bold uppercase tracking-wider text-calve-muted mb-1.5">
-                    Bureau privatif 28 m²
+                    {isEnglish ? "Private Office 28 sqm" : "Bureau privatif 28 m²"}
                   </label>
                   <input
                     type="text"
-                    value={office25Rate}
+                    value={office25Rate || (isEnglish ? "€1,200 excl. VAT / month" : "1 200 € HT / mois")}
                     onChange={(e) => setOffice25Rate(e.target.value)}
                     className="w-full px-4 py-2.5 rounded-xl border border-calve-border text-xs font-bold text-calve-charcoal"
                   />
-                  <span className="text-[10px] text-calve-muted mt-1 block">5 à 6 postes de travail</span>
+                  <span className="text-[10px] text-calve-muted mt-1 block">
+                    {isEnglish ? "5 to 6 workstations" : "5 à 6 postes de travail"}
+                  </span>
                 </div>
 
                 <div>
                   <label className="block text-[10px] font-bold uppercase tracking-wider text-calve-muted mb-1.5">
-                    Poste Fixe Open Space
+                    {isEnglish ? "Dedicated Desk Open Space" : "Poste Fixe Open Space"}
                   </label>
                   <input
                     type="text"
-                    value={openSpaceRate}
+                    value={openSpaceRate || (isEnglish ? "€250 excl. VAT / month" : "250 € HT / mois")}
                     onChange={(e) => setOpenSpaceRate(e.target.value)}
                     className="w-full px-4 py-2.5 rounded-xl border border-calve-border text-xs font-bold text-calve-charcoal"
                   />
-                  <span className="text-[10px] text-calve-muted mt-1 block">par mois par poste (5 postes/espace)</span>
+                  <span className="text-[10px] text-calve-muted mt-1 block">
+                    {isEnglish ? "per month per desk (5 desks/space)" : "par mois par poste (5 postes/espace)"}
+                  </span>
                 </div>
 
                 <div>
                   <label className="block text-[10px] font-bold uppercase tracking-wider text-calve-muted mb-1.5">
-                    Poste Flexible Nomade
+                    {isEnglish ? "Flexible Hot Desk" : "Poste Flexible Nomade"}
                   </label>
                   <input
                     type="text"
-                    value={nomadRate}
+                    value={nomadRate || (isEnglish ? "€20 excl. VAT day / €10 excl. VAT half-day" : "20 € HT journée / 10 € HT demi-journée")}
                     onChange={(e) => setNomadRate(e.target.value)}
                     className="w-full px-4 py-2.5 rounded-xl border border-calve-border text-xs font-bold text-calve-charcoal"
                   />
-                  <span className="text-[10px] text-calve-muted mt-1 block">sur réservation préalable</span>
+                  <span className="text-[10px] text-calve-muted mt-1 block">
+                    {isEnglish ? "upon prior reservation" : "sur réservation préalable"}
+                  </span>
                 </div>
 
                 <div>
                   <label className="block text-[10px] font-bold uppercase tracking-wider text-calve-muted mb-1.5">
-                    Grande Salle de Réunion 30 m²
+                    {isEnglish ? "Executive Meeting Room 30 sqm" : "Grande Salle de Réunion 30 m²"}
                   </label>
                   <input
                     type="text"
-                    value={meetingRate}
+                    value={meetingRate || (isEnglish ? "€120 excl. VAT half-day / €200 excl. VAT full day" : "120 € HT demi-j / 200 € HT journée")}
                     onChange={(e) => setMeetingRate(e.target.value)}
                     className="w-full px-4 py-2.5 rounded-xl border border-calve-border text-xs font-bold text-calve-charcoal"
                   />
-                  <span className="text-[10px] text-calve-muted mt-1 block">avec écran 4K &amp; café barista inclus</span>
+                  <span className="text-[10px] text-calve-muted mt-1 block">
+                    {isEnglish ? "with 4K screen & barista coffee included" : "avec écran 4K & café barista inclus"}
+                  </span>
                 </div>
 
                 <div>
                   <label className="block text-[10px] font-bold uppercase tracking-wider text-calve-muted mb-1.5">
-                    Taux de TVA Standard
+                    {isEnglish ? "Standard VAT Rate" : "Taux de TVA Standard"}
                   </label>
                   <input
                     type="text"
@@ -518,7 +558,9 @@ export default function SettingsPage() {
                     onChange={(e) => setVatRate(e.target.value)}
                     className="w-full px-4 py-2.5 rounded-xl border border-calve-border text-xs font-bold text-calve-charcoal"
                   />
-                  <span className="text-[10px] text-calve-muted mt-1 block">applicable aux prestations de service</span>
+                  <span className="text-[10px] text-calve-muted mt-1 block">
+                    {isEnglish ? "applicable to corporate service contracts" : "applicable aux prestations de service"}
+                  </span>
                 </div>
               </div>
             </div>
@@ -527,18 +569,18 @@ export default function SettingsPage() {
             <div className="p-6 sm:p-8 rounded-3xl bg-white border border-calve-border/80 shadow-2xs space-y-5">
               <div className="border-b border-calve-border/60 pb-3">
                 <h3 className="text-base font-extrabold text-calve-charcoal">
-                  2. Conditions de Bail &amp; Politiques Résidents
+                  {t("settings.lease.title")}
                 </h3>
               </div>
 
               <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
                 <div>
                   <label className="block text-[10px] font-bold uppercase tracking-wider text-calve-muted mb-1.5">
-                    DÉPÔT DE GARANTIE
+                    {isEnglish ? "SECURITY DEPOSIT" : "DÉPÔT DE GARANTIE"}
                   </label>
                   <input
                     type="text"
-                    value={depositRule}
+                    value={depositRule || (isEnglish ? "2 months rent excl. VAT" : "2 mois de loyer HT")}
                     onChange={(e) => setDepositRule(e.target.value)}
                     className="w-full px-4 py-2.5 rounded-xl border border-calve-border text-xs text-calve-charcoal"
                   />
@@ -546,11 +588,11 @@ export default function SettingsPage() {
 
                 <div>
                   <label className="block text-[10px] font-bold uppercase tracking-wider text-calve-muted mb-1.5">
-                    PRÉAVIS DE SORTIE
+                    {isEnglish ? "NOTICE PERIOD" : "PRÉAVIS DE SORTIE"}
                   </label>
                   <input
                     type="text"
-                    value={noticePeriod}
+                    value={noticePeriod || (isEnglish ? "3 months for private offices · 1 month for open space" : "3 mois pour bureaux privatifs · 1 mois pour open space")}
                     onChange={(e) => setNoticePeriod(e.target.value)}
                     className="w-full px-4 py-2.5 rounded-xl border border-calve-border text-xs text-calve-charcoal"
                   />
@@ -558,11 +600,11 @@ export default function SettingsPage() {
 
                 <div>
                   <label className="block text-[10px] font-bold uppercase tracking-wider text-calve-muted mb-1.5">
-                    PARKING EN COUR FERMÉE
+                    {isEnglish ? "SECURE COURTYARD PARKING" : "PARKING EN COUR FERMÉE"}
                   </label>
                   <input
                     type="text"
-                    value={parkingPolicy}
+                    value={parkingPolicy || (isEnglish ? "Included with private suites (9 secure courtyard bays total)" : "Inclus avec bureaux privatifs (9 places cour sécurisée au total)")}
                     onChange={(e) => setParkingPolicy(e.target.value)}
                     className="w-full px-4 py-2.5 rounded-xl border border-calve-border text-xs text-calve-charcoal"
                   />
@@ -573,195 +615,25 @@ export default function SettingsPage() {
         )}
 
         {/* ========================================================== */}
-        {/* ========================================================== */}
-        {/* TAB: BASE DE DONNÉES OVH MYSQL (DATA BRIDGE)               */}
-        {/* ========================================================== */}
-        {activeTab === "database" && (
-          <div className="space-y-6 animate-in fade-in">
-            <div className="p-6 sm:p-8 rounded-3xl bg-white border border-calve-border/80 shadow-2xs space-y-6">
-              <div className="flex flex-col sm:flex-row sm:items-center justify-between pb-4 border-b border-calve-border/60 gap-4">
-                <div>
-                  <div className="flex items-center gap-2">
-                    <Database className="w-5 h-5 text-calve-slate" />
-                    <h3 className="text-base font-extrabold text-calve-charcoal">
-                      Passerelle Base de Données OVH Cloud (MySQL v8.4)
-                    </h3>
-                  </div>
-                  <p className="text-xs text-calve-muted mt-0.5">
-                    Synchronisation permanente des prospects, réservations et données Maison Calvé sur votre base OVH dédiée.
-                  </p>
-                </div>
-
-                <div className="flex items-center gap-2">
-                  {ovhStatus?.success || ovhStatus?.status === "healthy" ? (
-                    <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-emerald-50 text-emerald-700 border border-emerald-200 text-xs font-bold">
-                      <span className="w-2 h-2 rounded-full bg-emerald-500"></span>
-                      Connecté &amp; Opérationnel
-                    </span>
-                  ) : ovhStatus?.error ? (
-                    <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-rose-50 text-rose-700 border border-rose-200 text-xs font-bold">
-                      <AlertCircle className="w-3.5 h-3.5 text-rose-500" />
-                      Échec de connexion
-                    </span>
-                  ) : (
-                    <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-slate-100 text-slate-600 border border-slate-200 text-xs font-semibold">
-                      <Server className="w-3.5 h-3.5 text-slate-500" />
-                      Prêt pour le test
-                    </span>
-                  )}
-                </div>
-              </div>
-
-              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-                <div className="p-4 rounded-2xl bg-slate-50 border border-slate-200/80">
-                  <div className="text-[10px] font-bold uppercase tracking-wider text-calve-muted mb-1">
-                    Hôte MySQL OVH
-                  </div>
-                  <div className="text-xs font-mono font-bold text-calve-charcoal">
-                    uwenyoimaison.mysql.db
-                  </div>
-                </div>
-
-                <div className="p-4 rounded-2xl bg-slate-50 border border-slate-200/80">
-                  <div className="text-[10px] font-bold uppercase tracking-wider text-calve-muted mb-1">
-                    Nom de la Base
-                  </div>
-                  <div className="text-xs font-mono font-bold text-calve-charcoal">
-                    uwenyoimaison
-                  </div>
-                </div>
-
-                <div className="p-4 rounded-2xl bg-slate-50 border border-slate-200/80">
-                  <div className="text-[10px] font-bold uppercase tracking-wider text-calve-muted mb-1">
-                    Utilisateur MySQL
-                  </div>
-                  <div className="text-xs font-mono font-bold text-calve-charcoal">
-                    uwenyoimaison
-                  </div>
-                </div>
-
-                <div className="p-4 rounded-2xl bg-slate-50 border border-slate-200/80">
-                  <div className="text-[10px] font-bold uppercase tracking-wider text-calve-muted mb-1">
-                    Dossier d&apos;hébergement
-                  </div>
-                  <div className="text-xs font-mono font-bold text-calve-charcoal">
-                    www/maison-api/
-                  </div>
-                </div>
-              </div>
-
-              <div className="space-y-3">
-                <div>
-                  <label className="block text-[10px] font-bold uppercase tracking-wider text-calve-muted mb-1">
-                    URL Passerelle REST API (Next.js &rarr; OVH PHP)
-                  </label>
-                  <div className="p-3 rounded-xl bg-slate-900 text-sky-400 font-mono text-xs break-all border border-slate-800">
-                    https://uwenyoi.cluster131.hosting.ovh.net/maison-api/index.php
-                  </div>
-                </div>
-
-                <div>
-                  <label className="block text-[10px] font-bold uppercase tracking-wider text-calve-muted mb-1">
-                    Clé Secrète de Sécurité (Header X-API-KEY)
-                  </label>
-                  <div className="p-3 rounded-xl bg-slate-900 text-emerald-400 font-mono text-xs break-all border border-slate-800">
-                    mc_sec_ovh_uwenyoimaison_2026
-                  </div>
-                </div>
-              </div>
-
-              {ovhStatus && (
-                <div
-                  className={`p-4 rounded-2xl text-xs font-medium border ${
-                    ovhStatus.success || ovhStatus.status === "healthy"
-                      ? "bg-emerald-50 border-emerald-200 text-emerald-900"
-                      : "bg-rose-50 border-rose-200 text-rose-900"
-                  }`}
-                >
-                  <div className="font-bold flex items-center gap-1.5 mb-1">
-                    {ovhStatus.success || ovhStatus.status === "healthy" ? (
-                      <CheckCircle2 className="w-4 h-4 text-emerald-600" />
-                    ) : (
-                      <AlertCircle className="w-4 h-4 text-rose-600" />
-                    )}
-                    <span>
-                      {ovhStatus.success || ovhStatus.status === "healthy"
-                        ? "Communication avec OVH MySQL réussie !"
-                        : "Erreur lors du contact avec la passerelle OVH"}
-                    </span>
-                  </div>
-                  <p>
-                    {ovhStatus.message || ovhStatus.error || JSON.stringify(ovhStatus)}
-                  </p>
-                  {ovhStatus.total_leads !== undefined && (
-                    <div className="mt-2 font-mono text-[11px] text-emerald-800">
-                      Total leads dans OVH MySQL : <strong>{ovhStatus.total_leads}</strong> | PHP : {ovhStatus.php_version}
-                    </div>
-                  )}
-                  {ovhStatus.syncedCount !== undefined && (
-                    <div className="mt-2 font-mono text-[11px] text-emerald-800">
-                      Leads synchronisés avec succès : <strong>{ovhStatus.syncedCount}</strong>
-                    </div>
-                  )}
-                </div>
-              )}
-
-              <div className="flex flex-wrap items-center gap-3 pt-2">
-                <button
-                  type="button"
-                  onClick={handleTestOvh}
-                  disabled={ovhTesting}
-                  className="flex items-center gap-2 px-5 py-2.5 rounded-xl bg-calve-slate hover:bg-calve-slate-dark text-white text-xs font-bold transition-all cursor-pointer shadow-xs disabled:opacity-50"
-                >
-                  <RefreshCw className={`w-3.5 h-3.5 ${ovhTesting ? "animate-spin" : ""}`} />
-                  <span>{ovhTesting ? "Test en cours..." : "Tester la Connexion OVH"}</span>
-                </button>
-
-                <button
-                  type="button"
-                  onClick={handleSyncAllOvh}
-                  disabled={ovhSyncing}
-                  className="flex items-center gap-2 px-5 py-2.5 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-bold transition-all cursor-pointer shadow-xs disabled:opacity-50"
-                >
-                  <Database className={`w-3.5 h-3.5 ${ovhSyncing ? "animate-spin" : ""}`} />
-                  <span>{ovhSyncing ? "Synchronisation..." : "Migrer tous les Leads vers OVH"}</span>
-                </button>
-
-                <a
-                  href="https://uwenyoi.cluster131.hosting.ovh.net/maison-api/test.php"
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="flex items-center gap-1.5 px-4 py-2.5 rounded-xl bg-slate-100 hover:bg-slate-200 text-calve-charcoal text-xs font-semibold transition-all border border-slate-200/80"
-                >
-                  <span>Ouvrir le Diagnostic OVH (test.php)</span>
-                  <ExternalLink className="w-3.5 h-3.5 text-calve-muted" />
-                </a>
-              </div>
-            </div>
-          </div>
-        )}
-
-        {/* ========================================================== */}
         {/* TAB 3: SYSTEM, SEO & SOCIAL                                */}
-        {/* ========================================================== */}
         {/* ========================================================== */}
         {activeTab === "system" && (
           <div className="space-y-6 animate-in fade-in">
             <div className="p-6 sm:p-8 rounded-3xl bg-white border border-calve-border/80 shadow-2xs space-y-5">
               <div className="border-b border-calve-border/60 pb-3">
                 <h3 className="text-base font-extrabold text-calve-charcoal">
-                  1. Référencement Naturel (SEO) &amp; Canaux Sociaux
+                  {t("settings.seo.title")}
                 </h3>
               </div>
 
               <div className="space-y-4">
                 <div>
                   <label className="block text-[10px] font-bold uppercase tracking-wider text-calve-muted mb-1.5">
-                    META TITLE PRINCIPAL DU SITE
+                    {isEnglish ? "PRIMARY WEBSITE META TITLE" : "META TITLE PRINCIPAL DU SITE"}
                   </label>
                   <input
                     type="text"
-                    value={metaTitle}
+                    value={metaTitle || (isEnglish ? "Maison Calvé — Premium Coworking Bordeaux Fondaudège with Parking" : "Maison Calvé — Coworking Bordeaux Fondaudège avec Parking")}
                     onChange={(e) => setMetaTitle(e.target.value)}
                     className="w-full px-4 py-2.5 rounded-xl border border-calve-border text-xs text-calve-charcoal font-medium"
                   />
@@ -770,7 +642,7 @@ export default function SettingsPage() {
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                   <div>
                     <label className="block text-[10px] font-bold uppercase tracking-wider text-calve-muted mb-1.5">
-                      COMPTE INSTAGRAM OFFICIEL
+                      {isEnglish ? "OFFICIAL INSTAGRAM HANDLE" : "COMPTE INSTAGRAM OFFICIEL"}
                     </label>
                     <div className="relative">
                       <Share2 className="w-3.5 h-3.5 text-calve-muted absolute left-3.5 top-1/2 -translate-y-1/2" />
@@ -785,7 +657,7 @@ export default function SettingsPage() {
 
                   <div>
                     <label className="block text-[10px] font-bold uppercase tracking-wider text-calve-muted mb-1.5">
-                      COORDONNÉES GÉOGRAPHIQUES (BORDEAUX FONDAUDÈGE)
+                      {isEnglish ? "GEOGRAPHICAL COORDINATES (BORDEAUX FONDAUDÈGE)" : "COORDONNÉES GÉOGRAPHIQUES (BORDEAUX FONDAUDÈGE)"}
                     </label>
                     <div className="relative">
                       <MapPin className="w-3.5 h-3.5 text-calve-muted absolute left-3.5 top-1/2 -translate-y-1/2" />
@@ -801,7 +673,7 @@ export default function SettingsPage() {
 
                 <div>
                   <label className="block text-[10px] font-bold uppercase tracking-wider text-calve-muted mb-1.5">
-                    EMAIL DISPATCHER DES ALERTES LEADS &amp; VISITES
+                    {isEnglish ? "LEAD & TOUR ALERTS DISPATCHER EMAIL" : "EMAIL DISPATCHER DES ALERTES LEADS & VISITES"}
                   </label>
                   <div className="relative">
                     <Mail className="w-3.5 h-3.5 text-calve-muted absolute left-3.5 top-1/2 -translate-y-1/2" />
@@ -819,25 +691,25 @@ export default function SettingsPage() {
         )}
 
         {/* ========================================================== */}
-        {/* TAB 4: PROFILE & SECURITY                                  */}
+        {/* TAB 5: PROFILE & SECURITY                                  */}
         {/* ========================================================== */}
         {activeTab === "profile" && (
           <div className="space-y-6 animate-in fade-in">
             <div className="p-6 sm:p-8 rounded-3xl bg-white border border-calve-border/80 shadow-2xs space-y-5">
               <div className="border-b border-calve-border/60 pb-3">
                 <h3 className="text-base font-extrabold text-calve-charcoal">
-                  1. Compte Administrateur &amp; Chiffrement Sécurisé
+                  {t("settings.profile.title")}
                 </h3>
               </div>
 
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                 <div>
                   <label className="block text-[10px] font-bold uppercase tracking-wider text-calve-muted mb-1.5">
-                    NOM DE L&apos;ADMINISTRATEUR
+                    {isEnglish ? "ADMINISTRATOR FULL NAME" : "NOM DE L'ADMINISTRATEUR"}
                   </label>
                   <input
                     type="text"
-                    value={adminName}
+                    value={adminName || (isEnglish ? "Paul (Operations Director)" : "Paul (Directeur d'exploitation)")}
                     onChange={(e) => setAdminName(e.target.value)}
                     className="w-full px-4 py-2.5 rounded-xl border border-calve-border text-xs font-bold text-calve-charcoal"
                   />
@@ -845,7 +717,7 @@ export default function SettingsPage() {
 
                 <div>
                   <label className="block text-[10px] font-bold uppercase tracking-wider text-calve-muted mb-1.5">
-                    EMAIL D&apos;AUTHENTIFICATION
+                    {isEnglish ? "AUTHENTICATION EMAIL" : "EMAIL D'AUTHENTIFICATION"}
                   </label>
                   <input
                     type="email"
@@ -860,15 +732,141 @@ export default function SettingsPage() {
                 <div>
                   <div className="font-bold text-xs text-calve-charcoal flex items-center gap-1.5">
                     <Lock className="w-3.5 h-3.5 text-emerald-600" />
-                    <span>Sécurité des sessions &amp; jetons d&apos;accès</span>
+                    <span>{isEnglish ? "Session security & access token revocation" : "Sécurité des sessions & jetons d'accès"}</span>
                   </div>
                   <p className="text-[11px] text-calve-muted mt-0.5">
-                    Sessions protégées avec signature sécurisée et jeton HttpOnly contre les attaques XSS.
+                    {isEnglish
+                      ? "HMAC-SHA256 signed tokens with HttpOnly cookies preventing XSS and replay exploits."
+                      : "Sessions protégées avec signature sécurisée et jeton HttpOnly contre les attaques XSS."}
                   </p>
                 </div>
                 <span className="px-3 py-1 rounded-full bg-emerald-100 text-emerald-800 text-[10px] font-bold shrink-0">
-                  Actif &amp; Protégé
+                  {isEnglish ? "Active & Protected" : "Actif & Protégé"}
                 </span>
+              </div>
+            </div>
+
+            {/* Card 2: Change Administrator Password */}
+            <div className="p-6 sm:p-8 rounded-3xl bg-white border border-calve-border/80 shadow-2xs space-y-5">
+              <div className="border-b border-calve-border/60 pb-3">
+                <div className="flex items-center gap-2">
+                  <KeyRound className="w-5 h-5 text-calve-slate" />
+                  <h3 className="text-base font-extrabold text-calve-charcoal">
+                    {t("settings.password.title")}
+                  </h3>
+                </div>
+                <p className="text-xs text-calve-muted mt-0.5">
+                  {t("settings.password.subtitle")}
+                </p>
+              </div>
+
+              {passwordStatus && (
+                <div
+                  className={`p-4 rounded-2xl text-xs font-semibold flex items-center gap-2 animate-in fade-in border ${
+                    passwordStatus.success
+                      ? "bg-emerald-50 border-emerald-200 text-emerald-900"
+                      : "bg-rose-50 border-rose-200 text-rose-900"
+                  }`}
+                >
+                  {passwordStatus.success ? (
+                    <CheckCircle2 className="w-4 h-4 text-emerald-600 shrink-0" />
+                  ) : (
+                    <AlertCircle className="w-4 h-4 text-rose-600 shrink-0" />
+                  )}
+                  <span>{passwordStatus.message}</span>
+                </div>
+              )}
+
+              <div className="space-y-4">
+                {/* Current Password */}
+                <div>
+                  <label className="block text-[10px] font-bold uppercase tracking-wider text-calve-muted mb-1.5">
+                    {t("settings.password.current")}
+                  </label>
+                  <div className="relative max-w-md">
+                    <input
+                      type={showCurrentPass ? "text" : "password"}
+                      value={currentPassword}
+                      onChange={(e) => setCurrentPassword(e.target.value)}
+                      placeholder="••••••••••••"
+                      className="w-full px-4 py-2.5 rounded-xl border border-calve-border text-xs font-mono text-calve-charcoal focus:border-calve-slate pr-10 shadow-2xs"
+                    />
+                    <button
+                      type="button"
+                      onClick={() => setShowCurrentPass(!showCurrentPass)}
+                      className="absolute right-3 top-1/2 -translate-y-1/2 text-calve-muted hover:text-calve-charcoal cursor-pointer"
+                      title={showCurrentPass ? "Hide password" : "Show password"}
+                    >
+                      {showCurrentPass ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
+                    </button>
+                  </div>
+                </div>
+
+                {/* New Password & Confirm Password */}
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 max-w-2xl">
+                  <div>
+                    <label className="block text-[10px] font-bold uppercase tracking-wider text-calve-muted mb-1.5">
+                      {t("settings.password.new")}
+                    </label>
+                    <div className="relative">
+                      <input
+                        type={showNewPass ? "text" : "password"}
+                        value={newPassword}
+                        onChange={(e) => setNewPassword(e.target.value)}
+                        placeholder="••••••••••••"
+                        minLength={6}
+                        className="w-full px-4 py-2.5 rounded-xl border border-calve-border text-xs font-mono text-calve-charcoal focus:border-calve-slate pr-10 shadow-2xs"
+                      />
+                      <button
+                        type="button"
+                        onClick={() => setShowNewPass(!showNewPass)}
+                        className="absolute right-3 top-1/2 -translate-y-1/2 text-calve-muted hover:text-calve-charcoal cursor-pointer"
+                        title={showNewPass ? "Hide password" : "Show password"}
+                      >
+                        {showNewPass ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
+                      </button>
+                    </div>
+                    <span className="text-[10px] text-calve-muted mt-1 block">
+                      {t("settings.password.hint")}
+                    </span>
+                  </div>
+
+                  <div>
+                    <label className="block text-[10px] font-bold uppercase tracking-wider text-calve-muted mb-1.5">
+                      {t("settings.password.confirm")}
+                    </label>
+                    <div className="relative">
+                      <input
+                        type={showConfirmPass ? "text" : "password"}
+                        value={confirmPassword}
+                        onChange={(e) => setConfirmPassword(e.target.value)}
+                        placeholder="••••••••••••"
+                        minLength={6}
+                        className="w-full px-4 py-2.5 rounded-xl border border-calve-border text-xs font-mono text-calve-charcoal focus:border-calve-slate pr-10 shadow-2xs"
+                      />
+                      <button
+                        type="button"
+                        onClick={() => setShowConfirmPass(!showConfirmPass)}
+                        className="absolute right-3 top-1/2 -translate-y-1/2 text-calve-muted hover:text-calve-charcoal cursor-pointer"
+                        title={showConfirmPass ? "Hide password" : "Show password"}
+                      >
+                        {showConfirmPass ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
+                      </button>
+                    </div>
+                  </div>
+                </div>
+
+                <div className="pt-2">
+                  <button
+                    type="button"
+                    onClick={handleUpdatePassword}
+                    disabled={passwordLoading || !currentPassword || !newPassword || !confirmPassword}
+                    className="flex items-center gap-2 px-5 py-2.5 rounded-xl bg-calve-slate hover:bg-calve-slate-dark text-white text-xs font-bold transition-all shadow-xs hover:shadow-sm cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed"
+                  >
+                    <KeyRound className={`w-3.5 h-3.5 ${passwordLoading ? "animate-spin" : ""}`} />
+                    <span>{passwordLoading ? (isEnglish ? "Updating..." : "Mise à jour...") : t("settings.password.btn")}</span>
+                  </button>
+                </div>
               </div>
             </div>
 
@@ -877,10 +875,10 @@ export default function SettingsPage() {
               <div className="border-b border-calve-border/60 pb-3 flex items-center justify-between">
                 <div>
                   <h3 className="text-base font-extrabold text-calve-charcoal">
-                    2. Sauvegarde &amp; Export JSON de la Base CRM
+                    {t("settings.backup.title")}
                   </h3>
                   <p className="text-xs text-calve-muted mt-0.5">
-                    Téléchargez un instantané complet de tous les leads, baux, et visites privées.
+                    {t("settings.backup.subtitle")}
                   </p>
                 </div>
               </div>
@@ -892,7 +890,7 @@ export default function SettingsPage() {
                   className="flex items-center gap-2 px-5 py-2.5 rounded-xl bg-slate-100 hover:bg-slate-200 text-xs font-bold text-calve-charcoal transition-all cursor-pointer shadow-2xs"
                 >
                   <Download className="w-4 h-4 text-calve-slate" />
-                  <span>Télécharger Sauvegarde (.json)</span>
+                  <span>{t("settings.backup.btn")}</span>
                 </button>
               </div>
             </div>

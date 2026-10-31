@@ -402,6 +402,7 @@ export default function AudienceSection({
                   src="/images/brand/maison-calve-logo.png"
                   alt="Maison Calvé"
                   fill
+                  sizes="28px"
                   className="object-cover"
                 />
               </div>

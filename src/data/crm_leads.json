@@ -1,6 +1,39 @@
 [
   {
     "name": "Rafi",
+    "email": "rafi.euroit@gmail.com",
+    "phone": "+8801521112363",
+    "company": "Hasib",
+    "type": "meeting-room",
+    "date": "2026-11-03",
+    "timeSlot": "morning",
+    "attendees": 8,
+    "meetingPurpose": "other",
+    "visitRequested": true,
+    "source": "Book a Visit (Header)",
+    "status": "qualified",
+    "priority": "high",
+    "message": "",
+    "id": "MC-2026-108",
+    "createdAt": "2026-10-31T06:59:29.396Z",
+    "updatedAt": "2026-10-31T07:03:03.203Z",
+    "notes": [
+      {
+        "id": "note-1793430152588",
+        "author": "Paul (Directeur)",
+        "text": "📞 Phone call completed: high interest",
+        "createdAt": "2026-10-31T07:02:32.588Z"
+      },
+      {
+        "id": "note-1793430157978",
+        "author": "Paul (Directeur)",
+        "text": "📝 Candidate file & lease received",
+        "createdAt": "2026-10-31T07:02:37.978Z"
+      }
+    ]
+  },
+  {
+    "name": "Rafi",
     "email": "hello@gta.com",
     "phone": "+33 6 015211123",
     "company": "Studio",
