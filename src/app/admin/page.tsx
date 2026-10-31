@@ -188,7 +188,7 @@ function getStatusBadgeConfig(status: LeadStatus, isEnglish: boolean) {
 function getLeadFinancials(lead: Lead): { label: string; rate: string } {
   if (lead.type === "private-office") {
     if (lead.officeSize?.includes("25")) {
-      return { label: lead.officeSize, rate: "1 000 € HT/mois" };
+      return { label: lead.officeSize, rate: "1 200 € HT/mois" };
     }
     if (lead.officeSize?.includes("17")) {
       return { label: lead.officeSize, rate: "750 € HT/mois" };
@@ -399,7 +399,7 @@ export default function AdminDashboardPage() {
 
     const getLeadRev = (l: Lead) => {
       if (l.type === "private-office") {
-        if (l.officeSize?.includes("25")) return 1000;
+        if (l.officeSize?.includes("28") || l.officeSize?.includes("25")) return 1200;
         if (l.officeSize?.includes("17")) return 750;
         return 850;
       }

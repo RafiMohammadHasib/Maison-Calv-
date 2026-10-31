@@ -173,7 +173,7 @@ function autoSeedIfEmpty($pdo) {
                 'category' => 'private',
                 'area' => '25 m²',
                 'capacity' => '5 à 6 postes de travail',
-                'price' => '1 000 € HT',
+                'price' => '1 200 € HT',
                 'period' => 'par mois',
                 'status' => 'available',
                 'status_text' => '1 bureau disponible',

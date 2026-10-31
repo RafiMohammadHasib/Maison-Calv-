@@ -185,7 +185,7 @@ export default function ToursPage() {
   // Pricing helper
   const getTourPrice = (tour: Lead) => {
     if (tour.type === "private-office") {
-      if (tour.officeSize?.includes("25")) return "1 000 € HT / mois";
+      if (tour.officeSize?.includes("28") || tour.officeSize?.includes("25")) return "1 200 € HT / mois";
       return "750 € HT / mois";
     }
     if (tour.type === "open-space") {

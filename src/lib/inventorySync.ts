@@ -81,7 +81,7 @@ export function getUnifiedTenants(providedLeads?: Lead[]): TenantRecord[] {
     if (lead.type === "private-office") {
       if (lead.officeSize?.includes("25")) {
         spaceName = "Bureau Privatif 28 m² (RDC Cour)";
-        rentStr = "1 000 € HT / mois";
+        rentStr = "1 200 € HT / mois";
         workstations = 5;
         parking = "Places #3 & #4";
       } else if (lead.officeSize?.includes("17")) {
@@ -196,7 +196,7 @@ export function getUnifiedSpaces(providedLeads?: Lead[]): SpaceInventoryRecord[]
       category: "private",
       area: "28 m²",
       capacity: "5 à 6 postes de travail",
-      price: "1 000 € HT",
+      price: "1 200 € HT",
       period: "par mois",
       status: won25m ? "occupied" : "available",
       statusText: won25m

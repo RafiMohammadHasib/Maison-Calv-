@@ -458,7 +458,7 @@ export default function PipelinePage() {
   // Helper for card pricing formatting
   const getCardPrice = (lead: Lead) => {
     if (lead.type === "private-office") {
-      if (lead.officeSize?.includes("25")) return "1 000 € HT";
+      if (lead.officeSize?.includes("28") || lead.officeSize?.includes("25")) return "1 200 € HT";
       return "750 € HT";
     }
     if (lead.type === "open-space") {

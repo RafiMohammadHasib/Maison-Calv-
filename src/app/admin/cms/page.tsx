@@ -23,7 +23,7 @@ export default function CMSPage() {
     "Un espace de travail confortable, calme et haut de gamme pensé pour s’y installer dans le temps."
   );
   const [office17Price, setOffice17Price] = useState("750€ HT");
-  const [office25Price, setOffice25Price] = useState("1000€ HT");
+  const [office25Price, setOffice25Price] = useState("1200€ HT");
   const [openSpacePrice, setOpenSpacePrice] = useState("250€ HT");
 
   const handleSave = (e: React.FormEvent) => {

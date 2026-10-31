@@ -289,7 +289,7 @@ export default function SpacesInventoryPage() {
             {metrics?.totalPrivateOffices ?? 5}
           </div>
           <p className="text-xs text-calve-muted">
-            21 m² (750 € HT) · 28 m² (1 000 € HT) · Suite Partenaire
+            21 m² (750 € HT) · 28 m² (1 200 € HT) · Suite Partenaire
           </p>
         </div>
 

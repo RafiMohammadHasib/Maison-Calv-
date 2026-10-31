@@ -89,7 +89,7 @@ export default function SettingsPage() {
   // Form State: 3. Rental Rules & Rates
   const [vatRate, setVatRate] = useState("20%");
   const [office17Rate, setOffice17Rate] = useState("750 € HT / mois");
-  const [office25Rate, setOffice25Rate] = useState("1 000 € HT / mois");
+  const [office25Rate, setOffice25Rate] = useState("1 200 € HT / mois");
   const [openSpaceRate, setOpenSpaceRate] = useState("250 € HT / mois");
   const [nomadRate, setNomadRate] = useState("20 € HT journée / 10 € HT demi-journée");
   const [meetingRate, setMeetingRate] = useState("120 € HT demi-j / 200 € HT journée");

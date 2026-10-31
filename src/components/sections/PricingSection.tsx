@@ -79,7 +79,7 @@ export default function PricingSection({ language, onOpenEnquiry }: PricingSecti
       id: "office-17m",
       name: language === "fr" ? "Bureaux Privatifs" : language === "en" ? "Private Office Suites" : "Despachos Privados",
       tagline: language === "fr" ? "Pour équipes de 3 à 6 collaborateurs" : language === "en" ? "For teams of 3 to 6 members" : "Para equipos de 3 a 6 personas",
-      price: "750€ à 1000€",
+      price: "750€ à 1200€",
       tax: "HT",
       period: language === "fr" ? "par mois (21 m² à 28 m²)" : language === "en" ? "per month (21 sqm to 28 sqm)" : "al mes (21 m² a 28 m²)",
       popular: false,

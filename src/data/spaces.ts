@@ -149,7 +149,7 @@ export const SPACES: SpaceItem[] = [
       es: "Hasta 5 a 6 puestos"
     },
     pricing: {
-      amount: "1000€",
+      amount: "1200€",
       tax: "HT",
       period: {
         fr: "par mois",

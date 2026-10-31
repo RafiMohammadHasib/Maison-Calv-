@@ -40,7 +40,7 @@ const ROOMS_DATA: FloorPlanRoom[] = [
     category: "office",
     area: "28 m²",
     capacity: "5 à 6 postes",
-    price: "1000€ HT / mois",
+    price: "1200€ HT / mois",
     status: "Disponible",
     available: true,
     color: "#45666c",

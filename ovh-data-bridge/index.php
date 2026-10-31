@@ -519,7 +519,7 @@ if ($action === 'update_lead' || ($action === 'lead' && ($method === 'PATCH' || 
         if ($existing['type'] === 'private-office') {
             if (strpos($existing['office_size'], '25') !== false) {
                 $spaceName = 'Bureau Privatif 25m² (RDC Cour)';
-                $rentStr = '1 000 € HT / mois';
+                $rentStr = '1 200 € HT / mois';
                 $ws = 5;
             } else {
                 $spaceName = 'Bureau Privatif 17 m² (Aile Ouest)';
