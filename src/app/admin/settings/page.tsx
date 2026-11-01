@@ -10,24 +10,27 @@ import {
   ShieldCheck,
   Save,
   ExternalLink,
-  Phone,
   Mail,
   MapPin,
   Clock,
   CheckCircle2,
   Download,
   Lock,
-  Share2,
-  AlertCircle,
   KeyRound,
   Eye,
-  EyeOff
+  EyeOff,
+  Share2,
+  AlertCircle,
+  Database,
+  Server,
+  RefreshCw
 } from "lucide-react";
 
 export default function SettingsPage() {
   const { language, t, isEnglish } = useLanguage();
   const [activeTab, setActiveTab] = useState<"identity" | "rental" | "system" | "profile">("identity");
 
+  // Read URL query parameter for direct tab linking (e.g. ?tab=system or ?tab=profile)
   useEffect(() => {
     if (typeof window !== "undefined") {
       const params = new URLSearchParams(window.location.search);
@@ -44,17 +47,61 @@ export default function SettingsPage() {
     }
   }, []);
 
+  // OVH sync state
+  const [ovhTesting, setOvhTesting] = useState(false);
+  const [ovhSyncing, setOvhSyncing] = useState(false);
+  const [ovhStatus, setOvhStatus] = useState<any>(null);
+
+  const handleTestOvh = async () => {
+    setOvhTesting(true);
+    setOvhStatus(null);
+    try {
+      const res = await fetch("/api/admin/ovh-sync", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ action: "test" })
+      });
+      const data = await res.json();
+      setOvhStatus(data);
+    } catch (err: any) {
+      setOvhStatus({ success: false, error: err.message || "Failed to reach OVH" });
+    } finally {
+      setOvhTesting(false);
+    }
+  };
+
+  const handleSyncAllOvh = async () => {
+    setOvhSyncing(true);
+    setOvhStatus(null);
+    try {
+      const res = await fetch("/api/admin/ovh-sync", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ action: "sync_all" })
+      });
+      const data = await res.json();
+      setOvhStatus(data);
+    } catch (err: any) {
+      setOvhStatus({ success: false, error: err.message || "Sync failed" });
+    } finally {
+      setOvhSyncing(false);
+    }
+  };
+
+  const [loading, setLoading] = useState(true);
+  const [saving, setSaving] = useState(false);
   const [saved, setSaved] = useState(false);
+  const [syncedWithOvh, setSyncedWithOvh] = useState(false);
   const [lastSyncTime, setLastSyncTime] = useState("03:00 PM");
 
   // Form State: 1. Identity & Agency
   const [agencyName, setAgencyName] = useState("MAISON CALVÉ");
-  const [tagline, setTagline] = useState("");
+  const [tagline, setTagline] = useState("High-End Real Estate & Coworking in Bordeaux");
   const [paulPhone, setPaulPhone] = useState("+33 5 56 00 22 10");
   const [edgarPhone, setEdgarPhone] = useState("+33 7 81 96 83 95");
   const [agencyEmail, setAgencyEmail] = useState("contact@maisoncalve.fr");
   const [officeAddress, setOfficeAddress] = useState("48 rue Calvé, 33000 Bordeaux");
-  const [officeHours, setOfficeHours] = useState("");
+  const [officeHours, setOfficeHours] = useState("Monday - Friday: 08:30 AM - 07:00 PM | Saturday: By Appointment (Residents 24/7)");
 
   // Form State: 2. Legal Notice
   const [siret, setSiret] = useState("944 393 487 00011");
@@ -62,27 +109,27 @@ export default function SettingsPage() {
   const [guarantee, setGuarantee] = useState("Galian Assurances — 120 000 € / Allianz Pro");
 
   // Form State: 3. Rental Rules & Rates
+  const [office17Rate, setOffice17Rate] = useState("€750 excl. VAT / month");
+  const [office25Rate, setOffice25Rate] = useState("€1,200 excl. VAT / month");
+  const [openSpaceRate, setOpenSpaceRate] = useState("€250 excl. VAT / month");
+  const [nomadRate, setNomadRate] = useState("€20 excl. VAT day / €10 excl. VAT half-day");
+  const [meetingRate, setMeetingRate] = useState("€120 excl. VAT half-day / €200 excl. VAT full day");
   const [vatRate, setVatRate] = useState("20%");
-  const [office17Rate, setOffice17Rate] = useState("");
-  const [office25Rate, setOffice25Rate] = useState("");
-  const [openSpaceRate, setOpenSpaceRate] = useState("");
-  const [nomadRate, setNomadRate] = useState("");
-  const [meetingRate, setMeetingRate] = useState("");
-  const [depositRule, setDepositRule] = useState("");
-  const [noticePeriod, setNoticePeriod] = useState("");
-  const [parkingPolicy, setParkingPolicy] = useState("");
+  const [depositRule, setDepositRule] = useState("2 months rent excl. VAT");
+  const [noticePeriod, setNoticePeriod] = useState("3 months for private offices · 1 month for open space");
+  const [parkingPolicy, setParkingPolicy] = useState("Included with private suites (9 secure courtyard bays total)");
 
   // Form State: 4. System & SEO
-  const [metaTitle, setMetaTitle] = useState("");
+  const [metaTitle, setMetaTitle] = useState("Maison Calvé — Premium Coworking Bordeaux Fondaudège with Parking");
   const [instagramAccount, setInstagramAccount] = useState("@maisoncalvebordeaux");
   const [gpsCoordinates, setGpsCoordinates] = useState("44.8488° N, 0.5843° W (Tram D Croix-de-Seguey)");
   const [leadDispatcherEmail, setLeadDispatcherEmail] = useState("admin@maisoncalve.fr");
 
   // Form State: 5. Profile & Security
-  const [adminName, setAdminName] = useState("");
+  const [adminName, setAdminName] = useState("Paul (Operations Director)");
   const [adminEmail, setAdminEmail] = useState("admin@maisoncalve.fr");
 
-  // Password Change State
+  // Password Update State
   const [currentPassword, setCurrentPassword] = useState("");
   const [newPassword, setNewPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
@@ -92,9 +139,143 @@ export default function SettingsPage() {
   const [passwordLoading, setPasswordLoading] = useState(false);
   const [passwordStatus, setPasswordStatus] = useState<{ success: boolean; message: string } | null>(null);
 
-  const handleUpdatePassword = async (e: React.FormEvent) => {
+  // Fetch all persisted settings on initial mount
+  const fetchAllSettings = async () => {
+    try {
+      setLoading(true);
+      const res = await fetch("/api/admin/settings");
+      const data = await res.json();
+      if (data.success && data.settings) {
+        const s = data.settings;
+        if (s.settings_identity) {
+          const id = s.settings_identity;
+          if (id.agencyName) setAgencyName(id.agencyName);
+          if (id.tagline) setTagline(id.tagline);
+          if (id.paulPhone) setPaulPhone(id.paulPhone);
+          if (id.edgarPhone) setEdgarPhone(id.edgarPhone);
+          if (id.agencyEmail) setAgencyEmail(id.agencyEmail);
+          if (id.officeAddress) setOfficeAddress(id.officeAddress);
+          if (id.officeHours) setOfficeHours(id.officeHours);
+          if (id.siret) setSiret(id.siret);
+          if (id.licenseCPI) setLicenseCPI(id.licenseCPI);
+          if (id.guarantee) setGuarantee(id.guarantee);
+        }
+        if (s.settings_rental) {
+          const r = s.settings_rental;
+          if (r.office17Rate) setOffice17Rate(r.office17Rate);
+          if (r.office25Rate) setOffice25Rate(r.office25Rate);
+          if (r.openSpaceRate) setOpenSpaceRate(r.openSpaceRate);
+          if (r.nomadRate) setNomadRate(r.nomadRate);
+          if (r.meetingRate) setMeetingRate(r.meetingRate);
+          if (r.vatRate) setVatRate(r.vatRate);
+          if (r.depositRule) setDepositRule(r.depositRule);
+          if (r.noticePeriod) setNoticePeriod(r.noticePeriod);
+          if (r.parkingPolicy) setParkingPolicy(r.parkingPolicy);
+        }
+        if (s.settings_system) {
+          const sys = s.settings_system;
+          if (sys.metaTitle) setMetaTitle(sys.metaTitle);
+          if (sys.instagramAccount) setInstagramAccount(sys.instagramAccount);
+          if (sys.gpsCoordinates) setGpsCoordinates(sys.gpsCoordinates);
+          if (sys.leadDispatcherEmail) setLeadDispatcherEmail(sys.leadDispatcherEmail);
+        }
+        if (s.settings_profile) {
+          const p = s.settings_profile;
+          if (p.adminName) setAdminName(p.adminName);
+          if (p.adminEmail) setAdminEmail(p.adminEmail);
+        }
+        if (data.source === "ovh_mysql") {
+          setSyncedWithOvh(true);
+        }
+        if (data.timestamp) {
+          const d = new Date(data.timestamp);
+          setLastSyncTime(d.toLocaleTimeString("en-US", { hour: "2-digit", minute: "2-digit" }));
+        }
+      }
+    } catch (err) {
+      console.error("Error fetching settings:", err);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    fetchAllSettings();
+  }, []);
+
+  // Save all 4 tabs in bulk to database
+  const handleSave = async (e: React.FormEvent) => {
     e.preventDefault();
+    try {
+      setSaving(true);
+      const res = await fetch("/api/admin/settings", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          settings: {
+            settings_identity: {
+              agencyName,
+              tagline,
+              paulPhone,
+              edgarPhone,
+              agencyEmail,
+              officeAddress,
+              officeHours,
+              siret,
+              licenseCPI,
+              guarantee
+            },
+            settings_rental: {
+              office17Rate,
+              office25Rate,
+              openSpaceRate,
+              nomadRate,
+              meetingRate,
+              vatRate,
+              depositRule,
+              noticePeriod,
+              parkingPolicy
+            },
+            settings_system: {
+              metaTitle,
+              instagramAccount,
+              gpsCoordinates,
+              leadDispatcherEmail
+            },
+            settings_profile: {
+              adminName,
+              adminEmail
+            }
+          }
+        })
+      });
+      const data = await res.json();
+      if (data.success) {
+        setSaved(true);
+        setSyncedWithOvh(Boolean(data.syncedWithOvh));
+        const now = new Date().toLocaleTimeString("en-US", { hour: "2-digit", minute: "2-digit" });
+        setLastSyncTime(now);
+        setTimeout(() => setSaved(false), 4000);
+      }
+    } catch (err) {
+      console.error("Error saving settings:", err);
+    } finally {
+      setSaving(false);
+    }
+  };
+
+  // Password update handler
+  const handleUpdatePassword = async (e?: React.FormEvent) => {
+    if (e) e.preventDefault();
     setPasswordStatus(null);
+
+    if (!currentPassword) {
+      setPasswordStatus({
+        success: false,
+        message: isEnglish ? "Please enter your current password." : "Veuillez saisir votre mot de passe actuel."
+      });
+      return;
+    }
 
     if (newPassword.length < 6) {
       setPasswordStatus({
@@ -124,12 +305,10 @@ export default function SettingsPage() {
         body: JSON.stringify({ currentPassword, newPassword, confirmPassword })
       });
       const data = await res.json();
-      if (res.ok && data.success) {
+      if (data.success) {
         setPasswordStatus({
           success: true,
-          message: isEnglish
-            ? "Administrator password updated successfully!"
-            : "Mot de passe administrateur modifié avec succès !"
+          message: isEnglish ? "Password updated successfully in database!" : "Mot de passe mis à jour avec succès dans MySQL !"
         });
         setCurrentPassword("");
         setNewPassword("");
@@ -137,7 +316,7 @@ export default function SettingsPage() {
       } else {
         setPasswordStatus({
           success: false,
-          message: data.message || (isEnglish ? "Failed to update password." : "Échec de la mise à jour du mot de passe.")
+          message: data.message || (isEnglish ? "Error updating password." : "Erreur lors de la mise à jour du mot de passe.")
         });
       }
     } catch (err: any) {
@@ -148,14 +327,6 @@ export default function SettingsPage() {
     } finally {
       setPasswordLoading(false);
     }
-  };
-
-  const handleSave = (e: React.FormEvent) => {
-    e.preventDefault();
-    const now = new Date().toLocaleTimeString(isEnglish ? "en-US" : "fr-FR", { hour: "2-digit", minute: "2-digit" });
-    setLastSyncTime(now);
-    setSaved(true);
-    setTimeout(() => setSaved(false), 3000);
   };
 
   const handleExportBackup = async () => {
@@ -177,7 +348,7 @@ export default function SettingsPage() {
     <AdminLayout>
       <form onSubmit={handleSave} className="space-y-6">
         {/* ========================================================== */}
-        {/* 1. TOP HEADER STRIP                                        */}
+        {/* 1. TOP HEADER STRIP (MATCHING REFERENCE IMAGES)            */}
         {/* ========================================================== */}
         <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-4">
           <div>
@@ -200,10 +371,11 @@ export default function SettingsPage() {
             </span>
             <button
               type="submit"
-              className="flex items-center gap-2 px-5 py-2.5 rounded-xl bg-calve-slate hover:bg-calve-slate-dark text-white text-xs font-bold transition-all shadow-xs hover:shadow-sm cursor-pointer"
+              disabled={saving}
+              className="flex items-center gap-2 px-5 py-2.5 rounded-xl bg-calve-slate hover:bg-calve-slate-dark text-white text-xs font-bold transition-all shadow-xs hover:shadow-sm cursor-pointer disabled:opacity-50"
             >
               <Save className="w-3.5 h-3.5" />
-              <span>{t("settings.save_btn")}</span>
+              <span>{saving ? (isEnglish ? "Saving..." : "Enregistrement...") : t("settings.save_btn")}</span>
             </button>
           </div>
         </div>
@@ -211,12 +383,12 @@ export default function SettingsPage() {
         {saved && (
           <div className="p-4 rounded-2xl bg-emerald-50 border border-emerald-200 text-emerald-900 text-xs font-bold flex items-center gap-2 animate-in fade-in">
             <CheckCircle2 className="w-4 h-4 text-emerald-600 shrink-0" />
-            <span>{t("settings.saved_banner")}</span>
+            <span>{isEnglish ? "Settings & system rules successfully saved in database!" : "Paramètres et règles système enregistrés avec succès dans MySQL !"}</span>
           </div>
         )}
 
         {/* ========================================================== */}
-        {/* 2. SEGMENTED NAVIGATION TABS CAPSULE                       */}
+        {/* 2. SEGMENTED NAVIGATION TABS CAPSULE (MATCHING REFERENCE)  */}
         {/* ========================================================== */}
         <div className="flex items-center gap-1.5 p-1.5 bg-slate-100/90 border border-slate-200/80 rounded-2xl overflow-x-auto text-xs font-semibold">
           <button
@@ -229,7 +401,7 @@ export default function SettingsPage() {
             }`}
           >
             <Building2 className="w-4 h-4 text-calve-slate" />
-            <span>{t("settings.tab.identity")}</span>
+            <span>{isEnglish ? "Identity & Agency" : "Identité & Agence"}</span>
           </button>
 
           <button
@@ -242,7 +414,7 @@ export default function SettingsPage() {
             }`}
           >
             <Percent className="w-4 h-4 text-calve-slate" />
-            <span>{t("settings.tab.rental")}</span>
+            <span>{isEnglish ? "Rental Rules & Rates" : "Règles & Tarifs"}</span>
           </button>
 
           <button
@@ -255,7 +427,7 @@ export default function SettingsPage() {
             }`}
           >
             <Sliders className="w-4 h-4 text-calve-slate" />
-            <span>{t("settings.tab.system")}</span>
+            <span>{isEnglish ? "System, SEO & Social" : "Système, SEO & Réseaux"}</span>
           </button>
 
           <button
@@ -268,12 +440,12 @@ export default function SettingsPage() {
             }`}
           >
             <ShieldCheck className="w-4 h-4 text-calve-slate" />
-            <span>{t("settings.tab.profile")}</span>
+            <span>{isEnglish ? "Profile & Security" : "Profil & Sécurité"}</span>
           </button>
         </div>
 
         {/* ========================================================== */}
-        {/* TAB 1: IDENTITY & AGENCY                                   */}
+        {/* TAB 1: IDENTITY & AGENCY (MATCHING IMAGE 8)                */}
         {/* ========================================================== */}
         {activeTab === "identity" && (
           <div className="space-y-6 animate-in fade-in">
@@ -282,10 +454,10 @@ export default function SettingsPage() {
               <div className="flex items-center justify-between border-b border-calve-border/60 pb-4">
                 <div>
                   <h3 className="text-base font-extrabold text-calve-charcoal">
-                    {t("settings.identity.title")}
+                    {isEnglish ? "1. Agency Identity & Branding" : "1. Identité & Image de Marque de l'Agence"}
                   </h3>
                   <p className="text-xs text-calve-muted mt-0.5">
-                    {t("settings.identity.subtitle")}
+                    {isEnglish ? "Information displayed publicly on the website and mandate agreements." : "Informations affichées publiquement sur le site et les mandats."}
                   </p>
                 </div>
                 <a
@@ -293,21 +465,18 @@ export default function SettingsPage() {
                   target="_blank"
                   className="px-3.5 py-1.5 rounded-xl bg-slate-50 border border-slate-200 hover:border-calve-slate text-xs font-semibold text-calve-charcoal transition-all flex items-center gap-1.5"
                 >
-                  <span>{t("settings.identity.public_portal")}</span>
+                  <span>{isEnglish ? "Public Portal" : "Portail Public"}</span>
                   <ExternalLink className="w-3 h-3 text-calve-muted" />
                 </a>
               </div>
 
-              {/* Form Grid */}
               <div className="space-y-4">
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                   <div>
-                    <label htmlFor="setting-agencyName" className="block text-[10px] font-bold uppercase tracking-wider text-calve-muted mb-1.5">
+                    <label className="block text-[10px] font-bold uppercase tracking-wider text-calve-muted mb-1.5">
                       {isEnglish ? "OFFICIAL AGENCY NAME" : "NOM OFFICIEL DE L'AGENCE"}
                     </label>
                     <input
-                      id="setting-agencyName"
-                      name="agencyName"
                       type="text"
                       value={agencyName}
                       onChange={(e) => setAgencyName(e.target.value)}
@@ -316,14 +485,12 @@ export default function SettingsPage() {
                   </div>
 
                   <div>
-                    <label htmlFor="setting-tagline" className="block text-[10px] font-bold uppercase tracking-wider text-calve-muted mb-1.5">
+                    <label className="block text-[10px] font-bold uppercase tracking-wider text-calve-muted mb-1.5">
                       {isEnglish ? "OFFICIAL TAGLINE / SUBTITLE" : "SLOGAN / SOUS-TITRE OFFICIEL"}
                     </label>
                     <input
-                      id="setting-tagline"
-                      name="tagline"
                       type="text"
-                      value={tagline || (isEnglish ? "High-End Real Estate & Coworking in Bordeaux" : "Immobilier & Coworking Haut de Gamme à Bordeaux")}
+                      value={tagline}
                       onChange={(e) => setTagline(e.target.value)}
                       className="w-full px-4 py-2.5 rounded-xl border border-calve-border bg-white text-xs text-calve-charcoal focus:border-calve-slate shadow-2xs"
                     />
@@ -332,48 +499,36 @@ export default function SettingsPage() {
 
                 <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                   <div>
-                    <label htmlFor="setting-paulPhone" className="block text-[10px] font-bold uppercase tracking-wider text-calve-muted mb-1.5">
-                      {isEnglish ? "PAUL GOIZET PHONE" : "TÉLÉPHONE PAUL GOIZET"}
+                    <label className="block text-[10px] font-bold uppercase tracking-wider text-calve-muted mb-1.5">
+                      PAUL GOIZET PHONE
                     </label>
-                    <div className="relative">
-                      <Phone className="w-3.5 h-3.5 text-calve-muted absolute left-3.5 top-1/2 -translate-y-1/2" />
-                      <input
-                        id="setting-paulPhone"
-                        name="paulPhone"
-                        type="text"
-                        value={paulPhone}
-                        onChange={(e) => setPaulPhone(e.target.value)}
-                        className="w-full pl-9 pr-3 py-2.5 rounded-xl border border-calve-border bg-white text-xs font-mono text-calve-charcoal focus:border-calve-slate shadow-2xs"
-                      />
-                    </div>
+                    <input
+                      type="text"
+                      value={paulPhone}
+                      onChange={(e) => setPaulPhone(e.target.value)}
+                      className="w-full px-4 py-2.5 rounded-xl border border-calve-border bg-white text-xs font-mono text-calve-charcoal focus:border-calve-slate shadow-2xs"
+                    />
                   </div>
 
                   <div>
-                    <label htmlFor="setting-edgarPhone" className="block text-[10px] font-bold uppercase tracking-wider text-calve-muted mb-1.5">
-                      {isEnglish ? "EDGAR GOIZET PHONE" : "TÉLÉPHONE EDGAR GOIZET"}
+                    <label className="block text-[10px] font-bold uppercase tracking-wider text-calve-muted mb-1.5">
+                      EDGAR GOIZET PHONE
                     </label>
-                    <div className="relative">
-                      <Phone className="w-3.5 h-3.5 text-calve-muted absolute left-3.5 top-1/2 -translate-y-1/2" />
-                      <input
-                        id="setting-edgarPhone"
-                        name="edgarPhone"
-                        type="text"
-                        value={edgarPhone}
-                        onChange={(e) => setEdgarPhone(e.target.value)}
-                        className="w-full pl-9 pr-3 py-2.5 rounded-xl border border-calve-border bg-white text-xs font-mono text-calve-charcoal focus:border-calve-slate shadow-2xs"
-                      />
-                    </div>
+                    <input
+                      type="text"
+                      value={edgarPhone}
+                      onChange={(e) => setEdgarPhone(e.target.value)}
+                      className="w-full px-4 py-2.5 rounded-xl border border-calve-border bg-white text-xs font-mono text-calve-charcoal focus:border-calve-slate shadow-2xs"
+                    />
                   </div>
 
                   <div>
-                    <label htmlFor="setting-agencyEmail" className="block text-[10px] font-bold uppercase tracking-wider text-calve-muted mb-1.5">
-                      {isEnglish ? "PRIMARY AGENCY EMAIL" : "EMAIL PRINCIPAL DE L'AGENCE"}
+                    <label className="block text-[10px] font-bold uppercase tracking-wider text-calve-muted mb-1.5">
+                      PRIMARY AGENCY EMAIL
                     </label>
                     <div className="relative">
                       <Mail className="w-3.5 h-3.5 text-calve-muted absolute left-3.5 top-1/2 -translate-y-1/2" />
                       <input
-                        id="setting-agencyEmail"
-                        name="agencyEmail"
                         type="email"
                         value={agencyEmail}
                         onChange={(e) => setAgencyEmail(e.target.value)}
@@ -385,14 +540,12 @@ export default function SettingsPage() {
 
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                   <div>
-                    <label htmlFor="setting-officeAddress" className="block text-[10px] font-bold uppercase tracking-wider text-calve-muted mb-1.5">
-                      {isEnglish ? "BORDEAUX OFFICE ADDRESS" : "ADRESSE DU SIÈGE BORDEAUX"}
+                    <label className="block text-[10px] font-bold uppercase tracking-wider text-calve-muted mb-1.5">
+                      BORDEAUX OFFICE ADDRESS
                     </label>
                     <div className="relative">
                       <MapPin className="w-3.5 h-3.5 text-calve-muted absolute left-3.5 top-1/2 -translate-y-1/2" />
                       <input
-                        id="setting-officeAddress"
-                        name="officeAddress"
                         type="text"
                         value={officeAddress}
                         onChange={(e) => setOfficeAddress(e.target.value)}
@@ -402,16 +555,14 @@ export default function SettingsPage() {
                   </div>
 
                   <div>
-                    <label htmlFor="setting-officeHours" className="block text-[10px] font-bold uppercase tracking-wider text-calve-muted mb-1.5">
-                      {isEnglish ? "OFFICE OPENING HOURS" : "HORAIRES D'OUVERTURE"}
+                    <label className="block text-[10px] font-bold uppercase tracking-wider text-calve-muted mb-1.5">
+                      OFFICE OPENING HOURS
                     </label>
                     <div className="relative">
                       <Clock className="w-3.5 h-3.5 text-calve-muted absolute left-3.5 top-1/2 -translate-y-1/2" />
                       <input
-                        id="setting-officeHours"
-                        name="officeHours"
                         type="text"
-                        value={officeHours || (isEnglish ? "Monday - Friday: 08:30 AM - 07:00 PM | Saturday: By Appointment (Residents 24/7)" : "Lundi - Vendredi : 08h30 - 19h00 | Samedi : Sur rendez-vous (Résidents 24/7)")}
+                        value={officeHours}
                         onChange={(e) => setOfficeHours(e.target.value)}
                         className="w-full pl-9 pr-3 py-2.5 rounded-xl border border-calve-border bg-white text-xs text-calve-charcoal focus:border-calve-slate shadow-2xs"
                       />
@@ -425,18 +576,16 @@ export default function SettingsPage() {
             <div className="p-6 sm:p-8 rounded-3xl bg-white border border-calve-border/80 shadow-2xs space-y-5">
               <div className="border-b border-calve-border/60 pb-3">
                 <h3 className="text-base font-extrabold text-calve-charcoal">
-                  {t("settings.legal.title")}
+                  2. Legal Notice &amp; Professional Licenses (Hoguet Law)
                 </h3>
               </div>
 
               <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                 <div>
-                  <label htmlFor="setting-siret" className="block text-[10px] font-bold uppercase tracking-wider text-calve-muted mb-1.5">
-                    {isEnglish ? "SIRET NUMBER" : "NUMÉRO SIRET"}
+                  <label className="block text-[10px] font-bold uppercase tracking-wider text-calve-muted mb-1.5">
+                    SIRET NUMBER
                   </label>
                   <input
-                    id="setting-siret"
-                    name="siret"
                     type="text"
                     value={siret}
                     onChange={(e) => setSiret(e.target.value)}
@@ -445,12 +594,10 @@ export default function SettingsPage() {
                 </div>
 
                 <div>
-                  <label htmlFor="setting-licenseCPI" className="block text-[10px] font-bold uppercase tracking-wider text-calve-muted mb-1.5">
-                    {isEnglish ? "PROFESSIONAL LICENSE CPI (CCI BORDEAUX)" : "CARTE PROFESSIONNELLE CPI (CCI BORDEAUX)"}
+                  <label className="block text-[10px] font-bold uppercase tracking-wider text-calve-muted mb-1.5">
+                    PROFESSIONAL LICENSE CPI (CCI BORDEAUX)
                   </label>
                   <input
-                    id="setting-licenseCPI"
-                    name="licenseCPI"
                     type="text"
                     value={licenseCPI}
                     onChange={(e) => setLicenseCPI(e.target.value)}
@@ -459,12 +606,10 @@ export default function SettingsPage() {
                 </div>
 
                 <div>
-                  <label htmlFor="setting-guarantee" className="block text-[10px] font-bold uppercase tracking-wider text-calve-muted mb-1.5">
-                    {isEnglish ? "FINANCIAL GUARANTEE & PROVIDER" : "GARANTIE FINANCIÈRE & ASSURANCE"}
+                  <label className="block text-[10px] font-bold uppercase tracking-wider text-calve-muted mb-1.5">
+                    FINANCIAL GUARANTEE &amp; PROVIDER
                   </label>
                   <input
-                    id="setting-guarantee"
-                    name="guarantee"
                     type="text"
                     value={guarantee}
                     onChange={(e) => setGuarantee(e.target.value)}
@@ -477,7 +622,7 @@ export default function SettingsPage() {
         )}
 
         {/* ========================================================== */}
-        {/* TAB 2: RENTAL RULES & RATES                                */}
+        {/* TAB 2: RENTAL RULES & RATES (MATCHING IMAGE 9)             */}
         {/* ========================================================== */}
         {activeTab === "rental" && (
           <div className="space-y-6 animate-in fade-in">
@@ -485,92 +630,82 @@ export default function SettingsPage() {
             <div className="p-6 sm:p-8 rounded-3xl bg-white border border-calve-border/80 shadow-2xs space-y-5">
               <div className="border-b border-calve-border/60 pb-3">
                 <h3 className="text-base font-extrabold text-calve-charcoal">
-                  {t("settings.rental.title")}
+                  1. Official Rental Pricing (Prices excl. VAT)
                 </h3>
                 <p className="text-xs text-calve-muted mt-0.5">
-                  {t("settings.rental.subtitle")}
+                  Rates displayed live on Maison Calvé public portal and CRM quotes.
                 </p>
               </div>
 
               <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
                 <div>
                   <label className="block text-[10px] font-bold uppercase tracking-wider text-calve-muted mb-1.5">
-                    {isEnglish ? "Private Office 21 sqm" : "Bureau Privatif 21 m²"}
+                    PRIVATE OFFICE 21 SQM
                   </label>
                   <input
                     type="text"
-                    value={office17Rate || (isEnglish ? "€750 excl. VAT / month" : "750 € HT / mois")}
+                    value={office17Rate}
                     onChange={(e) => setOffice17Rate(e.target.value)}
                     className="w-full px-4 py-2.5 rounded-xl border border-calve-border text-xs font-bold text-calve-charcoal"
                   />
-                  <span className="text-[10px] text-calve-muted mt-1 block">
-                    {isEnglish ? "3 to 4 workstations" : "3 à 4 postes de travail"}
-                  </span>
+                  <span className="text-[10px] text-calve-muted mt-1 block">3 to 4 workstations</span>
                 </div>
 
                 <div>
                   <label className="block text-[10px] font-bold uppercase tracking-wider text-calve-muted mb-1.5">
-                    {isEnglish ? "Private Office 28 sqm" : "Bureau privatif 28 m²"}
+                    PRIVATE OFFICE 28 SQM
                   </label>
                   <input
                     type="text"
-                    value={office25Rate || (isEnglish ? "€1,200 excl. VAT / month" : "1 200 € HT / mois")}
+                    value={office25Rate}
                     onChange={(e) => setOffice25Rate(e.target.value)}
                     className="w-full px-4 py-2.5 rounded-xl border border-calve-border text-xs font-bold text-calve-charcoal"
                   />
-                  <span className="text-[10px] text-calve-muted mt-1 block">
-                    {isEnglish ? "5 to 6 workstations" : "5 à 6 postes de travail"}
-                  </span>
+                  <span className="text-[10px] text-calve-muted mt-1 block">5 to 6 workstations</span>
                 </div>
 
                 <div>
                   <label className="block text-[10px] font-bold uppercase tracking-wider text-calve-muted mb-1.5">
-                    {isEnglish ? "Dedicated Desk Open Space" : "Poste Fixe Open Space"}
+                    DEDICATED DESK OPEN SPACE
                   </label>
                   <input
                     type="text"
-                    value={openSpaceRate || (isEnglish ? "€250 excl. VAT / month" : "250 € HT / mois")}
+                    value={openSpaceRate}
                     onChange={(e) => setOpenSpaceRate(e.target.value)}
                     className="w-full px-4 py-2.5 rounded-xl border border-calve-border text-xs font-bold text-calve-charcoal"
                   />
-                  <span className="text-[10px] text-calve-muted mt-1 block">
-                    {isEnglish ? "per month per desk (5 desks/space)" : "par mois par poste (5 postes/espace)"}
-                  </span>
+                  <span className="text-[10px] text-calve-muted mt-1 block">per month per desk (5 desks/space)</span>
                 </div>
 
                 <div>
                   <label className="block text-[10px] font-bold uppercase tracking-wider text-calve-muted mb-1.5">
-                    {isEnglish ? "Flexible Hot Desk" : "Poste Flexible Nomade"}
+                    FLEXIBLE HOT DESK
                   </label>
                   <input
                     type="text"
-                    value={nomadRate || (isEnglish ? "€20 excl. VAT day / €10 excl. VAT half-day" : "20 € HT journée / 10 € HT demi-journée")}
+                    value={nomadRate}
                     onChange={(e) => setNomadRate(e.target.value)}
                     className="w-full px-4 py-2.5 rounded-xl border border-calve-border text-xs font-bold text-calve-charcoal"
                   />
-                  <span className="text-[10px] text-calve-muted mt-1 block">
-                    {isEnglish ? "upon prior reservation" : "sur réservation préalable"}
-                  </span>
+                  <span className="text-[10px] text-calve-muted mt-1 block">upon prior reservation</span>
                 </div>
 
                 <div>
                   <label className="block text-[10px] font-bold uppercase tracking-wider text-calve-muted mb-1.5">
-                    {isEnglish ? "Executive Meeting Room 30 sqm" : "Grande Salle de Réunion 30 m²"}
+                    EXECUTIVE MEETING ROOM 30 SQM
                   </label>
                   <input
                     type="text"
-                    value={meetingRate || (isEnglish ? "€120 excl. VAT half-day / €200 excl. VAT full day" : "120 € HT demi-j / 200 € HT journée")}
+                    value={meetingRate}
                     onChange={(e) => setMeetingRate(e.target.value)}
                     className="w-full px-4 py-2.5 rounded-xl border border-calve-border text-xs font-bold text-calve-charcoal"
                   />
-                  <span className="text-[10px] text-calve-muted mt-1 block">
-                    {isEnglish ? "with 4K screen & barista coffee included" : "avec écran 4K & café barista inclus"}
-                  </span>
+                  <span className="text-[10px] text-calve-muted mt-1 block">with 4K screen &amp; barista coffee included</span>
                 </div>
 
                 <div>
                   <label className="block text-[10px] font-bold uppercase tracking-wider text-calve-muted mb-1.5">
-                    {isEnglish ? "Standard VAT Rate" : "Taux de TVA Standard"}
+                    STANDARD VAT RATE
                   </label>
                   <input
                     type="text"
@@ -578,29 +713,27 @@ export default function SettingsPage() {
                     onChange={(e) => setVatRate(e.target.value)}
                     className="w-full px-4 py-2.5 rounded-xl border border-calve-border text-xs font-bold text-calve-charcoal"
                   />
-                  <span className="text-[10px] text-calve-muted mt-1 block">
-                    {isEnglish ? "applicable to corporate service contracts" : "applicable aux prestations de service"}
-                  </span>
+                  <span className="text-[10px] text-calve-muted mt-1 block">applicable to corporate service contracts</span>
                 </div>
               </div>
             </div>
 
-            {/* Card 2: Lease Conditions & Rules */}
+            {/* Card 2: Lease Conditions & Resident Policies */}
             <div className="p-6 sm:p-8 rounded-3xl bg-white border border-calve-border/80 shadow-2xs space-y-5">
               <div className="border-b border-calve-border/60 pb-3">
                 <h3 className="text-base font-extrabold text-calve-charcoal">
-                  {t("settings.lease.title")}
+                  2. Lease Conditions &amp; Resident Policies
                 </h3>
               </div>
 
               <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
                 <div>
                   <label className="block text-[10px] font-bold uppercase tracking-wider text-calve-muted mb-1.5">
-                    {isEnglish ? "SECURITY DEPOSIT" : "DÉPÔT DE GARANTIE"}
+                    SECURITY DEPOSIT
                   </label>
                   <input
                     type="text"
-                    value={depositRule || (isEnglish ? "2 months rent excl. VAT" : "2 mois de loyer HT")}
+                    value={depositRule}
                     onChange={(e) => setDepositRule(e.target.value)}
                     className="w-full px-4 py-2.5 rounded-xl border border-calve-border text-xs text-calve-charcoal"
                   />
@@ -608,11 +741,11 @@ export default function SettingsPage() {
 
                 <div>
                   <label className="block text-[10px] font-bold uppercase tracking-wider text-calve-muted mb-1.5">
-                    {isEnglish ? "NOTICE PERIOD" : "PRÉAVIS DE SORTIE"}
+                    NOTICE PERIOD
                   </label>
                   <input
                     type="text"
-                    value={noticePeriod || (isEnglish ? "3 months for private offices · 1 month for open space" : "3 mois pour bureaux privatifs · 1 mois pour open space")}
+                    value={noticePeriod}
                     onChange={(e) => setNoticePeriod(e.target.value)}
                     className="w-full px-4 py-2.5 rounded-xl border border-calve-border text-xs text-calve-charcoal"
                   />
@@ -620,11 +753,11 @@ export default function SettingsPage() {
 
                 <div>
                   <label className="block text-[10px] font-bold uppercase tracking-wider text-calve-muted mb-1.5">
-                    {isEnglish ? "SECURE COURTYARD PARKING" : "PARKING EN COUR FERMÉE"}
+                    SECURE COURTYARD PARKING
                   </label>
                   <input
                     type="text"
-                    value={parkingPolicy || (isEnglish ? "Included with private suites (9 secure courtyard bays total)" : "Inclus avec bureaux privatifs (9 places cour sécurisée au total)")}
+                    value={parkingPolicy}
                     onChange={(e) => setParkingPolicy(e.target.value)}
                     className="w-full px-4 py-2.5 rounded-xl border border-calve-border text-xs text-calve-charcoal"
                   />
@@ -635,25 +768,25 @@ export default function SettingsPage() {
         )}
 
         {/* ========================================================== */}
-        {/* TAB 3: SYSTEM, SEO & SOCIAL                                */}
+        {/* TAB 3: SYSTEM, SEO & SOCIAL (MATCHING IMAGE 10)            */}
         {/* ========================================================== */}
         {activeTab === "system" && (
           <div className="space-y-6 animate-in fade-in">
             <div className="p-6 sm:p-8 rounded-3xl bg-white border border-calve-border/80 shadow-2xs space-y-5">
               <div className="border-b border-calve-border/60 pb-3">
                 <h3 className="text-base font-extrabold text-calve-charcoal">
-                  {t("settings.seo.title")}
+                  1. Search Engine Optimization (SEO) &amp; Social Channels
                 </h3>
               </div>
 
               <div className="space-y-4">
                 <div>
                   <label className="block text-[10px] font-bold uppercase tracking-wider text-calve-muted mb-1.5">
-                    {isEnglish ? "PRIMARY WEBSITE META TITLE" : "META TITLE PRINCIPAL DU SITE"}
+                    PRIMARY WEBSITE META TITLE
                   </label>
                   <input
                     type="text"
-                    value={metaTitle || (isEnglish ? "Maison Calvé — Premium Coworking Bordeaux Fondaudège with Parking" : "Maison Calvé — Coworking Bordeaux Fondaudège avec Parking")}
+                    value={metaTitle}
                     onChange={(e) => setMetaTitle(e.target.value)}
                     className="w-full px-4 py-2.5 rounded-xl border border-calve-border text-xs text-calve-charcoal font-medium"
                   />
@@ -662,7 +795,7 @@ export default function SettingsPage() {
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                   <div>
                     <label className="block text-[10px] font-bold uppercase tracking-wider text-calve-muted mb-1.5">
-                      {isEnglish ? "OFFICIAL INSTAGRAM HANDLE" : "COMPTE INSTAGRAM OFFICIEL"}
+                      OFFICIAL INSTAGRAM HANDLE
                     </label>
                     <div className="relative">
                       <Share2 className="w-3.5 h-3.5 text-calve-muted absolute left-3.5 top-1/2 -translate-y-1/2" />
@@ -677,7 +810,7 @@ export default function SettingsPage() {
 
                   <div>
                     <label className="block text-[10px] font-bold uppercase tracking-wider text-calve-muted mb-1.5">
-                      {isEnglish ? "GEOGRAPHICAL COORDINATES (BORDEAUX FONDAUDÈGE)" : "COORDONNÉES GÉOGRAPHIQUES (BORDEAUX FONDAUDÈGE)"}
+                      GEOGRAPHICAL COORDINATES (BORDEAUX FONDAUDÈGE)
                     </label>
                     <div className="relative">
                       <MapPin className="w-3.5 h-3.5 text-calve-muted absolute left-3.5 top-1/2 -translate-y-1/2" />
@@ -693,7 +826,7 @@ export default function SettingsPage() {
 
                 <div>
                   <label className="block text-[10px] font-bold uppercase tracking-wider text-calve-muted mb-1.5">
-                    {isEnglish ? "LEAD & TOUR ALERTS DISPATCHER EMAIL" : "EMAIL DISPATCHER DES ALERTES LEADS & VISITES"}
+                    LEAD &amp; TOUR ALERTS DISPATCHER EMAIL
                   </label>
                   <div className="relative">
                     <Mail className="w-3.5 h-3.5 text-calve-muted absolute left-3.5 top-1/2 -translate-y-1/2" />
@@ -711,25 +844,26 @@ export default function SettingsPage() {
         )}
 
         {/* ========================================================== */}
-        {/* TAB 5: PROFILE & SECURITY                                  */}
+        {/* TAB 4: PROFILE & SECURITY (MATCHING IMAGE 5)               */}
         {/* ========================================================== */}
         {activeTab === "profile" && (
           <div className="space-y-6 animate-in fade-in">
+            {/* Card 1: Administrator Account & Cryptographic Security */}
             <div className="p-6 sm:p-8 rounded-3xl bg-white border border-calve-border/80 shadow-2xs space-y-5">
               <div className="border-b border-calve-border/60 pb-3">
                 <h3 className="text-base font-extrabold text-calve-charcoal">
-                  {t("settings.profile.title")}
+                  1. Administrator Account &amp; Cryptographic Security
                 </h3>
               </div>
 
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                 <div>
                   <label className="block text-[10px] font-bold uppercase tracking-wider text-calve-muted mb-1.5">
-                    {isEnglish ? "ADMINISTRATOR FULL NAME" : "NOM DE L'ADMINISTRATEUR"}
+                    ADMINISTRATOR FULL NAME
                   </label>
                   <input
                     type="text"
-                    value={adminName || (isEnglish ? "Paul (Operations Director)" : "Paul (Directeur d'exploitation)")}
+                    value={adminName}
                     onChange={(e) => setAdminName(e.target.value)}
                     className="w-full px-4 py-2.5 rounded-xl border border-calve-border text-xs font-bold text-calve-charcoal"
                   />
@@ -737,7 +871,7 @@ export default function SettingsPage() {
 
                 <div>
                   <label className="block text-[10px] font-bold uppercase tracking-wider text-calve-muted mb-1.5">
-                    {isEnglish ? "AUTHENTICATION EMAIL" : "EMAIL D'AUTHENTIFICATION"}
+                    AUTHENTICATION EMAIL
                   </label>
                   <input
                     type="email"
@@ -752,40 +886,38 @@ export default function SettingsPage() {
                 <div>
                   <div className="font-bold text-xs text-calve-charcoal flex items-center gap-1.5">
                     <Lock className="w-3.5 h-3.5 text-emerald-600" />
-                    <span>{isEnglish ? "Session security & access token revocation" : "Sécurité des sessions & jetons d'accès"}</span>
+                    <span>Session security &amp; access token revocation</span>
                   </div>
                   <p className="text-[11px] text-calve-muted mt-0.5">
-                    {isEnglish
-                      ? "HMAC-SHA256 signed tokens with HttpOnly cookies preventing XSS and replay exploits."
-                      : "Sessions protégées avec signature sécurisée et jeton HttpOnly contre les attaques XSS."}
+                    HMAC-SHA256 signed tokens with HttpOnly cookies preventing XSS and replay exploits.
                   </p>
                 </div>
                 <span className="px-3 py-1 rounded-full bg-emerald-100 text-emerald-800 text-[10px] font-bold shrink-0">
-                  {isEnglish ? "Active & Protected" : "Actif & Protégé"}
+                  Active &amp; Protected
                 </span>
               </div>
             </div>
 
-            {/* Card 2: Change Administrator Password */}
+            {/* Card 2: Change Administrator Password (Matching Image 5) */}
             <div className="p-6 sm:p-8 rounded-3xl bg-white border border-calve-border/80 shadow-2xs space-y-5">
               <div className="border-b border-calve-border/60 pb-3">
                 <div className="flex items-center gap-2">
-                  <KeyRound className="w-5 h-5 text-calve-slate" />
+                  <KeyRound className="w-4 h-4 text-calve-slate" />
                   <h3 className="text-base font-extrabold text-calve-charcoal">
-                    {t("settings.password.title")}
+                    2. Change Administrator Password
                   </h3>
                 </div>
                 <p className="text-xs text-calve-muted mt-0.5">
-                  {t("settings.password.subtitle")}
+                  Update your access credentials for the Maison Calvé admin management portal.
                 </p>
               </div>
 
               {passwordStatus && (
                 <div
-                  className={`p-4 rounded-2xl text-xs font-semibold flex items-center gap-2 animate-in fade-in border ${
+                  className={`p-4 rounded-2xl text-xs font-semibold flex items-center gap-2 animate-in fade-in ${
                     passwordStatus.success
-                      ? "bg-emerald-50 border-emerald-200 text-emerald-900"
-                      : "bg-rose-50 border-rose-200 text-rose-900"
+                      ? "bg-emerald-50 border border-emerald-200 text-emerald-900"
+                      : "bg-rose-50 border border-rose-200 text-rose-900"
                   }`}
                 >
                   {passwordStatus.success ? (
@@ -798,23 +930,22 @@ export default function SettingsPage() {
               )}
 
               <div className="space-y-4">
-                {/* Current Password */}
                 <div>
                   <label className="block text-[10px] font-bold uppercase tracking-wider text-calve-muted mb-1.5">
-                    {t("settings.password.current")}
+                    CURRENT PASSWORD *
                   </label>
-                  <div className="relative max-w-md">
+                  <div className="relative">
                     <input
                       type={showCurrentPass ? "text" : "password"}
                       value={currentPassword}
                       onChange={(e) => setCurrentPassword(e.target.value)}
                       placeholder="••••••••••••"
-                      className="w-full px-4 py-2.5 rounded-xl border border-calve-border text-xs font-mono text-calve-charcoal focus:border-calve-slate pr-10 shadow-2xs"
+                      className="w-full px-4 py-2.5 pr-10 rounded-xl border border-calve-border bg-white text-xs font-mono text-calve-charcoal focus:border-calve-slate shadow-2xs"
                     />
                     <button
                       type="button"
                       onClick={() => setShowCurrentPass(!showCurrentPass)}
-                      className="absolute right-3 top-1/2 -translate-y-1/2 text-calve-muted hover:text-calve-charcoal cursor-pointer"
+                      className="absolute right-3 top-1/2 -translate-y-1/2 text-calve-muted hover:text-calve-charcoal cursor-pointer p-1"
                       title={showCurrentPass ? "Hide password" : "Show password"}
                     >
                       {showCurrentPass ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
@@ -822,11 +953,10 @@ export default function SettingsPage() {
                   </div>
                 </div>
 
-                {/* New Password & Confirm Password */}
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 max-w-2xl">
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                   <div>
                     <label className="block text-[10px] font-bold uppercase tracking-wider text-calve-muted mb-1.5">
-                      {t("settings.password.new")}
+                      NEW PASSWORD *
                     </label>
                     <div className="relative">
                       <input
@@ -834,26 +964,25 @@ export default function SettingsPage() {
                         value={newPassword}
                         onChange={(e) => setNewPassword(e.target.value)}
                         placeholder="••••••••••••"
-                        minLength={6}
-                        className="w-full px-4 py-2.5 rounded-xl border border-calve-border text-xs font-mono text-calve-charcoal focus:border-calve-slate pr-10 shadow-2xs"
+                        className="w-full px-4 py-2.5 pr-10 rounded-xl border border-calve-border bg-white text-xs font-mono text-calve-charcoal focus:border-calve-slate shadow-2xs"
                       />
                       <button
                         type="button"
                         onClick={() => setShowNewPass(!showNewPass)}
-                        className="absolute right-3 top-1/2 -translate-y-1/2 text-calve-muted hover:text-calve-charcoal cursor-pointer"
+                        className="absolute right-3 top-1/2 -translate-y-1/2 text-calve-muted hover:text-calve-charcoal cursor-pointer p-1"
                         title={showNewPass ? "Hide password" : "Show password"}
                       >
                         {showNewPass ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
                       </button>
                     </div>
                     <span className="text-[10px] text-calve-muted mt-1 block">
-                      {t("settings.password.hint")}
+                      Password must be at least 6 characters.
                     </span>
                   </div>
 
                   <div>
                     <label className="block text-[10px] font-bold uppercase tracking-wider text-calve-muted mb-1.5">
-                      {t("settings.password.confirm")}
+                      CONFIRM NEW PASSWORD *
                     </label>
                     <div className="relative">
                       <input
@@ -861,13 +990,12 @@ export default function SettingsPage() {
                         value={confirmPassword}
                         onChange={(e) => setConfirmPassword(e.target.value)}
                         placeholder="••••••••••••"
-                        minLength={6}
-                        className="w-full px-4 py-2.5 rounded-xl border border-calve-border text-xs font-mono text-calve-charcoal focus:border-calve-slate pr-10 shadow-2xs"
+                        className="w-full px-4 py-2.5 pr-10 rounded-xl border border-calve-border bg-white text-xs font-mono text-calve-charcoal focus:border-calve-slate shadow-2xs"
                       />
                       <button
                         type="button"
                         onClick={() => setShowConfirmPass(!showConfirmPass)}
-                        className="absolute right-3 top-1/2 -translate-y-1/2 text-calve-muted hover:text-calve-charcoal cursor-pointer"
+                        className="absolute right-3 top-1/2 -translate-y-1/2 text-calve-muted hover:text-calve-charcoal cursor-pointer p-1"
                         title={showConfirmPass ? "Hide password" : "Show password"}
                       >
                         {showConfirmPass ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
@@ -879,26 +1007,26 @@ export default function SettingsPage() {
                 <div className="pt-2">
                   <button
                     type="button"
-                    onClick={handleUpdatePassword}
+                    onClick={() => handleUpdatePassword()}
                     disabled={passwordLoading || !currentPassword || !newPassword || !confirmPassword}
-                    className="flex items-center gap-2 px-5 py-2.5 rounded-xl bg-calve-slate hover:bg-calve-slate-dark text-white text-xs font-bold transition-all shadow-xs hover:shadow-sm cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed"
+                    className="flex items-center gap-2 px-5 py-2.5 rounded-xl bg-calve-slate hover:bg-calve-slate-dark text-white text-xs font-bold transition-all shadow-xs disabled:opacity-50 cursor-pointer"
                   >
                     <KeyRound className={`w-3.5 h-3.5 ${passwordLoading ? "animate-spin" : ""}`} />
-                    <span>{passwordLoading ? (isEnglish ? "Updating..." : "Mise à jour...") : t("settings.password.btn")}</span>
+                    <span>{passwordLoading ? (isEnglish ? "Updating..." : "Mise à jour...") : (isEnglish ? "Update Password" : "Mettre à jour le mot de passe")}</span>
                   </button>
                 </div>
               </div>
             </div>
 
-            {/* Backup Card */}
+            {/* Card 3: Backup & Export JSON */}
             <div className="p-6 sm:p-8 rounded-3xl bg-white border border-calve-border/80 shadow-2xs space-y-4">
               <div className="border-b border-calve-border/60 pb-3 flex items-center justify-between">
                 <div>
                   <h3 className="text-base font-extrabold text-calve-charcoal">
-                    {t("settings.backup.title")}
+                    {isEnglish ? "3. Database JSON Backup & Export" : "3. Sauvegarde & Export JSON de la Base CRM"}
                   </h3>
                   <p className="text-xs text-calve-muted mt-0.5">
-                    {t("settings.backup.subtitle")}
+                    {isEnglish ? "Download a full JSON snapshot of all leads, leases, and private tours." : "Téléchargez un instantané complet de tous les leads, baux, et visites privées."}
                   </p>
                 </div>
               </div>
@@ -910,8 +1038,100 @@ export default function SettingsPage() {
                   className="flex items-center gap-2 px-5 py-2.5 rounded-xl bg-slate-100 hover:bg-slate-200 text-xs font-bold text-calve-charcoal transition-all cursor-pointer shadow-2xs"
                 >
                   <Download className="w-4 h-4 text-calve-slate" />
-                  <span>{t("settings.backup.btn")}</span>
+                  <span>{isEnglish ? "Download Backup (.json)" : "Télécharger Sauvegarde (.json)"}</span>
                 </button>
+              </div>
+            </div>
+
+            {/* Card 4: Passerelle Base de Données OVH Cloud (MySQL v8.4) */}
+            <div className="p-6 sm:p-8 rounded-3xl bg-white border border-calve-border/80 shadow-2xs space-y-5">
+              <div className="flex flex-col sm:flex-row sm:items-center justify-between pb-3 border-b border-calve-border/60 gap-4">
+                <div>
+                  <div className="flex items-center gap-2">
+                    <Database className="w-4 h-4 text-calve-slate" />
+                    <h3 className="text-base font-extrabold text-calve-charcoal">
+                      4. Passerelle Base de Données OVH Cloud (MySQL v8.4)
+                    </h3>
+                  </div>
+                  <p className="text-xs text-calve-muted mt-0.5">
+                    Pont de données distant reliant Next.js à votre hébergement OVH Web Cloud (uwenyoimaison).
+                  </p>
+                </div>
+
+                <div className="flex items-center gap-2">
+                  {ovhStatus?.success || ovhStatus?.status === "healthy" ? (
+                    <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-emerald-50 text-emerald-700 border border-emerald-200 text-xs font-bold">
+                      <span className="w-2 h-2 rounded-full bg-emerald-500"></span>
+                      Connecté &amp; Opérationnel
+                    </span>
+                  ) : ovhStatus?.error ? (
+                    <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-rose-50 text-rose-700 border border-rose-200 text-xs font-bold">
+                      <AlertCircle className="w-3.5 h-3.5 text-rose-500" />
+                      Échec de connexion
+                    </span>
+                  ) : (
+                    <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-slate-100 text-slate-600 border border-slate-200 text-xs font-semibold">
+                      <Server className="w-3.5 h-3.5 text-slate-500" />
+                      Prêt pour le test
+                    </span>
+                  )}
+                </div>
+              </div>
+
+              {ovhStatus && (
+                <div
+                  className={`p-4 rounded-2xl text-xs font-medium border ${
+                    ovhStatus.success || ovhStatus.status === "healthy"
+                      ? "bg-emerald-50 border-emerald-200 text-emerald-900"
+                      : "bg-rose-50 border-rose-200 text-rose-900"
+                  }`}
+                >
+                  <div className="font-bold flex items-center gap-1.5 mb-1">
+                    {ovhStatus.success || ovhStatus.status === "healthy" ? (
+                      <CheckCircle2 className="w-4 h-4 text-emerald-600" />
+                    ) : (
+                      <AlertCircle className="w-4 h-4 text-rose-600" />
+                    )}
+                    <span>
+                      {ovhStatus.success || ovhStatus.status === "healthy"
+                        ? "Communication avec OVH MySQL réussie !"
+                        : "Erreur lors du contact avec la passerelle OVH"}
+                    </span>
+                  </div>
+                  <p>{ovhStatus.message || ovhStatus.error || JSON.stringify(ovhStatus)}</p>
+                </div>
+              )}
+
+              <div className="flex flex-wrap items-center gap-3 pt-1">
+                <button
+                  type="button"
+                  onClick={handleTestOvh}
+                  disabled={ovhTesting}
+                  className="flex items-center gap-2 px-5 py-2.5 rounded-xl bg-calve-slate hover:bg-calve-slate-dark text-white text-xs font-bold transition-all cursor-pointer shadow-xs disabled:opacity-50"
+                >
+                  <RefreshCw className={`w-3.5 h-3.5 ${ovhTesting ? "animate-spin" : ""}`} />
+                  <span>{ovhTesting ? "Test en cours..." : "Tester la Connexion OVH"}</span>
+                </button>
+
+                <button
+                  type="button"
+                  onClick={handleSyncAllOvh}
+                  disabled={ovhSyncing}
+                  className="flex items-center gap-2 px-5 py-2.5 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-bold transition-all cursor-pointer shadow-xs disabled:opacity-50"
+                >
+                  <Database className={`w-3.5 h-3.5 ${ovhSyncing ? "animate-spin" : ""}`} />
+                  <span>{ovhSyncing ? "Synchronisation..." : "Migrer tous les Leads vers OVH"}</span>
+                </button>
+
+                <a
+                  href="http://uwenyoi.cluster131.hosting.ovh.net/maison-api/index.php?action=health"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="flex items-center gap-1.5 px-4 py-2.5 rounded-xl bg-slate-100 hover:bg-slate-200 text-calve-charcoal text-xs font-semibold transition-all border border-slate-200/80"
+                >
+                  <span>Diagnostic API Health</span>
+                  <ExternalLink className="w-3.5 h-3.5 text-calve-muted" />
+                </a>
               </div>
             </div>
           </div>

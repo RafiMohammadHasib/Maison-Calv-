@@ -2,14 +2,43 @@ import { NextResponse } from "next/server";
 import { cookies } from "next/headers";
 import { createSession, verifySession, revokeSession, SESSION_COOKIE_NAME, setSessionUser, getSessionUser } from "@/lib/session";
 import { getAdminConfig, saveAdminConfig, verifyAdminPassword, findAdminUser } from "@/lib/adminConfig";
+import { isOvhBridgeConfigured, fetchOvhSetting, saveOvhSetting } from "@/lib/ovhBridge";
 
 const ADMIN_EMAIL = process.env.ADMIN_EMAIL || "admin@maisoncalve.fr";
 
 export async function POST(request: Request) {
   try {
     const { email, password, rememberMe } = await request.json();
+    const normalizedEmail = (email || "").trim().toLowerCase();
 
-    const user = findAdminUser(email, password);
+    // 1. Check local/superadmin credentials
+    let user = findAdminUser(email, password);
+
+    // 2. If not matched, check OVH MySQL mc_settings
+    if (!user && isOvhBridgeConfigured()) {
+      try {
+        const ovhRes = await fetchOvhSetting("admin_credentials");
+        if (ovhRes.success && ovhRes.value) {
+          const storedEmail = (ovhRes.value.email || "admin@maisoncalve.fr").toLowerCase();
+          const storedPass = ovhRes.value.password;
+          if (
+            (normalizedEmail === storedEmail ||
+              normalizedEmail === "admin@maisoncalve.fr" ||
+              normalizedEmail === "admin@gg.fr" ||
+              normalizedEmail === "admin@maisoncalve.com") &&
+            password === storedPass
+          ) {
+            user = {
+              name: "Administrateur Maison Calvé",
+              email: ovhRes.value.email || "admin@maisoncalve.fr",
+              role: "Super Admin"
+            };
+          }
+        }
+      } catch (err) {
+        console.warn("Could not fetch credentials from OVH:", err);
+      }
+    }
 
     if (!user) {
       return NextResponse.json(
@@ -54,9 +83,15 @@ export async function POST(request: Request) {
     });
 
     return response;
-  } catch (err) {
-    console.error("Login error:", err);
-    return NextResponse.json({ success: false, message: "Erreur serveur" }, { status: 500 });
+  } catch (error: any) {
+    console.error("Authentication error:", error);
+    return NextResponse.json(
+      {
+        success: false,
+        message: "Une erreur interne est survenue lors de l'authentification."
+      },
+      { status: 500 }
+    );
   }
 }
 
@@ -88,10 +123,37 @@ export async function GET() {
       });
     }
 
-    return NextResponse.json({ authenticated: false }, { status: 401 });
-  } catch (err) {
-    console.error("Auth check error:", err);
-    return NextResponse.json({ authenticated: false }, { status: 500 });
+    return NextResponse.json({ authenticated: false });
+  } catch (error) {
+    console.error("Session verification error:", error);
+    return NextResponse.json({ authenticated: false });
+  }
+}
+
+export async function DELETE() {
+  try {
+    const cookieStore = await cookies();
+    const sessionCookie = cookieStore.get(SESSION_COOKIE_NAME);
+
+    if (sessionCookie?.value) {
+      await revokeSession(sessionCookie.value);
+    }
+
+    cookieStore.delete(SESSION_COOKIE_NAME);
+
+    return NextResponse.json({
+      success: true,
+      message: "Déconnexion réussie."
+    });
+  } catch (error: any) {
+    console.error("Sign-out error:", error);
+    return NextResponse.json(
+      {
+        success: false,
+        message: "Erreur lors de la déconnexion."
+      },
+      { status: 500 }
+    );
   }
 }
 
@@ -108,24 +170,18 @@ export async function PATCH(request: Request) {
       );
     }
 
-    const { currentPassword, newPassword, confirmPassword } = await request.json();
+    const body = await request.json();
+    const currentPassword = body.currentPassword;
+    const newPassword = body.newPassword;
+    const confirmPassword = body.confirmPassword || body.confirmNewPassword;
 
-    if (!currentPassword || !newPassword || !confirmPassword) {
+    if (!currentPassword || !newPassword) {
       return NextResponse.json(
         { success: false, message: "Tous les champs de mot de passe sont requis." },
         { status: 400 }
       );
     }
 
-    // Verify current password
-    if (!verifyAdminPassword(currentPassword)) {
-      return NextResponse.json(
-        { success: false, message: "Le mot de passe actuel est incorrect." },
-        { status: 400 }
-      );
-    }
-
-    // Check minimum length
     if (newPassword.length < 6) {
       return NextResponse.json(
         { success: false, message: "Le nouveau mot de passe doit comporter au moins 6 caractères." },
@@ -133,20 +189,59 @@ export async function PATCH(request: Request) {
       );
     }
 
-    // Check matching
-    if (newPassword !== confirmPassword) {
+    if (confirmPassword && newPassword !== confirmPassword) {
       return NextResponse.json(
         { success: false, message: "Le nouveau mot de passe et sa confirmation ne correspondent pas." },
         { status: 400 }
       );
     }
 
-    // Save new custom password
+    // Verify current password against local config
+    let isCurrentValid = verifyAdminPassword(currentPassword);
+
+    // If not valid locally, also check OVH MySQL
+    if (!isCurrentValid && isOvhBridgeConfigured()) {
+      try {
+        const ovhRes = await fetchOvhSetting("admin_credentials");
+        if (ovhRes.success && ovhRes.value && ovhRes.value.password) {
+          if (currentPassword === ovhRes.value.password) {
+            isCurrentValid = true;
+          }
+        }
+      } catch (err) {
+        console.warn("Could not check OVH credentials:", err);
+      }
+    }
+
+    if (!isCurrentValid) {
+      return NextResponse.json(
+        { success: false, message: "Le mot de passe actuel est incorrect." },
+        { status: 400 }
+      );
+    }
+
+    // Save locally
     saveAdminConfig({ customPassword: newPassword });
+
+    // Save in OVH MySQL mc_settings
+    let ovhSuccess = false;
+    if (isOvhBridgeConfigured()) {
+      try {
+        const ovhRes = await saveOvhSetting("admin_credentials", {
+          email: ADMIN_EMAIL,
+          password: newPassword,
+          updatedAt: new Date().toISOString()
+        });
+        ovhSuccess = Boolean(ovhRes.success);
+      } catch (err) {
+        console.warn("Could not persist password to OVH:", err);
+      }
+    }
 
     return NextResponse.json({
       success: true,
-      message: "Mot de passe administrateur modifié avec succès !"
+      message: "Mot de passe administrateur modifié avec succès !",
+      syncedWithOvh: ovhSuccess
     });
   } catch (err: any) {
     console.error("Password update error:", err);
@@ -154,47 +249,5 @@ export async function PATCH(request: Request) {
       { success: false, message: err.message || "Erreur serveur lors de la mise à jour." },
       { status: 500 }
     );
-  }
-}
-
-export async function DELETE() {
-  try {
-    const cookieStore = await cookies();
-    const sessionCookie = cookieStore.get(SESSION_COOKIE_NAME);
-
-    // Invalidate session ID on server
-    if (sessionCookie?.value) {
-      revokeSession(sessionCookie.value);
-    }
-
-    // Clear cookie with exact path=/ and maxAge=0
-    cookieStore.set(SESSION_COOKIE_NAME, "", {
-      path: "/",
-      maxAge: 0,
-      expires: new Date(0),
-      httpOnly: true,
-      secure: process.env.NODE_ENV === "production",
-      sameSite: "lax"
-    });
-    cookieStore.delete({
-      name: SESSION_COOKIE_NAME,
-      path: "/"
-    });
-
-    const response = NextResponse.json({
-      success: true,
-      message: "Session terminée et révoquée avec succès"
-    });
-
-    // Explicit Set-Cookie header to purge browser storage across all client contexts
-    response.headers.set(
-      "Set-Cookie",
-      `${SESSION_COOKIE_NAME}=; Path=/; Expires=Thu, 01 Jan 1970 00:00:00 GMT; Max-Age=0; HttpOnly; SameSite=Lax`
-    );
-
-    return response;
-  } catch (err) {
-    console.error("Logout error:", err);
-    return NextResponse.json({ success: false }, { status: 500 });
   }
 }

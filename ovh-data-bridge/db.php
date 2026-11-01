@@ -749,5 +749,66 @@ function autoSeedIfEmpty($pdo) {
             $insLead->execute($ld);
         }
     }
+// 4. Seed Settings if empty
+    $settingsCount = (int)$pdo->query("SELECT COUNT(*) FROM `mc_settings`")->fetchColumn();
+    if ($settingsCount === 0) {
+        $now = date('c');
+        $defaultSettings = [
+            'cms_content' => [
+                'heroBadge'       => 'Coworking haut de gamme – Bordeaux Fondaudège',
+                'heroDesc'        => "Un espace de travail confortable, calme et haut de gamme pensé pour s'y installer dans le temps.",
+                'office17Price'   => '750€ HT',
+                'office25Price'   => '1200€ HT',
+                'openSpacePrice'  => '250€ HT'
+            ],
+            'settings_identity' => [
+                'agencyName'      => 'MAISON CALVÉ',
+                'tagline'         => 'High-End Real Estate & Coworking in Bordeaux',
+                'paulPhone'       => '+33 5 56 00 22 10',
+                'edgarPhone'      => '+33 7 81 96 83 95',
+                'agencyEmail'     => 'contact@maisoncalve.fr',
+                'officeAddress'   => '48 rue Calvé, 33000 Bordeaux',
+                'officeHours'     => 'Monday - Friday: 08:30 AM - 07:00 PM | Saturday: By Appointment (Residents 24/7)',
+                'siret'           => '944 393 487 00011',
+                'licenseCPI'      => 'CPI33012023000000128 · CCI Bordeaux Gironde',
+                'guarantee'       => 'Galian Assurances — 120 000 € / Allianz Pro'
+            ],
+            'settings_rental' => [
+                'office17Rate'    => '€750 excl. VAT / month',
+                'office25Rate'    => '€1,200 excl. VAT / month',
+                'openSpaceRate'   => '€250 excl. VAT / month',
+                'nomadRate'       => '€20 excl. VAT day / €10 excl. VAT half-day',
+                'meetingRate'     => '€120 excl. VAT half-day / €200 excl. VAT full day',
+                'vatRate'         => '20%',
+                'depositRule'     => '2 months rent excl. VAT',
+                'noticePeriod'    => '3 months for private offices · 1 month for open space',
+                'parkingPolicy'   => 'Included with private suites (9 secure courtyard bays total)'
+            ],
+            'settings_system' => [
+                'metaTitle'       => 'Maison Calvé — Premium Coworking Bordeaux Fondaudège with Parking',
+                'instagramAccount'=> '@maisoncalvebordeaux',
+                'gpsCoordinates'  => '44.8488° N, 0.5843° W (Tram D Croix-de-Seguey)',
+                'leadDispatcherEmail' => 'admin@maisoncalve.fr'
+            ],
+            'settings_profile' => [
+                'adminName'       => 'Paul (Operations Director)',
+                'adminEmail'      => 'admin@maisoncalve.fr'
+            ],
+            'admin_credentials' => [
+                'email'           => 'admin@maisoncalve.fr',
+                'password'        => 'admin123',
+                'updatedAt'       => $now
+            ]
+        ];
+
+        $insSetting = $pdo->prepare("INSERT INTO `mc_settings` (setting_key, setting_value, updated_at) VALUES (:k, :v, :u)");
+        foreach ($defaultSettings as $k => $v) {
+            $insSetting->execute([
+                ':k' => $k,
+                ':v' => json_encode($v, JSON_UNESCAPED_UNICODE),
+                ':u' => $now
+            ]);
+        }
+    }
 }
 

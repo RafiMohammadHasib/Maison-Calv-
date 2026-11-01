@@ -1043,6 +1043,24 @@ if ($action === 'delete_tenant' || ($action === 'tenant' && $method === 'DELETE'
 
 if ($action === 'settings') {
     if ($method === 'GET') {
+        $singleKey = trim($_GET['key'] ?? '');
+        if (!empty($singleKey)) {
+            $stmt = $pdo->prepare("SELECT setting_value FROM `mc_settings` WHERE setting_key = :k");
+            $stmt->execute([':k' => $singleKey]);
+            $row = $stmt->fetch();
+            if ($row) {
+                $val = json_decode($row['setting_value'], true);
+                echo json_encode([
+                    'success' => true,
+                    'key'     => $singleKey,
+                    'value'   => $val !== null ? $val : $row['setting_value']
+                ]);
+            } else {
+                echo json_encode(['success' => false, 'message' => "Setting '{$singleKey}' not found.", 'value' => null]);
+            }
+            exit;
+        }
+
         $stmt = $pdo->query("SELECT setting_key, setting_value FROM `mc_settings`");
         $all = $stmt->fetchAll();
         $settings = [];
@@ -1055,16 +1073,41 @@ if ($action === 'settings') {
     }
 
     if ($method === 'POST') {
+        $now = date('c');
+
+        // 1. Bulk settings update support: { "settings": { "key1": "val1", "key2": { ... } } }
+        if (isset($inputData['settings']) && is_array($inputData['settings'])) {
+            $stmt = $pdo->prepare("INSERT INTO `mc_settings` (setting_key, setting_value, updated_at) 
+                VALUES (:k, :v, :u) 
+                ON DUPLICATE KEY UPDATE setting_value = VALUES(setting_value), updated_at = VALUES(updated_at)");
+            
+            $savedKeys = [];
+            foreach ($inputData['settings'] as $k => $v) {
+                $k = trim($k);
+                if (empty($k)) continue;
+                $valString = is_string($v) ? $v : json_encode($v, JSON_UNESCAPED_UNICODE);
+                $stmt->execute([':k' => $k, ':v' => $valString, ':u' => $now]);
+                $savedKeys[] = $k;
+            }
+
+            echo json_encode([
+                'success' => true,
+                'message' => 'Paramètres enregistrés avec succès.',
+                'saved_keys' => $savedKeys
+            ]);
+            exit;
+        }
+
+        // 2. Single setting update support: { "key": "...", "value": ... }
         $key = trim($inputData['key'] ?? '');
         $value = $inputData['value'] ?? null;
 
         if (empty($key)) {
             http_response_code(400);
-            echo json_encode(['success' => false, 'message' => 'Setting key required.']);
+            echo json_encode(['success' => false, 'message' => 'Clé de paramètre requise.']);
             exit;
         }
 
-        $now = date('c');
         $valString = is_string($value) ? $value : json_encode($value, JSON_UNESCAPED_UNICODE);
 
         $stmt = $pdo->prepare("INSERT INTO `mc_settings` (setting_key, setting_value, updated_at) 
@@ -1072,9 +1115,39 @@ if ($action === 'settings') {
             ON DUPLICATE KEY UPDATE setting_value = VALUES(setting_value), updated_at = VALUES(updated_at)");
         $stmt->execute([':k' => $key, ':v' => $valString, ':u' => $now]);
 
-        echo json_encode(['success' => true, 'message' => "Setting '{$key}' saved."]);
+        echo json_encode(['success' => true, 'message' => "Paramètre '{$key}' enregistré avec succès."]);
         exit;
     }
+
+    if ($method === 'DELETE') {
+        $key = trim($_GET['key'] ?? $inputData['key'] ?? '');
+        if (empty($key)) {
+            http_response_code(400);
+            echo json_encode(['success' => false, 'message' => 'Clé requise pour la suppression.']);
+            exit;
+        }
+
+        $stmt = $pdo->prepare("DELETE FROM `mc_settings` WHERE setting_key = :k");
+        $stmt->execute([':k' => $key]);
+
+        echo json_encode(['success' => true, 'message' => "Paramètre '{$key}' supprimé avec succès."]);
+        exit;
+    }
+}
+
+if ($action === 'delete_setting') {
+    $key = trim($_GET['key'] ?? $inputData['key'] ?? '');
+    if (empty($key)) {
+        http_response_code(400);
+        echo json_encode(['success' => false, 'message' => 'Clé requise pour la suppression.']);
+        exit;
+    }
+
+    $stmt = $pdo->prepare("DELETE FROM `mc_settings` WHERE setting_key = :k");
+    $stmt->execute([':k' => $key]);
+
+    echo json_encode(['success' => true, 'message' => "Paramètre '{$key}' supprimé avec succès."]);
+    exit;
 }
 
 // Fallback for unknown action

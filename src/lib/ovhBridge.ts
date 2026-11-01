@@ -494,3 +494,140 @@ export async function deleteOvhTenant(
     return { success: false, error: err.message };
   }
 }
+// =============================================================
+// SECTION 4: GLOBAL SETTINGS & CMS CONTENT (mc_settings)
+// =============================================================
+
+export async function fetchOvhSettings(): Promise<{
+  success: boolean;
+  settings: Record<string, any>;
+  error?: string;
+}> {
+  try {
+    const url = new URL(OVH_API_BRIDGE_URL);
+    url.searchParams.set("action", "settings");
+
+    const res = await fetch(url.toString(), {
+      method: "GET",
+      headers: {
+        "X-API-KEY": OVH_API_SECRET_KEY,
+        Accept: "application/json"
+      },
+      cache: "no-store"
+    });
+
+    const data = await res.json();
+    return {
+      success: Boolean(data.success),
+      settings: data.settings || {}
+    };
+  } catch (err: any) {
+    console.error("fetchOvhSettings error:", err);
+    return { success: false, settings: {}, error: err.message };
+  }
+}
+
+export async function fetchOvhSetting(
+  key: string
+): Promise<{ success: boolean; value: any; error?: string }> {
+  try {
+    const url = new URL(OVH_API_BRIDGE_URL);
+    url.searchParams.set("action", "settings");
+    url.searchParams.set("key", key);
+
+    const res = await fetch(url.toString(), {
+      method: "GET",
+      headers: {
+        "X-API-KEY": OVH_API_SECRET_KEY,
+        Accept: "application/json"
+      },
+      cache: "no-store"
+    });
+
+    const data = await res.json();
+    return {
+      success: Boolean(data.success),
+      value: data.value ?? null
+    };
+  } catch (err: any) {
+    console.error("fetchOvhSetting error:", err);
+    return { success: false, value: null, error: err.message };
+  }
+}
+
+export async function saveOvhSetting(
+  key: string,
+  value: any
+): Promise<{ success: boolean; message?: string; error?: string }> {
+  try {
+    const url = new URL(OVH_API_BRIDGE_URL);
+    url.searchParams.set("action", "settings");
+
+    const res = await fetch(url.toString(), {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        "X-API-KEY": OVH_API_SECRET_KEY,
+        Accept: "application/json"
+      },
+      body: JSON.stringify({ key, value })
+    });
+
+    const data = await res.json();
+    return data;
+  } catch (err: any) {
+    console.error("saveOvhSetting error:", err);
+    return { success: false, error: err.message };
+  }
+}
+
+export async function saveOvhSettingsBulk(
+  settings: Record<string, any>
+): Promise<{ success: boolean; message?: string; error?: string }> {
+  try {
+    const url = new URL(OVH_API_BRIDGE_URL);
+    url.searchParams.set("action", "settings");
+
+    const res = await fetch(url.toString(), {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        "X-API-KEY": OVH_API_SECRET_KEY,
+        Accept: "application/json"
+      },
+      body: JSON.stringify({ settings })
+    });
+
+    const data = await res.json();
+    return data;
+  } catch (err: any) {
+    console.error("saveOvhSettingsBulk error:", err);
+    return { success: false, error: err.message };
+  }
+}
+
+export async function deleteOvhSetting(
+  key: string
+): Promise<{ success: boolean; message?: string; error?: string }> {
+  try {
+    const url = new URL(OVH_API_BRIDGE_URL);
+    url.searchParams.set("action", "delete_setting");
+    url.searchParams.set("key", key);
+
+    const res = await fetch(url.toString(), {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        "X-API-KEY": OVH_API_SECRET_KEY,
+        Accept: "application/json"
+      },
+      body: JSON.stringify({ key })
+    });
+
+    const data = await res.json();
+    return data;
+  } catch (err: any) {
+    console.error("deleteOvhSetting error:", err);
+    return { success: false, error: err.message };
+  }
+}
