@@ -230,20 +230,22 @@ export default function SpacesInventoryPage() {
           : "Disponibilité en temps réel, synchronisation automatique des réservations et suivi des baux."
       }
     >
-      {/* Top Notification Banner */}
-      <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 p-4 rounded-2xl bg-gradient-to-r from-calve-charcoal to-[#1a2332] text-white shadow-xs">
-        <div className="flex items-center gap-3">
-          <div className="w-10 h-10 rounded-xl bg-calve-gold/20 border border-calve-gold/40 flex items-center justify-center shrink-0">
-            <Building2 className="w-5 h-5 text-calve-gold" />
+      {/* Executive Quick Actions & Real-Time Sync Bar */}
+      <div className="bg-white border border-calve-border/90 rounded-2xl p-4 sm:p-5 shadow-xs flex flex-col md:flex-row md:items-center justify-between gap-4">
+        {/* Left Info & Live Sync Status */}
+        <div className="flex items-start sm:items-center gap-3.5 min-w-0">
+          <div className="w-10 h-10 rounded-xl bg-calve-stone/80 border border-calve-border/70 flex items-center justify-center text-calve-slate shrink-0">
+            <Building2 className="w-5 h-5" />
           </div>
-          <div>
-            <div className="text-sm font-bold flex items-center gap-2">
+          <div className="min-w-0">
+            <div className="text-sm font-extrabold text-calve-charcoal flex items-center gap-2 flex-wrap">
               <span>{isEnglish ? "Automated Space Booking System" : "Attribution Automatisée des Espaces"}</span>
-              <span className="text-[10px] uppercase font-bold tracking-wider px-2 py-0.5 rounded-full bg-emerald-500/20 text-emerald-300 border border-emerald-500/30">
+              <span className="inline-flex items-center gap-1.5 text-[10px] uppercase font-bold tracking-wider px-2 py-0.5 rounded-full bg-emerald-50 text-emerald-800 border border-emerald-200">
+                <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse" />
                 {isEnglish ? "Live Synced" : "Synchro Directe"}
               </span>
             </div>
-            <p className="text-xs text-white/70">
+            <p className="text-xs text-calve-muted mt-0.5 leading-relaxed">
               {isEnglish
                 ? "When an opportunity is marked as 'Won' in the CRM, its requested space immediately locks as Booked / Occupied."
                 : "Dès qu'un prospect passe en statut 'Gagné' dans le CRM, son espace est instantanément verrouillé comme Réservé / Occupé."}
@@ -251,28 +253,30 @@ export default function SpacesInventoryPage() {
           </div>
         </div>
 
-        <div className="flex items-center gap-2 w-full sm:w-auto">
+        {/* Right Actions */}
+        <div className="flex items-center gap-2 w-full md:w-auto shrink-0 pt-2 sm:pt-0 border-t sm:border-t-0 border-calve-stone">
           <button
             onClick={() => setIsCreateOpen(true)}
-            className="flex-1 sm:flex-initial inline-flex items-center justify-center gap-1.5 px-3 py-2 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-xs font-bold text-white transition-all cursor-pointer shadow-xs"
+            className="flex-1 sm:flex-initial inline-flex items-center justify-center gap-1.5 px-4 py-2.5 rounded-xl bg-calve-slate hover:bg-calve-slate-dark text-xs font-bold text-white transition-all shadow-xs cursor-pointer active:scale-95"
           >
             <Plus className="w-3.5 h-3.5" />
-            <span>{isEnglish ? "+ New Space" : "+ Nouvel Espace"}</span>
+            <span>{isEnglish ? "New Space" : "Nouvel Espace"}</span>
           </button>
           <button
             onClick={fetchSpaces}
             disabled={refreshing}
-            className="flex-1 sm:flex-initial inline-flex items-center justify-center gap-1.5 px-3 py-2 rounded-xl bg-white/10 hover:bg-white/15 border border-white/20 text-xs font-semibold text-white transition-all cursor-pointer disabled:opacity-50"
+            className="inline-flex items-center justify-center gap-1.5 px-3 py-2.5 rounded-xl bg-white hover:bg-calve-stone/60 border border-calve-border/80 text-xs font-semibold text-calve-slate transition-all shadow-2xs cursor-pointer disabled:opacity-50 active:scale-95"
+            title={isEnglish ? "Refresh database" : "Actualiser la base"}
           >
             <RefreshCw className={`w-3.5 h-3.5 ${refreshing ? "animate-spin" : ""}`} />
-            <span>{isEnglish ? "Refresh" : "Actualiser"}</span>
+            <span className="hidden sm:inline">{isEnglish ? "Refresh" : "Actualiser"}</span>
           </button>
           <Link
             href="/admin/tenants"
-            className="flex-1 sm:flex-initial inline-flex items-center justify-center gap-1.5 px-3 py-2 rounded-xl bg-white/10 hover:bg-white/15 border border-white/20 text-xs font-semibold text-white transition-all cursor-pointer"
+            className="flex-1 sm:flex-initial inline-flex items-center justify-center gap-1.5 px-3.5 py-2.5 rounded-xl bg-white hover:bg-calve-stone/60 border border-calve-border/80 text-xs font-semibold text-calve-charcoal transition-all shadow-2xs cursor-pointer active:scale-95"
           >
             <span>{isEnglish ? "View Tenants" : "Voir Résidents"}</span>
-            <ArrowUpRight className="w-3.5 h-3.5" />
+            <ArrowUpRight className="w-3.5 h-3.5 text-calve-muted" />
           </Link>
         </div>
       </div>
@@ -328,7 +332,7 @@ export default function SpacesInventoryPage() {
         </div>
       ) : (
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-          {spaces.map((space) => {
+          {spaces.map((space, idx) => {
             const isAvailable = space.status === "available";
             const isOccupied = space.status === "occupied";
             const isLimited = space.status === "limited";
@@ -351,6 +355,8 @@ export default function SpacesInventoryPage() {
                       src={space.image}
                       alt={space.name}
                       fill
+                      priority={idx < 3}
+                      sizes="(max-width: 768px) 100vw, (max-width: 1280px) 50vw, 33vw"
                       className="object-cover"
                     />
                     <div className="absolute top-3 right-3">
@@ -538,7 +544,7 @@ export default function SpacesInventoryPage() {
             <form onSubmit={handleEditSubmit} className="space-y-4">
               <div>
                 <label className="block text-[10px] font-bold uppercase text-slate-500 mb-1">
-                  Nom de l&apos;espace
+                  {isEnglish ? "Space Name" : "Nom de l'espace"}
                 </label>
                 <input
                   type="text"
@@ -552,7 +558,7 @@ export default function SpacesInventoryPage() {
               <div className="grid grid-cols-2 gap-3">
                 <div>
                   <label className="block text-[10px] font-bold uppercase text-slate-500 mb-1">
-                    Tarif (€ HT)
+                    {isEnglish ? "Rate (€ excl. VAT)" : "Tarif (€ HT)"}
                   </label>
                   <input
                     type="text"
@@ -563,7 +569,7 @@ export default function SpacesInventoryPage() {
                 </div>
                 <div>
                   <label className="block text-[10px] font-bold uppercase text-slate-500 mb-1">
-                    Période
+                    {isEnglish ? "Billing Period" : "Période"}
                   </label>
                   <input
                     type="text"
@@ -577,7 +583,7 @@ export default function SpacesInventoryPage() {
               <div className="grid grid-cols-2 gap-3">
                 <div>
                   <label className="block text-[10px] font-bold uppercase text-slate-500 mb-1">
-                    Superficie
+                    {isEnglish ? "Floor Area" : "Superficie"}
                   </label>
                   <input
                     type="text"
@@ -588,7 +594,7 @@ export default function SpacesInventoryPage() {
                 </div>
                 <div>
                   <label className="block text-[10px] font-bold uppercase text-slate-500 mb-1">
-                    Capacité
+                    {isEnglish ? "Capacity" : "Capacité"}
                   </label>
                   <input
                     type="text"
@@ -602,7 +608,7 @@ export default function SpacesInventoryPage() {
               <div className="grid grid-cols-2 gap-3">
                 <div>
                   <label className="block text-[10px] font-bold uppercase text-slate-500 mb-1">
-                    Statut de Disponibilité
+                    {isEnglish ? "Availability Status" : "Statut de Disponibilité"}
                   </label>
                   <select
                     value={editForm.status}
@@ -614,14 +620,14 @@ export default function SpacesInventoryPage() {
                     }
                     className="w-full px-3 py-2 rounded-xl border border-slate-200 text-xs font-bold text-slate-900 bg-white"
                   >
-                    <option value="available">Disponible (Available)</option>
-                    <option value="limited">Limité (Limited)</option>
-                    <option value="occupied">Occupé (Occupied)</option>
+                    <option value="available">{isEnglish ? "Available" : "Disponible"}</option>
+                    <option value="limited">{isEnglish ? "Limited" : "Limité"}</option>
+                    <option value="occupied">{isEnglish ? "Occupied" : "Occupé"}</option>
                   </select>
                 </div>
                 <div>
                   <label className="block text-[10px] font-bold uppercase text-slate-500 mb-1">
-                    Texte affiché
+                    {isEnglish ? "Display Badge Text" : "Texte affiché"}
                   </label>
                   <input
                     type="text"
@@ -636,16 +642,16 @@ export default function SpacesInventoryPage() {
                 <button
                   type="button"
                   onClick={() => setEditingSpace(null)}
-                  className="px-4 py-2 rounded-xl border border-slate-200 text-xs font-semibold text-slate-600 hover:bg-slate-50"
+                  className="px-4 py-2 rounded-xl border border-slate-200 text-xs font-semibold text-slate-600 hover:bg-slate-50 cursor-pointer"
                 >
-                  Annuler
+                  {isEnglish ? "Cancel" : "Annuler"}
                 </button>
                 <button
                   type="submit"
                   className="flex items-center gap-1.5 px-5 py-2 rounded-xl bg-calve-slate hover:bg-calve-slate-dark text-white text-xs font-bold shadow-xs cursor-pointer"
                 >
                   <Save className="w-3.5 h-3.5" />
-                  <span>Enregistrer dans OVH MySQL</span>
+                  <span>{isEnglish ? "Save Changes" : "Enregistrer les modifications"}</span>
                 </button>
               </div>
             </form>
@@ -674,12 +680,12 @@ export default function SpacesInventoryPage() {
             <form onSubmit={handleCreateSubmit} className="space-y-4">
               <div>
                 <label className="block text-[10px] font-bold uppercase text-slate-500 mb-1">
-                  Nom de l&apos;espace *
+                  {isEnglish ? "Space Name *" : "Nom de l'espace *"}
                 </label>
                 <input
                   type="text"
                   required
-                  placeholder="Ex: Bureau Privatif Standing 20m²"
+                  placeholder={isEnglish ? "e.g. Executive Private Suite 20m²" : "Ex: Bureau Privatif Standing 20m²"}
                   value={createForm.name}
                   onChange={(e) => setCreateForm({ ...createForm, name: e.target.value })}
                   className="w-full px-3 py-2 rounded-xl border border-slate-200 text-xs font-bold text-slate-900"
@@ -689,7 +695,7 @@ export default function SpacesInventoryPage() {
               <div className="grid grid-cols-2 gap-3">
                 <div>
                   <label className="block text-[10px] font-bold uppercase text-slate-500 mb-1">
-                    Catégorie
+                    {isEnglish ? "Category" : "Catégorie"}
                   </label>
                   <select
                     value={createForm.category}
@@ -701,16 +707,16 @@ export default function SpacesInventoryPage() {
                     }
                     className="w-full px-3 py-2 rounded-xl border border-slate-200 text-xs text-slate-900 bg-white"
                   >
-                    <option value="private">Bureau Privatif (Private)</option>
-                    <option value="open">Open Space</option>
-                    <option value="meeting">Salle de Réunion</option>
-                    <option value="parking">Stationnement & Cour</option>
+                    <option value="private">{isEnglish ? "Private Office" : "Bureau Privatif"}</option>
+                    <option value="open">{isEnglish ? "Dedicated Desk / Coworking" : "Open Space Fixe"}</option>
+                    <option value="meeting">{isEnglish ? "Meeting Room" : "Salle de Réunion"}</option>
+                    <option value="parking">{isEnglish ? "Courtyard Parking" : "Stationnement & Cour"}</option>
                   </select>
                 </div>
 
                 <div>
                   <label className="block text-[10px] font-bold uppercase text-slate-500 mb-1">
-                    Tarif (€ HT)
+                    {isEnglish ? "Rate (€ excl. VAT)" : "Tarif (€ HT)"}
                   </label>
                   <input
                     type="text"
@@ -725,7 +731,7 @@ export default function SpacesInventoryPage() {
               <div className="grid grid-cols-2 gap-3">
                 <div>
                   <label className="block text-[10px] font-bold uppercase text-slate-500 mb-1">
-                    Superficie
+                    {isEnglish ? "Floor Area" : "Superficie"}
                   </label>
                   <input
                     type="text"
@@ -738,11 +744,11 @@ export default function SpacesInventoryPage() {
 
                 <div>
                   <label className="block text-[10px] font-bold uppercase text-slate-500 mb-1">
-                    Capacité
+                    {isEnglish ? "Capacity" : "Capacité"}
                   </label>
                   <input
                     type="text"
-                    placeholder="4 postes de travail"
+                    placeholder={isEnglish ? "4 workstations" : "4 postes de travail"}
                     value={createForm.capacity}
                     onChange={(e) => setCreateForm({ ...createForm, capacity: e.target.value })}
                     className="w-full px-3 py-2 rounded-xl border border-slate-200 text-xs text-slate-900"
@@ -754,16 +760,16 @@ export default function SpacesInventoryPage() {
                 <button
                   type="button"
                   onClick={() => setIsCreateOpen(false)}
-                  className="px-4 py-2 rounded-xl border border-slate-200 text-xs font-semibold text-slate-600 hover:bg-slate-50"
+                  className="px-4 py-2 rounded-xl border border-slate-200 text-xs font-semibold text-slate-600 hover:bg-slate-50 cursor-pointer"
                 >
-                  Annuler
+                  {isEnglish ? "Cancel" : "Annuler"}
                 </button>
                 <button
                   type="submit"
                   className="flex items-center gap-1.5 px-5 py-2 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-bold shadow-xs cursor-pointer"
                 >
                   <Plus className="w-3.5 h-3.5" />
-                  <span>Créer dans la Base de Données</span>
+                  <span>{isEnglish ? "Create Space" : "Créer dans la Base de Données"}</span>
                 </button>
               </div>
             </form>

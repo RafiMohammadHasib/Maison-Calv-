@@ -146,7 +146,7 @@ export default function PricingSection({ language, onOpenEnquiry }: PricingSecti
     <section id="tarifs" className="py-12 sm:py-16 bg-white">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         {/* Header */}
-        <div className="text-center max-w-3xl mx-auto mb-10 sm:mb-12">
+        <div className="text-center max-w-3xl mx-auto mb-10 sm:mb-12" data-reveal="fade-up">
           <div className="text-xs font-bold tracking-[0.2em] uppercase text-calve-slate mb-3">
             {t.tag}
           </div>
@@ -159,7 +159,7 @@ export default function PricingSection({ language, onOpenEnquiry }: PricingSecti
         </div>
 
         {/* Pricing Cards Grid */}
-        <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-4 gap-6">
+        <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-4 gap-6" data-reveal="stagger">
           {plans.map((plan) => (
             <div
               key={plan.id}

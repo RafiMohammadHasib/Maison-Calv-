@@ -332,6 +332,7 @@ export default function EnquiryModal({
                     src="/images/brand/maison-calve-logo.png"
                     alt="Maison Calvé"
                     fill
+                    sizes="24px"
                     className="object-cover"
                   />
                 </div>

@@ -10,29 +10,44 @@ import {
   ShieldCheck,
   Save,
   ExternalLink,
-  Phone,
   Mail,
   MapPin,
   Clock,
   CheckCircle2,
-  FileText,
   Download,
   Lock,
-  Key,
+  KeyRound,
   Eye,
   EyeOff,
-  Globe,
   Share2,
-  Sparkles,
+  AlertCircle,
   Database,
   Server,
-  RefreshCw,
-  AlertCircle
+  RefreshCw
 } from "lucide-react";
 
 export default function SettingsPage() {
-  const { language, t } = useLanguage();
-  const [activeTab, setActiveTab] = useState<"identity" | "rental" | "database" | "system" | "profile">("identity");
+  const { language, t, isEnglish } = useLanguage();
+  const [activeTab, setActiveTab] = useState<"identity" | "rental" | "system" | "profile">("identity");
+
+  // Read URL query parameter for direct tab linking (e.g. ?tab=system or ?tab=profile)
+  useEffect(() => {
+    if (typeof window !== "undefined") {
+      const params = new URLSearchParams(window.location.search);
+      const tab = params.get("tab");
+      if (tab === "seo" || tab === "system") {
+        setActiveTab("system");
+      } else if (tab === "profile") {
+        setActiveTab("profile");
+      } else if (tab === "rental") {
+        setActiveTab("rental");
+      } else if (tab === "identity") {
+        setActiveTab("identity");
+      }
+    }
+  }, []);
+
+  // OVH sync state
   const [ovhTesting, setOvhTesting] = useState(false);
   const [ovhSyncing, setOvhSyncing] = useState(false);
   const [ovhStatus, setOvhStatus] = useState<any>(null);
@@ -72,22 +87,59 @@ export default function SettingsPage() {
       setOvhSyncing(false);
     }
   };
+
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
   const [saved, setSaved] = useState(false);
   const [syncedWithOvh, setSyncedWithOvh] = useState(false);
   const [lastSyncTime, setLastSyncTime] = useState("03:00 PM");
 
-  // Password state
+  // Form State: 1. Identity & Agency
+  const [agencyName, setAgencyName] = useState("MAISON CALVÉ");
+  const [tagline, setTagline] = useState("High-End Real Estate & Coworking in Bordeaux");
+  const [paulPhone, setPaulPhone] = useState("+33 5 56 00 22 10");
+  const [edgarPhone, setEdgarPhone] = useState("+33 7 81 96 83 95");
+  const [agencyEmail, setAgencyEmail] = useState("contact@maisoncalve.fr");
+  const [officeAddress, setOfficeAddress] = useState("48 rue Calvé, 33000 Bordeaux");
+  const [officeHours, setOfficeHours] = useState("Monday - Friday: 08:30 AM - 07:00 PM | Saturday: By Appointment (Residents 24/7)");
+
+  // Form State: 2. Legal Notice
+  const [siret, setSiret] = useState("944 393 487 00011");
+  const [licenseCPI, setLicenseCPI] = useState("CPI33012023000000128 · CCI Bordeaux Gironde");
+  const [guarantee, setGuarantee] = useState("Galian Assurances — 120 000 € / Allianz Pro");
+
+  // Form State: 3. Rental Rules & Rates
+  const [office17Rate, setOffice17Rate] = useState("€750 excl. VAT / month");
+  const [office25Rate, setOffice25Rate] = useState("€1,200 excl. VAT / month");
+  const [openSpaceRate, setOpenSpaceRate] = useState("€250 excl. VAT / month");
+  const [nomadRate, setNomadRate] = useState("€20 excl. VAT day / €10 excl. VAT half-day");
+  const [meetingRate, setMeetingRate] = useState("€120 excl. VAT half-day / €200 excl. VAT full day");
+  const [vatRate, setVatRate] = useState("20%");
+  const [depositRule, setDepositRule] = useState("2 months rent excl. VAT");
+  const [noticePeriod, setNoticePeriod] = useState("3 months for private offices · 1 month for open space");
+  const [parkingPolicy, setParkingPolicy] = useState("Included with private suites (9 secure courtyard bays total)");
+
+  // Form State: 4. System & SEO
+  const [metaTitle, setMetaTitle] = useState("Maison Calvé — Premium Coworking Bordeaux Fondaudège with Parking");
+  const [instagramAccount, setInstagramAccount] = useState("@maisoncalvebordeaux");
+  const [gpsCoordinates, setGpsCoordinates] = useState("44.8488° N, 0.5843° W (Tram D Croix-de-Seguey)");
+  const [leadDispatcherEmail, setLeadDispatcherEmail] = useState("admin@maisoncalve.fr");
+
+  // Form State: 5. Profile & Security
+  const [adminName, setAdminName] = useState("Paul (Operations Director)");
+  const [adminEmail, setAdminEmail] = useState("admin@maisoncalve.fr");
+
+  // Password Update State
   const [currentPassword, setCurrentPassword] = useState("");
   const [newPassword, setNewPassword] = useState("");
-  const [confirmNewPassword, setConfirmNewPassword] = useState("");
+  const [confirmPassword, setConfirmPassword] = useState("");
   const [showCurrentPass, setShowCurrentPass] = useState(false);
   const [showNewPass, setShowNewPass] = useState(false);
   const [showConfirmPass, setShowConfirmPass] = useState(false);
-  const [passwordUpdating, setPasswordUpdating] = useState(false);
-  const [passwordMessage, setPasswordMessage] = useState<{ type: "success" | "error"; text: string } | null>(null);
+  const [passwordLoading, setPasswordLoading] = useState(false);
+  const [passwordStatus, setPasswordStatus] = useState<{ success: boolean; message: string } | null>(null);
 
+  // Fetch all persisted settings on initial mount
   const fetchAllSettings = async () => {
     try {
       setLoading(true);
@@ -151,79 +203,7 @@ export default function SettingsPage() {
     fetchAllSettings();
   }, []);
 
-  const handleUpdatePassword = async () => {
-    setPasswordMessage(null);
-    if (!currentPassword) {
-      setPasswordMessage({ type: "error", text: "Veuillez saisir votre mot de passe actuel." });
-      return;
-    }
-    if (!newPassword || newPassword.length < 6) {
-      setPasswordMessage({ type: "error", text: "Le nouveau mot de passe doit comporter au moins 6 caractères." });
-      return;
-    }
-    if (newPassword !== confirmNewPassword) {
-      setPasswordMessage({ type: "error", text: "Les deux nouveaux mots de passe ne correspondent pas." });
-      return;
-    }
-
-    try {
-      setPasswordUpdating(true);
-      const res = await fetch("/api/admin/auth", {
-        method: "PATCH",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ currentPassword, newPassword })
-      });
-      const data = await res.json();
-      if (data.success) {
-        setPasswordMessage({ type: "success", text: "Mot de passe mis à jour avec succès dans MySQL !" });
-        setCurrentPassword("");
-        setNewPassword("");
-        setConfirmNewPassword("");
-      } else {
-        setPasswordMessage({ type: "error", text: data.message || "Erreur lors de la mise à jour du mot de passe." });
-      }
-    } catch (err: any) {
-      setPasswordMessage({ type: "error", text: err.message || "Erreur de connexion au serveur." });
-    } finally {
-      setPasswordUpdating(false);
-    }
-  };
-
-  // Form State: 1. Identity & Agency
-  const [agencyName, setAgencyName] = useState("MAISON CALVÉ");
-  const [tagline, setTagline] = useState("Immobilier & Coworking Haut de Gamme à Bordeaux");
-  const [paulPhone, setPaulPhone] = useState("+33 5 56 00 22 10");
-  const [edgarPhone, setEdgarPhone] = useState("+33 7 81 96 83 95");
-  const [agencyEmail, setAgencyEmail] = useState("contact@maisoncalve.fr");
-  const [officeAddress, setOfficeAddress] = useState("48 rue Calvé, 33000 Bordeaux");
-  const [officeHours, setOfficeHours] = useState("Lundi - Vendredi : 08h30 - 19h00 | Samedi : Sur rendez-vous (Résidents 24/7)");
-
-  // Form State: 2. Legal Notice
-  const [siret, setSiret] = useState("944 393 487 00011");
-  const [licenseCPI, setLicenseCPI] = useState("CPI33012023000000128 · CCI Bordeaux Gironde");
-  const [guarantee, setGuarantee] = useState("Galian Assurances — 120 000 € / Allianz Pro");
-
-  // Form State: 3. Rental Rules & Rates
-  const [vatRate, setVatRate] = useState("20%");
-  const [office17Rate, setOffice17Rate] = useState("750 € HT / mois");
-  const [office25Rate, setOffice25Rate] = useState("1 200 € HT / mois");
-  const [openSpaceRate, setOpenSpaceRate] = useState("250 € HT / mois");
-  const [nomadRate, setNomadRate] = useState("20 € HT journée / 10 € HT demi-journée");
-  const [meetingRate, setMeetingRate] = useState("120 € HT demi-j / 200 € HT journée");
-  const [depositRule, setDepositRule] = useState("2 mois de loyer HT");
-  const [noticePeriod, setNoticePeriod] = useState("3 mois pour bureaux privatifs · 1 mois pour open space");
-  const [parkingPolicy, setParkingPolicy] = useState("Inclus avec bureaux privatifs (9 places cour sécurisée au total)");
-
-  // Form State: 4. System & SEO
-  const [metaTitle, setMetaTitle] = useState("Maison Calvé — Coworking Bordeaux Fondaudège avec Parking");
-  const [instagramAccount, setInstagramAccount] = useState("@maisoncalvebordeaux");
-  const [gpsCoordinates, setGpsCoordinates] = useState("44.8488° N, 0.5843° W (Tram D Croix-de-Seguey)");
-  const [leadDispatcherEmail, setLeadDispatcherEmail] = useState("admin@maisoncalve.fr");
-
-  // Form State: 5. Profile & Security
-  const [adminName, setAdminName] = useState("Paul (Directeur d'exploitation)");
-  const [adminEmail, setAdminEmail] = useState("admin@maisoncalve.fr");
-
+  // Save all 4 tabs in bulk to database
   const handleSave = async (e: React.FormEvent) => {
     e.preventDefault();
     try {
@@ -284,6 +264,71 @@ export default function SettingsPage() {
     }
   };
 
+  // Password update handler
+  const handleUpdatePassword = async (e?: React.FormEvent) => {
+    if (e) e.preventDefault();
+    setPasswordStatus(null);
+
+    if (!currentPassword) {
+      setPasswordStatus({
+        success: false,
+        message: isEnglish ? "Please enter your current password." : "Veuillez saisir votre mot de passe actuel."
+      });
+      return;
+    }
+
+    if (newPassword.length < 6) {
+      setPasswordStatus({
+        success: false,
+        message: isEnglish
+          ? "The new password must be at least 6 characters long."
+          : "Le nouveau mot de passe doit comporter au moins 6 caractères."
+      });
+      return;
+    }
+
+    if (newPassword !== confirmPassword) {
+      setPasswordStatus({
+        success: false,
+        message: isEnglish
+          ? "The new password and confirmation do not match."
+          : "Le nouveau mot de passe et sa confirmation ne correspondent pas."
+      });
+      return;
+    }
+
+    try {
+      setPasswordLoading(true);
+      const res = await fetch("/api/admin/auth", {
+        method: "PATCH",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ currentPassword, newPassword, confirmPassword })
+      });
+      const data = await res.json();
+      if (data.success) {
+        setPasswordStatus({
+          success: true,
+          message: isEnglish ? "Password updated successfully in database!" : "Mot de passe mis à jour avec succès dans MySQL !"
+        });
+        setCurrentPassword("");
+        setNewPassword("");
+        setConfirmPassword("");
+      } else {
+        setPasswordStatus({
+          success: false,
+          message: data.message || (isEnglish ? "Error updating password." : "Erreur lors de la mise à jour du mot de passe.")
+        });
+      }
+    } catch (err: any) {
+      setPasswordStatus({
+        success: false,
+        message: err.message || (isEnglish ? "Server connection error." : "Erreur de connexion au serveur.")
+      });
+    } finally {
+      setPasswordLoading(false);
+    }
+  };
+
   const handleExportBackup = async () => {
     try {
       const res = await fetch("/api/admin/leads");
@@ -303,7 +348,7 @@ export default function SettingsPage() {
     <AdminLayout>
       <form onSubmit={handleSave} className="space-y-6">
         {/* ========================================================== */}
-        {/* 1. TOP HEADER STRIP (MATCHING REFERENCE IMAGE 2)           */}
+        {/* 1. TOP HEADER STRIP (MATCHING REFERENCE IMAGES)            */}
         {/* ========================================================== */}
         <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-4">
           <div>
@@ -326,10 +371,11 @@ export default function SettingsPage() {
             </span>
             <button
               type="submit"
-              className="flex items-center gap-2 px-5 py-2.5 rounded-xl bg-calve-slate hover:bg-calve-slate-dark text-white text-xs font-bold transition-all shadow-xs hover:shadow-sm cursor-pointer"
+              disabled={saving}
+              className="flex items-center gap-2 px-5 py-2.5 rounded-xl bg-calve-slate hover:bg-calve-slate-dark text-white text-xs font-bold transition-all shadow-xs hover:shadow-sm cursor-pointer disabled:opacity-50"
             >
               <Save className="w-3.5 h-3.5" />
-              <span>{t("settings.save_btn")}</span>
+              <span>{saving ? (isEnglish ? "Saving..." : "Enregistrement...") : t("settings.save_btn")}</span>
             </button>
           </div>
         </div>
@@ -337,12 +383,12 @@ export default function SettingsPage() {
         {saved && (
           <div className="p-4 rounded-2xl bg-emerald-50 border border-emerald-200 text-emerald-900 text-xs font-bold flex items-center gap-2 animate-in fade-in">
             <CheckCircle2 className="w-4 h-4 text-emerald-600 shrink-0" />
-            <span>{t("settings.saved_banner")}</span>
+            <span>{isEnglish ? "Settings & system rules successfully saved in database!" : "Paramètres et règles système enregistrés avec succès dans MySQL !"}</span>
           </div>
         )}
 
         {/* ========================================================== */}
-        {/* 2. SEGMENTED NAVIGATION TABS CAPSULE (MATCHING IMAGE 2)    */}
+        {/* 2. SEGMENTED NAVIGATION TABS CAPSULE (MATCHING REFERENCE)  */}
         {/* ========================================================== */}
         <div className="flex items-center gap-1.5 p-1.5 bg-slate-100/90 border border-slate-200/80 rounded-2xl overflow-x-auto text-xs font-semibold">
           <button
@@ -355,7 +401,7 @@ export default function SettingsPage() {
             }`}
           >
             <Building2 className="w-4 h-4 text-calve-slate" />
-            <span>{t("settings.tab.identity")}</span>
+            <span>{isEnglish ? "Identity & Agency" : "Identité & Agence"}</span>
           </button>
 
           <button
@@ -368,10 +414,8 @@ export default function SettingsPage() {
             }`}
           >
             <Percent className="w-4 h-4 text-calve-slate" />
-            <span>{t("settings.tab.rental")}</span>
+            <span>{isEnglish ? "Rental Rules & Rates" : "Règles & Tarifs"}</span>
           </button>
-
-
 
           <button
             type="button"
@@ -383,7 +427,7 @@ export default function SettingsPage() {
             }`}
           >
             <Sliders className="w-4 h-4 text-calve-slate" />
-            <span>{t("settings.tab.system")}</span>
+            <span>{isEnglish ? "System, SEO & Social" : "Système, SEO & Réseaux"}</span>
           </button>
 
           <button
@@ -396,12 +440,12 @@ export default function SettingsPage() {
             }`}
           >
             <ShieldCheck className="w-4 h-4 text-calve-slate" />
-            <span>{t("settings.tab.profile")}</span>
+            <span>{isEnglish ? "Profile & Security" : "Profil & Sécurité"}</span>
           </button>
         </div>
 
         {/* ========================================================== */}
-        {/* TAB 1: IDENTITY & AGENCY (MATCHING IMAGE 2 PRECISELY)      */}
+        {/* TAB 1: IDENTITY & AGENCY (MATCHING IMAGE 8)                */}
         {/* ========================================================== */}
         {activeTab === "identity" && (
           <div className="space-y-6 animate-in fade-in">
@@ -410,10 +454,10 @@ export default function SettingsPage() {
               <div className="flex items-center justify-between border-b border-calve-border/60 pb-4">
                 <div>
                   <h3 className="text-base font-extrabold text-calve-charcoal">
-                    {t("settings.identity.title")}
+                    {isEnglish ? "1. Agency Identity & Branding" : "1. Identité & Image de Marque de l'Agence"}
                   </h3>
                   <p className="text-xs text-calve-muted mt-0.5">
-                    {t("settings.identity.subtitle")}
+                    {isEnglish ? "Information displayed publicly on the website and mandate agreements." : "Informations affichées publiquement sur le site et les mandats."}
                   </p>
                 </div>
                 <a
@@ -421,17 +465,16 @@ export default function SettingsPage() {
                   target="_blank"
                   className="px-3.5 py-1.5 rounded-xl bg-slate-50 border border-slate-200 hover:border-calve-slate text-xs font-semibold text-calve-charcoal transition-all flex items-center gap-1.5"
                 >
-                  <span>{t("settings.identity.public_portal")}</span>
+                  <span>{isEnglish ? "Public Portal" : "Portail Public"}</span>
                   <ExternalLink className="w-3 h-3 text-calve-muted" />
                 </a>
               </div>
 
-              {/* Form Grid */}
               <div className="space-y-4">
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                   <div>
                     <label className="block text-[10px] font-bold uppercase tracking-wider text-calve-muted mb-1.5">
-                      {language === "fr" ? "NOM OFFICIEL DE L'AGENCE" : "OFFICIAL AGENCY NAME"}
+                      {isEnglish ? "OFFICIAL AGENCY NAME" : "NOM OFFICIEL DE L'AGENCE"}
                     </label>
                     <input
                       type="text"
@@ -443,7 +486,7 @@ export default function SettingsPage() {
 
                   <div>
                     <label className="block text-[10px] font-bold uppercase tracking-wider text-calve-muted mb-1.5">
-                      OFFICIAL TAGLINE / SUBTITLE
+                      {isEnglish ? "OFFICIAL TAGLINE / SUBTITLE" : "SLOGAN / SOUS-TITRE OFFICIEL"}
                     </label>
                     <input
                       type="text"
@@ -459,30 +502,24 @@ export default function SettingsPage() {
                     <label className="block text-[10px] font-bold uppercase tracking-wider text-calve-muted mb-1.5">
                       PAUL GOIZET PHONE
                     </label>
-                    <div className="relative">
-                      <Phone className="w-3.5 h-3.5 text-calve-muted absolute left-3.5 top-1/2 -translate-y-1/2" />
-                      <input
-                        type="text"
-                        value={paulPhone}
-                        onChange={(e) => setPaulPhone(e.target.value)}
-                        className="w-full pl-9 pr-3 py-2.5 rounded-xl border border-calve-border bg-white text-xs font-mono text-calve-charcoal focus:border-calve-slate shadow-2xs"
-                      />
-                    </div>
+                    <input
+                      type="text"
+                      value={paulPhone}
+                      onChange={(e) => setPaulPhone(e.target.value)}
+                      className="w-full px-4 py-2.5 rounded-xl border border-calve-border bg-white text-xs font-mono text-calve-charcoal focus:border-calve-slate shadow-2xs"
+                    />
                   </div>
 
                   <div>
                     <label className="block text-[10px] font-bold uppercase tracking-wider text-calve-muted mb-1.5">
                       EDGAR GOIZET PHONE
                     </label>
-                    <div className="relative">
-                      <Phone className="w-3.5 h-3.5 text-calve-muted absolute left-3.5 top-1/2 -translate-y-1/2" />
-                      <input
-                        type="text"
-                        value={edgarPhone}
-                        onChange={(e) => setEdgarPhone(e.target.value)}
-                        className="w-full pl-9 pr-3 py-2.5 rounded-xl border border-calve-border bg-white text-xs font-mono text-calve-charcoal focus:border-calve-slate shadow-2xs"
-                      />
-                    </div>
+                    <input
+                      type="text"
+                      value={edgarPhone}
+                      onChange={(e) => setEdgarPhone(e.target.value)}
+                      className="w-full px-4 py-2.5 rounded-xl border border-calve-border bg-white text-xs font-mono text-calve-charcoal focus:border-calve-slate shadow-2xs"
+                    />
                   </div>
 
                   <div>
@@ -585,7 +622,7 @@ export default function SettingsPage() {
         )}
 
         {/* ========================================================== */}
-        {/* TAB 2: RENTAL RULES & RATES                                */}
+        {/* TAB 2: RENTAL RULES & RATES (MATCHING IMAGE 9)             */}
         {/* ========================================================== */}
         {activeTab === "rental" && (
           <div className="space-y-6 animate-in fade-in">
@@ -593,17 +630,17 @@ export default function SettingsPage() {
             <div className="p-6 sm:p-8 rounded-3xl bg-white border border-calve-border/80 shadow-2xs space-y-5">
               <div className="border-b border-calve-border/60 pb-3">
                 <h3 className="text-base font-extrabold text-calve-charcoal">
-                  1. Grille Tarifaire Officielle (Prix en € HT)
+                  1. Official Rental Pricing (Prices excl. VAT)
                 </h3>
                 <p className="text-xs text-calve-muted mt-0.5">
-                  Tarifs affichés en direct sur le site public de Maison Calvé et les devis CRM.
+                  Rates displayed live on Maison Calvé public portal and CRM quotes.
                 </p>
               </div>
 
               <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
                 <div>
                   <label className="block text-[10px] font-bold uppercase tracking-wider text-calve-muted mb-1.5">
-                    Bureau Privatif 21 m²
+                    PRIVATE OFFICE 21 SQM
                   </label>
                   <input
                     type="text"
@@ -611,12 +648,12 @@ export default function SettingsPage() {
                     onChange={(e) => setOffice17Rate(e.target.value)}
                     className="w-full px-4 py-2.5 rounded-xl border border-calve-border text-xs font-bold text-calve-charcoal"
                   />
-                  <span className="text-[10px] text-calve-muted mt-1 block">3 à 4 postes de travail</span>
+                  <span className="text-[10px] text-calve-muted mt-1 block">3 to 4 workstations</span>
                 </div>
 
                 <div>
                   <label className="block text-[10px] font-bold uppercase tracking-wider text-calve-muted mb-1.5">
-                    Bureau privatif 28 m²
+                    PRIVATE OFFICE 28 SQM
                   </label>
                   <input
                     type="text"
@@ -624,12 +661,12 @@ export default function SettingsPage() {
                     onChange={(e) => setOffice25Rate(e.target.value)}
                     className="w-full px-4 py-2.5 rounded-xl border border-calve-border text-xs font-bold text-calve-charcoal"
                   />
-                  <span className="text-[10px] text-calve-muted mt-1 block">5 à 6 postes de travail</span>
+                  <span className="text-[10px] text-calve-muted mt-1 block">5 to 6 workstations</span>
                 </div>
 
                 <div>
                   <label className="block text-[10px] font-bold uppercase tracking-wider text-calve-muted mb-1.5">
-                    Poste Fixe Open Space
+                    DEDICATED DESK OPEN SPACE
                   </label>
                   <input
                     type="text"
@@ -637,12 +674,12 @@ export default function SettingsPage() {
                     onChange={(e) => setOpenSpaceRate(e.target.value)}
                     className="w-full px-4 py-2.5 rounded-xl border border-calve-border text-xs font-bold text-calve-charcoal"
                   />
-                  <span className="text-[10px] text-calve-muted mt-1 block">par mois par poste (5 postes/espace)</span>
+                  <span className="text-[10px] text-calve-muted mt-1 block">per month per desk (5 desks/space)</span>
                 </div>
 
                 <div>
                   <label className="block text-[10px] font-bold uppercase tracking-wider text-calve-muted mb-1.5">
-                    Poste Flexible Nomade
+                    FLEXIBLE HOT DESK
                   </label>
                   <input
                     type="text"
@@ -650,12 +687,12 @@ export default function SettingsPage() {
                     onChange={(e) => setNomadRate(e.target.value)}
                     className="w-full px-4 py-2.5 rounded-xl border border-calve-border text-xs font-bold text-calve-charcoal"
                   />
-                  <span className="text-[10px] text-calve-muted mt-1 block">sur réservation préalable</span>
+                  <span className="text-[10px] text-calve-muted mt-1 block">upon prior reservation</span>
                 </div>
 
                 <div>
                   <label className="block text-[10px] font-bold uppercase tracking-wider text-calve-muted mb-1.5">
-                    Grande Salle de Réunion 30 m²
+                    EXECUTIVE MEETING ROOM 30 SQM
                   </label>
                   <input
                     type="text"
@@ -663,12 +700,12 @@ export default function SettingsPage() {
                     onChange={(e) => setMeetingRate(e.target.value)}
                     className="w-full px-4 py-2.5 rounded-xl border border-calve-border text-xs font-bold text-calve-charcoal"
                   />
-                  <span className="text-[10px] text-calve-muted mt-1 block">avec écran 4K &amp; café barista inclus</span>
+                  <span className="text-[10px] text-calve-muted mt-1 block">with 4K screen &amp; barista coffee included</span>
                 </div>
 
                 <div>
                   <label className="block text-[10px] font-bold uppercase tracking-wider text-calve-muted mb-1.5">
-                    Taux de TVA Standard
+                    STANDARD VAT RATE
                   </label>
                   <input
                     type="text"
@@ -676,23 +713,23 @@ export default function SettingsPage() {
                     onChange={(e) => setVatRate(e.target.value)}
                     className="w-full px-4 py-2.5 rounded-xl border border-calve-border text-xs font-bold text-calve-charcoal"
                   />
-                  <span className="text-[10px] text-calve-muted mt-1 block">applicable aux prestations de service</span>
+                  <span className="text-[10px] text-calve-muted mt-1 block">applicable to corporate service contracts</span>
                 </div>
               </div>
             </div>
 
-            {/* Card 2: Lease Conditions & Rules */}
+            {/* Card 2: Lease Conditions & Resident Policies */}
             <div className="p-6 sm:p-8 rounded-3xl bg-white border border-calve-border/80 shadow-2xs space-y-5">
               <div className="border-b border-calve-border/60 pb-3">
                 <h3 className="text-base font-extrabold text-calve-charcoal">
-                  2. Conditions de Bail &amp; Politiques Résidents
+                  2. Lease Conditions &amp; Resident Policies
                 </h3>
               </div>
 
               <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
                 <div>
                   <label className="block text-[10px] font-bold uppercase tracking-wider text-calve-muted mb-1.5">
-                    DÉPÔT DE GARANTIE
+                    SECURITY DEPOSIT
                   </label>
                   <input
                     type="text"
@@ -704,7 +741,7 @@ export default function SettingsPage() {
 
                 <div>
                   <label className="block text-[10px] font-bold uppercase tracking-wider text-calve-muted mb-1.5">
-                    PRÉAVIS DE SORTIE
+                    NOTICE PERIOD
                   </label>
                   <input
                     type="text"
@@ -716,7 +753,7 @@ export default function SettingsPage() {
 
                 <div>
                   <label className="block text-[10px] font-bold uppercase tracking-wider text-calve-muted mb-1.5">
-                    PARKING EN COUR FERMÉE
+                    SECURE COURTYARD PARKING
                   </label>
                   <input
                     type="text"
@@ -731,23 +768,21 @@ export default function SettingsPage() {
         )}
 
         {/* ========================================================== */}
-        {/* ========================================================== */}
-        {/* TAB 3: SYSTEM, SEO & SOCIAL                                */}
-        {/* ========================================================== */}
+        {/* TAB 3: SYSTEM, SEO & SOCIAL (MATCHING IMAGE 10)            */}
         {/* ========================================================== */}
         {activeTab === "system" && (
           <div className="space-y-6 animate-in fade-in">
             <div className="p-6 sm:p-8 rounded-3xl bg-white border border-calve-border/80 shadow-2xs space-y-5">
               <div className="border-b border-calve-border/60 pb-3">
                 <h3 className="text-base font-extrabold text-calve-charcoal">
-                  1. Référencement Naturel (SEO) &amp; Canaux Sociaux
+                  1. Search Engine Optimization (SEO) &amp; Social Channels
                 </h3>
               </div>
 
               <div className="space-y-4">
                 <div>
                   <label className="block text-[10px] font-bold uppercase tracking-wider text-calve-muted mb-1.5">
-                    META TITLE PRINCIPAL DU SITE
+                    PRIMARY WEBSITE META TITLE
                   </label>
                   <input
                     type="text"
@@ -760,7 +795,7 @@ export default function SettingsPage() {
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                   <div>
                     <label className="block text-[10px] font-bold uppercase tracking-wider text-calve-muted mb-1.5">
-                      COMPTE INSTAGRAM OFFICIEL
+                      OFFICIAL INSTAGRAM HANDLE
                     </label>
                     <div className="relative">
                       <Share2 className="w-3.5 h-3.5 text-calve-muted absolute left-3.5 top-1/2 -translate-y-1/2" />
@@ -775,7 +810,7 @@ export default function SettingsPage() {
 
                   <div>
                     <label className="block text-[10px] font-bold uppercase tracking-wider text-calve-muted mb-1.5">
-                      COORDONNÉES GÉOGRAPHIQUES (BORDEAUX FONDAUDÈGE)
+                      GEOGRAPHICAL COORDINATES (BORDEAUX FONDAUDÈGE)
                     </label>
                     <div className="relative">
                       <MapPin className="w-3.5 h-3.5 text-calve-muted absolute left-3.5 top-1/2 -translate-y-1/2" />
@@ -791,7 +826,7 @@ export default function SettingsPage() {
 
                 <div>
                   <label className="block text-[10px] font-bold uppercase tracking-wider text-calve-muted mb-1.5">
-                    EMAIL DISPATCHER DES ALERTES LEADS &amp; VISITES
+                    LEAD &amp; TOUR ALERTS DISPATCHER EMAIL
                   </label>
                   <div className="relative">
                     <Mail className="w-3.5 h-3.5 text-calve-muted absolute left-3.5 top-1/2 -translate-y-1/2" />
@@ -809,11 +844,11 @@ export default function SettingsPage() {
         )}
 
         {/* ========================================================== */}
-        {/* TAB 4: PROFILE & SECURITY                                  */}
+        {/* TAB 4: PROFILE & SECURITY (MATCHING IMAGE 5)               */}
         {/* ========================================================== */}
         {activeTab === "profile" && (
           <div className="space-y-6 animate-in fade-in">
-            {/* Card 1: Administrator Account & Cryptographic Security (Matching Image 5) */}
+            {/* Card 1: Administrator Account & Cryptographic Security */}
             <div className="p-6 sm:p-8 rounded-3xl bg-white border border-calve-border/80 shadow-2xs space-y-5">
               <div className="border-b border-calve-border/60 pb-3">
                 <h3 className="text-base font-extrabold text-calve-charcoal">
@@ -867,7 +902,7 @@ export default function SettingsPage() {
             <div className="p-6 sm:p-8 rounded-3xl bg-white border border-calve-border/80 shadow-2xs space-y-5">
               <div className="border-b border-calve-border/60 pb-3">
                 <div className="flex items-center gap-2">
-                  <Key className="w-4 h-4 text-calve-slate" />
+                  <KeyRound className="w-4 h-4 text-calve-slate" />
                   <h3 className="text-base font-extrabold text-calve-charcoal">
                     2. Change Administrator Password
                   </h3>
@@ -877,20 +912,20 @@ export default function SettingsPage() {
                 </p>
               </div>
 
-              {passwordMessage && (
+              {passwordStatus && (
                 <div
                   className={`p-4 rounded-2xl text-xs font-semibold flex items-center gap-2 animate-in fade-in ${
-                    passwordMessage.type === "success"
+                    passwordStatus.success
                       ? "bg-emerald-50 border border-emerald-200 text-emerald-900"
                       : "bg-rose-50 border border-rose-200 text-rose-900"
                   }`}
                 >
-                  {passwordMessage.type === "success" ? (
+                  {passwordStatus.success ? (
                     <CheckCircle2 className="w-4 h-4 text-emerald-600 shrink-0" />
                   ) : (
                     <AlertCircle className="w-4 h-4 text-rose-600 shrink-0" />
                   )}
-                  <span>{passwordMessage.text}</span>
+                  <span>{passwordStatus.message}</span>
                 </div>
               )}
 
@@ -911,6 +946,7 @@ export default function SettingsPage() {
                       type="button"
                       onClick={() => setShowCurrentPass(!showCurrentPass)}
                       className="absolute right-3 top-1/2 -translate-y-1/2 text-calve-muted hover:text-calve-charcoal cursor-pointer p-1"
+                      title={showCurrentPass ? "Hide password" : "Show password"}
                     >
                       {showCurrentPass ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
                     </button>
@@ -934,6 +970,7 @@ export default function SettingsPage() {
                         type="button"
                         onClick={() => setShowNewPass(!showNewPass)}
                         className="absolute right-3 top-1/2 -translate-y-1/2 text-calve-muted hover:text-calve-charcoal cursor-pointer p-1"
+                        title={showNewPass ? "Hide password" : "Show password"}
                       >
                         {showNewPass ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
                       </button>
@@ -950,8 +987,8 @@ export default function SettingsPage() {
                     <div className="relative">
                       <input
                         type={showConfirmPass ? "text" : "password"}
-                        value={confirmNewPassword}
-                        onChange={(e) => setConfirmNewPassword(e.target.value)}
+                        value={confirmPassword}
+                        onChange={(e) => setConfirmPassword(e.target.value)}
                         placeholder="••••••••••••"
                         className="w-full px-4 py-2.5 pr-10 rounded-xl border border-calve-border bg-white text-xs font-mono text-calve-charcoal focus:border-calve-slate shadow-2xs"
                       />
@@ -959,6 +996,7 @@ export default function SettingsPage() {
                         type="button"
                         onClick={() => setShowConfirmPass(!showConfirmPass)}
                         className="absolute right-3 top-1/2 -translate-y-1/2 text-calve-muted hover:text-calve-charcoal cursor-pointer p-1"
+                        title={showConfirmPass ? "Hide password" : "Show password"}
                       >
                         {showConfirmPass ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
                       </button>
@@ -969,12 +1007,12 @@ export default function SettingsPage() {
                 <div className="pt-2">
                   <button
                     type="button"
-                    onClick={handleUpdatePassword}
-                    disabled={passwordUpdating}
+                    onClick={() => handleUpdatePassword()}
+                    disabled={passwordLoading || !currentPassword || !newPassword || !confirmPassword}
                     className="flex items-center gap-2 px-5 py-2.5 rounded-xl bg-calve-slate hover:bg-calve-slate-dark text-white text-xs font-bold transition-all shadow-xs disabled:opacity-50 cursor-pointer"
                   >
-                    <Key className="w-3.5 h-3.5" />
-                    <span>{passwordUpdating ? "Mise à jour..." : "Update Password"}</span>
+                    <KeyRound className={`w-3.5 h-3.5 ${passwordLoading ? "animate-spin" : ""}`} />
+                    <span>{passwordLoading ? (isEnglish ? "Updating..." : "Mise à jour...") : (isEnglish ? "Update Password" : "Mettre à jour le mot de passe")}</span>
                   </button>
                 </div>
               </div>
@@ -985,10 +1023,10 @@ export default function SettingsPage() {
               <div className="border-b border-calve-border/60 pb-3 flex items-center justify-between">
                 <div>
                   <h3 className="text-base font-extrabold text-calve-charcoal">
-                    3. Sauvegarde &amp; Export JSON de la Base CRM
+                    {isEnglish ? "3. Database JSON Backup & Export" : "3. Sauvegarde & Export JSON de la Base CRM"}
                   </h3>
                   <p className="text-xs text-calve-muted mt-0.5">
-                    Téléchargez un instantané complet de tous les leads, baux, et visites privées.
+                    {isEnglish ? "Download a full JSON snapshot of all leads, leases, and private tours." : "Téléchargez un instantané complet de tous les leads, baux, et visites privées."}
                   </p>
                 </div>
               </div>
@@ -1000,12 +1038,12 @@ export default function SettingsPage() {
                   className="flex items-center gap-2 px-5 py-2.5 rounded-xl bg-slate-100 hover:bg-slate-200 text-xs font-bold text-calve-charcoal transition-all cursor-pointer shadow-2xs"
                 >
                   <Download className="w-4 h-4 text-calve-slate" />
-                  <span>Télécharger Sauvegarde (.json)</span>
+                  <span>{isEnglish ? "Download Backup (.json)" : "Télécharger Sauvegarde (.json)"}</span>
                 </button>
               </div>
             </div>
 
-            {/* Card 4: Passerelle OVH MySQL & Diagnostics */}
+            {/* Card 4: Passerelle Base de Données OVH Cloud (MySQL v8.4) */}
             <div className="p-6 sm:p-8 rounded-3xl bg-white border border-calve-border/80 shadow-2xs space-y-5">
               <div className="flex flex-col sm:flex-row sm:items-center justify-between pb-3 border-b border-calve-border/60 gap-4">
                 <div>
@@ -1098,7 +1136,7 @@ export default function SettingsPage() {
             </div>
           </div>
         )}
-</form>
+      </form>
     </AdminLayout>
   );
 }

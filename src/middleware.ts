@@ -1,10 +1,12 @@
 import { NextResponse } from "next/server";
 import type { NextRequest } from "next/server";
+import { verifySession, SESSION_COOKIE_NAME } from "@/lib/session";
 
-export function middleware(request: NextRequest) {
+export async function middleware(request: NextRequest) {
   const { pathname } = request.nextUrl;
-  const sessionCookie = request.cookies.get("mc_admin_session");
-  const isAuthenticated = sessionCookie?.value === "mc_session_authorized_2026";
+  const sessionCookie = request.cookies.get(SESSION_COOKIE_NAME);
+  const authResult = await verifySession(sessionCookie?.value);
+  const isAuthenticated = authResult.valid;
 
   // 1. Redirections for legacy or alternate admin paths
   if (pathname === "/admin/crm" || pathname === "/admin/leads") {
@@ -19,13 +21,23 @@ export function middleware(request: NextRequest) {
     if (!isAuthenticated) {
       const loginUrl = new URL("/admin/login", request.url);
       loginUrl.searchParams.set("redirect", pathname);
-      return NextResponse.redirect(loginUrl);
+      const res = NextResponse.redirect(loginUrl);
+      if (sessionCookie) {
+        res.cookies.set(SESSION_COOKIE_NAME, "", {
+          path: "/",
+          maxAge: 0,
+          expires: new Date(0),
+          httpOnly: true,
+          sameSite: "lax"
+        });
+      }
+      return res;
     }
   }
 
-  // 3. If already authenticated and trying to access /admin/login, redirect to /admin
+  // 3. If already authenticated and trying to access /admin/login, redirect to /admin/pipeline
   if (pathname === "/admin/login" && isAuthenticated) {
-    const redirectParam = request.nextUrl.searchParams.get("redirect") || "/admin";
+    const redirectParam = request.nextUrl.searchParams.get("redirect") || "/admin/pipeline";
     return NextResponse.redirect(new URL(redirectParam, request.url));
   }
 
