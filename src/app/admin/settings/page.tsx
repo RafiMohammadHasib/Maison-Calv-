@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import AdminLayout from "@/components/admin/AdminLayout";
 import { useLanguage } from "@/lib/languageContext";
 import {
@@ -18,6 +18,9 @@ import {
   FileText,
   Download,
   Lock,
+  Key,
+  Eye,
+  EyeOff,
   Globe,
   Share2,
   Sparkles,
@@ -69,8 +72,122 @@ export default function SettingsPage() {
       setOvhSyncing(false);
     }
   };
+  const [loading, setLoading] = useState(true);
+  const [saving, setSaving] = useState(false);
   const [saved, setSaved] = useState(false);
+  const [syncedWithOvh, setSyncedWithOvh] = useState(false);
   const [lastSyncTime, setLastSyncTime] = useState("03:00 PM");
+
+  // Password state
+  const [currentPassword, setCurrentPassword] = useState("");
+  const [newPassword, setNewPassword] = useState("");
+  const [confirmNewPassword, setConfirmNewPassword] = useState("");
+  const [showCurrentPass, setShowCurrentPass] = useState(false);
+  const [showNewPass, setShowNewPass] = useState(false);
+  const [showConfirmPass, setShowConfirmPass] = useState(false);
+  const [passwordUpdating, setPasswordUpdating] = useState(false);
+  const [passwordMessage, setPasswordMessage] = useState<{ type: "success" | "error"; text: string } | null>(null);
+
+  const fetchAllSettings = async () => {
+    try {
+      setLoading(true);
+      const res = await fetch("/api/admin/settings");
+      const data = await res.json();
+      if (data.success && data.settings) {
+        const s = data.settings;
+        if (s.settings_identity) {
+          const id = s.settings_identity;
+          if (id.agencyName) setAgencyName(id.agencyName);
+          if (id.tagline) setTagline(id.tagline);
+          if (id.paulPhone) setPaulPhone(id.paulPhone);
+          if (id.edgarPhone) setEdgarPhone(id.edgarPhone);
+          if (id.agencyEmail) setAgencyEmail(id.agencyEmail);
+          if (id.officeAddress) setOfficeAddress(id.officeAddress);
+          if (id.officeHours) setOfficeHours(id.officeHours);
+          if (id.siret) setSiret(id.siret);
+          if (id.licenseCPI) setLicenseCPI(id.licenseCPI);
+          if (id.guarantee) setGuarantee(id.guarantee);
+        }
+        if (s.settings_rental) {
+          const r = s.settings_rental;
+          if (r.office17Rate) setOffice17Rate(r.office17Rate);
+          if (r.office25Rate) setOffice25Rate(r.office25Rate);
+          if (r.openSpaceRate) setOpenSpaceRate(r.openSpaceRate);
+          if (r.nomadRate) setNomadRate(r.nomadRate);
+          if (r.meetingRate) setMeetingRate(r.meetingRate);
+          if (r.vatRate) setVatRate(r.vatRate);
+          if (r.depositRule) setDepositRule(r.depositRule);
+          if (r.noticePeriod) setNoticePeriod(r.noticePeriod);
+          if (r.parkingPolicy) setParkingPolicy(r.parkingPolicy);
+        }
+        if (s.settings_system) {
+          const sys = s.settings_system;
+          if (sys.metaTitle) setMetaTitle(sys.metaTitle);
+          if (sys.instagramAccount) setInstagramAccount(sys.instagramAccount);
+          if (sys.gpsCoordinates) setGpsCoordinates(sys.gpsCoordinates);
+          if (sys.leadDispatcherEmail) setLeadDispatcherEmail(sys.leadDispatcherEmail);
+        }
+        if (s.settings_profile) {
+          const p = s.settings_profile;
+          if (p.adminName) setAdminName(p.adminName);
+          if (p.adminEmail) setAdminEmail(p.adminEmail);
+        }
+        if (data.source === "ovh_mysql") {
+          setSyncedWithOvh(true);
+        }
+        if (data.timestamp) {
+          const d = new Date(data.timestamp);
+          setLastSyncTime(d.toLocaleTimeString("en-US", { hour: "2-digit", minute: "2-digit" }));
+        }
+      }
+    } catch (err) {
+      console.error("Error fetching settings:", err);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    fetchAllSettings();
+  }, []);
+
+  const handleUpdatePassword = async () => {
+    setPasswordMessage(null);
+    if (!currentPassword) {
+      setPasswordMessage({ type: "error", text: "Veuillez saisir votre mot de passe actuel." });
+      return;
+    }
+    if (!newPassword || newPassword.length < 6) {
+      setPasswordMessage({ type: "error", text: "Le nouveau mot de passe doit comporter au moins 6 caractères." });
+      return;
+    }
+    if (newPassword !== confirmNewPassword) {
+      setPasswordMessage({ type: "error", text: "Les deux nouveaux mots de passe ne correspondent pas." });
+      return;
+    }
+
+    try {
+      setPasswordUpdating(true);
+      const res = await fetch("/api/admin/auth", {
+        method: "PATCH",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ currentPassword, newPassword })
+      });
+      const data = await res.json();
+      if (data.success) {
+        setPasswordMessage({ type: "success", text: "Mot de passe mis à jour avec succès dans MySQL !" });
+        setCurrentPassword("");
+        setNewPassword("");
+        setConfirmNewPassword("");
+      } else {
+        setPasswordMessage({ type: "error", text: data.message || "Erreur lors de la mise à jour du mot de passe." });
+      }
+    } catch (err: any) {
+      setPasswordMessage({ type: "error", text: err.message || "Erreur de connexion au serveur." });
+    } finally {
+      setPasswordUpdating(false);
+    }
+  };
 
   // Form State: 1. Identity & Agency
   const [agencyName, setAgencyName] = useState("MAISON CALVÉ");
@@ -107,12 +224,64 @@ export default function SettingsPage() {
   const [adminName, setAdminName] = useState("Paul (Directeur d'exploitation)");
   const [adminEmail, setAdminEmail] = useState("admin@maisoncalve.fr");
 
-  const handleSave = (e: React.FormEvent) => {
+  const handleSave = async (e: React.FormEvent) => {
     e.preventDefault();
-    const now = new Date().toLocaleTimeString("en-US", { hour: "2-digit", minute: "2-digit" });
-    setLastSyncTime(now);
-    setSaved(true);
-    setTimeout(() => setSaved(false), 3000);
+    try {
+      setSaving(true);
+      const res = await fetch("/api/admin/settings", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          settings: {
+            settings_identity: {
+              agencyName,
+              tagline,
+              paulPhone,
+              edgarPhone,
+              agencyEmail,
+              officeAddress,
+              officeHours,
+              siret,
+              licenseCPI,
+              guarantee
+            },
+            settings_rental: {
+              office17Rate,
+              office25Rate,
+              openSpaceRate,
+              nomadRate,
+              meetingRate,
+              vatRate,
+              depositRule,
+              noticePeriod,
+              parkingPolicy
+            },
+            settings_system: {
+              metaTitle,
+              instagramAccount,
+              gpsCoordinates,
+              leadDispatcherEmail
+            },
+            settings_profile: {
+              adminName,
+              adminEmail
+            }
+          }
+        })
+      });
+      const data = await res.json();
+      if (data.success) {
+        setSaved(true);
+        setSyncedWithOvh(Boolean(data.syncedWithOvh));
+        const now = new Date().toLocaleTimeString("en-US", { hour: "2-digit", minute: "2-digit" });
+        setLastSyncTime(now);
+        setTimeout(() => setSaved(false), 4000);
+      }
+    } catch (err) {
+      console.error("Error saving settings:", err);
+    } finally {
+      setSaving(false);
+    }
   };
 
   const handleExportBackup = async () => {
@@ -202,18 +371,7 @@ export default function SettingsPage() {
             <span>{t("settings.tab.rental")}</span>
           </button>
 
-          <button
-            type="button"
-            onClick={() => setActiveTab("database")}
-            className={`flex items-center gap-2 px-4 py-2 rounded-xl transition-all cursor-pointer whitespace-nowrap ${
-              activeTab === "database"
-                ? "bg-white text-calve-charcoal shadow-2xs font-bold"
-                : "text-calve-muted hover:text-calve-charcoal"
-            }`}
-          >
-            <Database className="w-4 h-4 text-calve-slate" />
-            <span>Base MySQL OVH</span>
-          </button>
+
 
           <button
             type="button"
@@ -574,174 +732,6 @@ export default function SettingsPage() {
 
         {/* ========================================================== */}
         {/* ========================================================== */}
-        {/* TAB: BASE DE DONNÉES OVH MYSQL (DATA BRIDGE)               */}
-        {/* ========================================================== */}
-        {activeTab === "database" && (
-          <div className="space-y-6 animate-in fade-in">
-            <div className="p-6 sm:p-8 rounded-3xl bg-white border border-calve-border/80 shadow-2xs space-y-6">
-              <div className="flex flex-col sm:flex-row sm:items-center justify-between pb-4 border-b border-calve-border/60 gap-4">
-                <div>
-                  <div className="flex items-center gap-2">
-                    <Database className="w-5 h-5 text-calve-slate" />
-                    <h3 className="text-base font-extrabold text-calve-charcoal">
-                      Passerelle Base de Données OVH Cloud (MySQL v8.4)
-                    </h3>
-                  </div>
-                  <p className="text-xs text-calve-muted mt-0.5">
-                    Synchronisation permanente des prospects, réservations et données Maison Calvé sur votre base OVH dédiée.
-                  </p>
-                </div>
-
-                <div className="flex items-center gap-2">
-                  {ovhStatus?.success || ovhStatus?.status === "healthy" ? (
-                    <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-emerald-50 text-emerald-700 border border-emerald-200 text-xs font-bold">
-                      <span className="w-2 h-2 rounded-full bg-emerald-500"></span>
-                      Connecté &amp; Opérationnel
-                    </span>
-                  ) : ovhStatus?.error ? (
-                    <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-rose-50 text-rose-700 border border-rose-200 text-xs font-bold">
-                      <AlertCircle className="w-3.5 h-3.5 text-rose-500" />
-                      Échec de connexion
-                    </span>
-                  ) : (
-                    <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-slate-100 text-slate-600 border border-slate-200 text-xs font-semibold">
-                      <Server className="w-3.5 h-3.5 text-slate-500" />
-                      Prêt pour le test
-                    </span>
-                  )}
-                </div>
-              </div>
-
-              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-                <div className="p-4 rounded-2xl bg-slate-50 border border-slate-200/80">
-                  <div className="text-[10px] font-bold uppercase tracking-wider text-calve-muted mb-1">
-                    Hôte MySQL OVH
-                  </div>
-                  <div className="text-xs font-mono font-bold text-calve-charcoal">
-                    uwenyoimaison.mysql.db
-                  </div>
-                </div>
-
-                <div className="p-4 rounded-2xl bg-slate-50 border border-slate-200/80">
-                  <div className="text-[10px] font-bold uppercase tracking-wider text-calve-muted mb-1">
-                    Nom de la Base
-                  </div>
-                  <div className="text-xs font-mono font-bold text-calve-charcoal">
-                    uwenyoimaison
-                  </div>
-                </div>
-
-                <div className="p-4 rounded-2xl bg-slate-50 border border-slate-200/80">
-                  <div className="text-[10px] font-bold uppercase tracking-wider text-calve-muted mb-1">
-                    Utilisateur MySQL
-                  </div>
-                  <div className="text-xs font-mono font-bold text-calve-charcoal">
-                    uwenyoimaison
-                  </div>
-                </div>
-
-                <div className="p-4 rounded-2xl bg-slate-50 border border-slate-200/80">
-                  <div className="text-[10px] font-bold uppercase tracking-wider text-calve-muted mb-1">
-                    Dossier d&apos;hébergement
-                  </div>
-                  <div className="text-xs font-mono font-bold text-calve-charcoal">
-                    www/maison-api/
-                  </div>
-                </div>
-              </div>
-
-              <div className="space-y-3">
-                <div>
-                  <label className="block text-[10px] font-bold uppercase tracking-wider text-calve-muted mb-1">
-                    URL Passerelle REST API (Next.js &rarr; OVH PHP)
-                  </label>
-                  <div className="p-3 rounded-xl bg-slate-900 text-sky-400 font-mono text-xs break-all border border-slate-800">
-                    https://uwenyoi.cluster131.hosting.ovh.net/maison-api/index.php
-                  </div>
-                </div>
-
-                <div>
-                  <label className="block text-[10px] font-bold uppercase tracking-wider text-calve-muted mb-1">
-                    Clé Secrète de Sécurité (Header X-API-KEY)
-                  </label>
-                  <div className="p-3 rounded-xl bg-slate-900 text-emerald-400 font-mono text-xs break-all border border-slate-800">
-                    mc_sec_ovh_uwenyoimaison_2026
-                  </div>
-                </div>
-              </div>
-
-              {ovhStatus && (
-                <div
-                  className={`p-4 rounded-2xl text-xs font-medium border ${
-                    ovhStatus.success || ovhStatus.status === "healthy"
-                      ? "bg-emerald-50 border-emerald-200 text-emerald-900"
-                      : "bg-rose-50 border-rose-200 text-rose-900"
-                  }`}
-                >
-                  <div className="font-bold flex items-center gap-1.5 mb-1">
-                    {ovhStatus.success || ovhStatus.status === "healthy" ? (
-                      <CheckCircle2 className="w-4 h-4 text-emerald-600" />
-                    ) : (
-                      <AlertCircle className="w-4 h-4 text-rose-600" />
-                    )}
-                    <span>
-                      {ovhStatus.success || ovhStatus.status === "healthy"
-                        ? "Communication avec OVH MySQL réussie !"
-                        : "Erreur lors du contact avec la passerelle OVH"}
-                    </span>
-                  </div>
-                  <p>
-                    {ovhStatus.message || ovhStatus.error || JSON.stringify(ovhStatus)}
-                  </p>
-                  {ovhStatus.total_leads !== undefined && (
-                    <div className="mt-2 font-mono text-[11px] text-emerald-800">
-                      Total leads dans OVH MySQL : <strong>{ovhStatus.total_leads}</strong> | PHP : {ovhStatus.php_version}
-                    </div>
-                  )}
-                  {ovhStatus.syncedCount !== undefined && (
-                    <div className="mt-2 font-mono text-[11px] text-emerald-800">
-                      Leads synchronisés avec succès : <strong>{ovhStatus.syncedCount}</strong>
-                    </div>
-                  )}
-                </div>
-              )}
-
-              <div className="flex flex-wrap items-center gap-3 pt-2">
-                <button
-                  type="button"
-                  onClick={handleTestOvh}
-                  disabled={ovhTesting}
-                  className="flex items-center gap-2 px-5 py-2.5 rounded-xl bg-calve-slate hover:bg-calve-slate-dark text-white text-xs font-bold transition-all cursor-pointer shadow-xs disabled:opacity-50"
-                >
-                  <RefreshCw className={`w-3.5 h-3.5 ${ovhTesting ? "animate-spin" : ""}`} />
-                  <span>{ovhTesting ? "Test en cours..." : "Tester la Connexion OVH"}</span>
-                </button>
-
-                <button
-                  type="button"
-                  onClick={handleSyncAllOvh}
-                  disabled={ovhSyncing}
-                  className="flex items-center gap-2 px-5 py-2.5 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-bold transition-all cursor-pointer shadow-xs disabled:opacity-50"
-                >
-                  <Database className={`w-3.5 h-3.5 ${ovhSyncing ? "animate-spin" : ""}`} />
-                  <span>{ovhSyncing ? "Synchronisation..." : "Migrer tous les Leads vers OVH"}</span>
-                </button>
-
-                <a
-                  href="https://uwenyoi.cluster131.hosting.ovh.net/maison-api/test.php"
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="flex items-center gap-1.5 px-4 py-2.5 rounded-xl bg-slate-100 hover:bg-slate-200 text-calve-charcoal text-xs font-semibold transition-all border border-slate-200/80"
-                >
-                  <span>Ouvrir le Diagnostic OVH (test.php)</span>
-                  <ExternalLink className="w-3.5 h-3.5 text-calve-muted" />
-                </a>
-              </div>
-            </div>
-          </div>
-        )}
-
-        {/* ========================================================== */}
         {/* TAB 3: SYSTEM, SEO & SOCIAL                                */}
         {/* ========================================================== */}
         {/* ========================================================== */}
@@ -823,17 +813,18 @@ export default function SettingsPage() {
         {/* ========================================================== */}
         {activeTab === "profile" && (
           <div className="space-y-6 animate-in fade-in">
+            {/* Card 1: Administrator Account & Cryptographic Security (Matching Image 5) */}
             <div className="p-6 sm:p-8 rounded-3xl bg-white border border-calve-border/80 shadow-2xs space-y-5">
               <div className="border-b border-calve-border/60 pb-3">
                 <h3 className="text-base font-extrabold text-calve-charcoal">
-                  1. Compte Administrateur &amp; Chiffrement Sécurisé
+                  1. Administrator Account &amp; Cryptographic Security
                 </h3>
               </div>
 
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                 <div>
                   <label className="block text-[10px] font-bold uppercase tracking-wider text-calve-muted mb-1.5">
-                    NOM DE L&apos;ADMINISTRATEUR
+                    ADMINISTRATOR FULL NAME
                   </label>
                   <input
                     type="text"
@@ -845,7 +836,7 @@ export default function SettingsPage() {
 
                 <div>
                   <label className="block text-[10px] font-bold uppercase tracking-wider text-calve-muted mb-1.5">
-                    EMAIL D&apos;AUTHENTIFICATION
+                    AUTHENTICATION EMAIL
                   </label>
                   <input
                     type="email"
@@ -860,24 +851,141 @@ export default function SettingsPage() {
                 <div>
                   <div className="font-bold text-xs text-calve-charcoal flex items-center gap-1.5">
                     <Lock className="w-3.5 h-3.5 text-emerald-600" />
-                    <span>Sécurité des sessions &amp; jetons d&apos;accès</span>
+                    <span>Session security &amp; access token revocation</span>
                   </div>
                   <p className="text-[11px] text-calve-muted mt-0.5">
-                    Sessions protégées avec signature sécurisée et jeton HttpOnly contre les attaques XSS.
+                    HMAC-SHA256 signed tokens with HttpOnly cookies preventing XSS and replay exploits.
                   </p>
                 </div>
                 <span className="px-3 py-1 rounded-full bg-emerald-100 text-emerald-800 text-[10px] font-bold shrink-0">
-                  Actif &amp; Protégé
+                  Active &amp; Protected
                 </span>
               </div>
             </div>
 
-            {/* Backup Card */}
+            {/* Card 2: Change Administrator Password (Matching Image 5) */}
+            <div className="p-6 sm:p-8 rounded-3xl bg-white border border-calve-border/80 shadow-2xs space-y-5">
+              <div className="border-b border-calve-border/60 pb-3">
+                <div className="flex items-center gap-2">
+                  <Key className="w-4 h-4 text-calve-slate" />
+                  <h3 className="text-base font-extrabold text-calve-charcoal">
+                    2. Change Administrator Password
+                  </h3>
+                </div>
+                <p className="text-xs text-calve-muted mt-0.5">
+                  Update your access credentials for the Maison Calvé admin management portal.
+                </p>
+              </div>
+
+              {passwordMessage && (
+                <div
+                  className={`p-4 rounded-2xl text-xs font-semibold flex items-center gap-2 animate-in fade-in ${
+                    passwordMessage.type === "success"
+                      ? "bg-emerald-50 border border-emerald-200 text-emerald-900"
+                      : "bg-rose-50 border border-rose-200 text-rose-900"
+                  }`}
+                >
+                  {passwordMessage.type === "success" ? (
+                    <CheckCircle2 className="w-4 h-4 text-emerald-600 shrink-0" />
+                  ) : (
+                    <AlertCircle className="w-4 h-4 text-rose-600 shrink-0" />
+                  )}
+                  <span>{passwordMessage.text}</span>
+                </div>
+              )}
+
+              <div className="space-y-4">
+                <div>
+                  <label className="block text-[10px] font-bold uppercase tracking-wider text-calve-muted mb-1.5">
+                    CURRENT PASSWORD *
+                  </label>
+                  <div className="relative">
+                    <input
+                      type={showCurrentPass ? "text" : "password"}
+                      value={currentPassword}
+                      onChange={(e) => setCurrentPassword(e.target.value)}
+                      placeholder="••••••••••••"
+                      className="w-full px-4 py-2.5 pr-10 rounded-xl border border-calve-border bg-white text-xs font-mono text-calve-charcoal focus:border-calve-slate shadow-2xs"
+                    />
+                    <button
+                      type="button"
+                      onClick={() => setShowCurrentPass(!showCurrentPass)}
+                      className="absolute right-3 top-1/2 -translate-y-1/2 text-calve-muted hover:text-calve-charcoal cursor-pointer p-1"
+                    >
+                      {showCurrentPass ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
+                    </button>
+                  </div>
+                </div>
+
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                  <div>
+                    <label className="block text-[10px] font-bold uppercase tracking-wider text-calve-muted mb-1.5">
+                      NEW PASSWORD *
+                    </label>
+                    <div className="relative">
+                      <input
+                        type={showNewPass ? "text" : "password"}
+                        value={newPassword}
+                        onChange={(e) => setNewPassword(e.target.value)}
+                        placeholder="••••••••••••"
+                        className="w-full px-4 py-2.5 pr-10 rounded-xl border border-calve-border bg-white text-xs font-mono text-calve-charcoal focus:border-calve-slate shadow-2xs"
+                      />
+                      <button
+                        type="button"
+                        onClick={() => setShowNewPass(!showNewPass)}
+                        className="absolute right-3 top-1/2 -translate-y-1/2 text-calve-muted hover:text-calve-charcoal cursor-pointer p-1"
+                      >
+                        {showNewPass ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
+                      </button>
+                    </div>
+                    <span className="text-[10px] text-calve-muted mt-1 block">
+                      Password must be at least 6 characters.
+                    </span>
+                  </div>
+
+                  <div>
+                    <label className="block text-[10px] font-bold uppercase tracking-wider text-calve-muted mb-1.5">
+                      CONFIRM NEW PASSWORD *
+                    </label>
+                    <div className="relative">
+                      <input
+                        type={showConfirmPass ? "text" : "password"}
+                        value={confirmNewPassword}
+                        onChange={(e) => setConfirmNewPassword(e.target.value)}
+                        placeholder="••••••••••••"
+                        className="w-full px-4 py-2.5 pr-10 rounded-xl border border-calve-border bg-white text-xs font-mono text-calve-charcoal focus:border-calve-slate shadow-2xs"
+                      />
+                      <button
+                        type="button"
+                        onClick={() => setShowConfirmPass(!showConfirmPass)}
+                        className="absolute right-3 top-1/2 -translate-y-1/2 text-calve-muted hover:text-calve-charcoal cursor-pointer p-1"
+                      >
+                        {showConfirmPass ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
+                      </button>
+                    </div>
+                  </div>
+                </div>
+
+                <div className="pt-2">
+                  <button
+                    type="button"
+                    onClick={handleUpdatePassword}
+                    disabled={passwordUpdating}
+                    className="flex items-center gap-2 px-5 py-2.5 rounded-xl bg-calve-slate hover:bg-calve-slate-dark text-white text-xs font-bold transition-all shadow-xs disabled:opacity-50 cursor-pointer"
+                  >
+                    <Key className="w-3.5 h-3.5" />
+                    <span>{passwordUpdating ? "Mise à jour..." : "Update Password"}</span>
+                  </button>
+                </div>
+              </div>
+            </div>
+
+            {/* Card 3: Backup & Export JSON */}
             <div className="p-6 sm:p-8 rounded-3xl bg-white border border-calve-border/80 shadow-2xs space-y-4">
               <div className="border-b border-calve-border/60 pb-3 flex items-center justify-between">
                 <div>
                   <h3 className="text-base font-extrabold text-calve-charcoal">
-                    2. Sauvegarde &amp; Export JSON de la Base CRM
+                    3. Sauvegarde &amp; Export JSON de la Base CRM
                   </h3>
                   <p className="text-xs text-calve-muted mt-0.5">
                     Téléchargez un instantané complet de tous les leads, baux, et visites privées.
@@ -896,9 +1004,101 @@ export default function SettingsPage() {
                 </button>
               </div>
             </div>
+
+            {/* Card 4: Passerelle OVH MySQL & Diagnostics */}
+            <div className="p-6 sm:p-8 rounded-3xl bg-white border border-calve-border/80 shadow-2xs space-y-5">
+              <div className="flex flex-col sm:flex-row sm:items-center justify-between pb-3 border-b border-calve-border/60 gap-4">
+                <div>
+                  <div className="flex items-center gap-2">
+                    <Database className="w-4 h-4 text-calve-slate" />
+                    <h3 className="text-base font-extrabold text-calve-charcoal">
+                      4. Passerelle Base de Données OVH Cloud (MySQL v8.4)
+                    </h3>
+                  </div>
+                  <p className="text-xs text-calve-muted mt-0.5">
+                    Pont de données distant reliant Next.js à votre hébergement OVH Web Cloud (uwenyoimaison).
+                  </p>
+                </div>
+
+                <div className="flex items-center gap-2">
+                  {ovhStatus?.success || ovhStatus?.status === "healthy" ? (
+                    <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-emerald-50 text-emerald-700 border border-emerald-200 text-xs font-bold">
+                      <span className="w-2 h-2 rounded-full bg-emerald-500"></span>
+                      Connecté &amp; Opérationnel
+                    </span>
+                  ) : ovhStatus?.error ? (
+                    <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-rose-50 text-rose-700 border border-rose-200 text-xs font-bold">
+                      <AlertCircle className="w-3.5 h-3.5 text-rose-500" />
+                      Échec de connexion
+                    </span>
+                  ) : (
+                    <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-slate-100 text-slate-600 border border-slate-200 text-xs font-semibold">
+                      <Server className="w-3.5 h-3.5 text-slate-500" />
+                      Prêt pour le test
+                    </span>
+                  )}
+                </div>
+              </div>
+
+              {ovhStatus && (
+                <div
+                  className={`p-4 rounded-2xl text-xs font-medium border ${
+                    ovhStatus.success || ovhStatus.status === "healthy"
+                      ? "bg-emerald-50 border-emerald-200 text-emerald-900"
+                      : "bg-rose-50 border-rose-200 text-rose-900"
+                  }`}
+                >
+                  <div className="font-bold flex items-center gap-1.5 mb-1">
+                    {ovhStatus.success || ovhStatus.status === "healthy" ? (
+                      <CheckCircle2 className="w-4 h-4 text-emerald-600" />
+                    ) : (
+                      <AlertCircle className="w-4 h-4 text-rose-600" />
+                    )}
+                    <span>
+                      {ovhStatus.success || ovhStatus.status === "healthy"
+                        ? "Communication avec OVH MySQL réussie !"
+                        : "Erreur lors du contact avec la passerelle OVH"}
+                    </span>
+                  </div>
+                  <p>{ovhStatus.message || ovhStatus.error || JSON.stringify(ovhStatus)}</p>
+                </div>
+              )}
+
+              <div className="flex flex-wrap items-center gap-3 pt-1">
+                <button
+                  type="button"
+                  onClick={handleTestOvh}
+                  disabled={ovhTesting}
+                  className="flex items-center gap-2 px-5 py-2.5 rounded-xl bg-calve-slate hover:bg-calve-slate-dark text-white text-xs font-bold transition-all cursor-pointer shadow-xs disabled:opacity-50"
+                >
+                  <RefreshCw className={`w-3.5 h-3.5 ${ovhTesting ? "animate-spin" : ""}`} />
+                  <span>{ovhTesting ? "Test en cours..." : "Tester la Connexion OVH"}</span>
+                </button>
+
+                <button
+                  type="button"
+                  onClick={handleSyncAllOvh}
+                  disabled={ovhSyncing}
+                  className="flex items-center gap-2 px-5 py-2.5 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-bold transition-all cursor-pointer shadow-xs disabled:opacity-50"
+                >
+                  <Database className={`w-3.5 h-3.5 ${ovhSyncing ? "animate-spin" : ""}`} />
+                  <span>{ovhSyncing ? "Synchronisation..." : "Migrer tous les Leads vers OVH"}</span>
+                </button>
+
+                <a
+                  href="http://uwenyoi.cluster131.hosting.ovh.net/maison-api/index.php?action=health"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="flex items-center gap-1.5 px-4 py-2.5 rounded-xl bg-slate-100 hover:bg-slate-200 text-calve-charcoal text-xs font-semibold transition-all border border-slate-200/80"
+                >
+                  <span>Diagnostic API Health</span>
+                  <ExternalLink className="w-3.5 h-3.5 text-calve-muted" />
+                </a>
+              </div>
+            </div>
           </div>
         )}
-      </form>
+</form>
     </AdminLayout>
   );
 }

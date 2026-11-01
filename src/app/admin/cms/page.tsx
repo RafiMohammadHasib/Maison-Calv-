@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import AdminLayout from "@/components/admin/AdminLayout";
 import { useLanguage } from "@/lib/languageContext";
 import {
@@ -11,48 +11,129 @@ import {
   Save,
   ExternalLink,
   Layers,
-  ArrowRight
+  ArrowRight,
+  RefreshCw,
+  Database
 } from "lucide-react";
 
 export default function CMSPage() {
   const { language, t, isEnglish } = useLanguage();
+  const [loading, setLoading] = useState(true);
+  const [saving, setSaving] = useState(false);
   const [saved, setSaved] = useState(false);
+  const [syncedWithOvh, setSyncedWithOvh] = useState(false);
 
-  const [heroBadge, setHeroBadge] = useState("Coworking haut de gamme - Bordeaux Fondaudège");
+  const [heroBadge, setHeroBadge] = useState("Coworking haut de gamme – Bordeaux Fondaudège");
   const [heroDesc, setHeroDesc] = useState(
-    "Un espace de travail confortable, calme et haut de gamme pensé pour s’y installer dans le temps."
+    "Un espace de travail confortable, calme et haut de gamme pensé pour s'y installer dans le temps."
   );
   const [office17Price, setOffice17Price] = useState("750€ HT");
   const [office25Price, setOffice25Price] = useState("1200€ HT");
   const [openSpacePrice, setOpenSpacePrice] = useState("250€ HT");
 
-  const handleSave = (e: React.FormEvent) => {
+  const fetchCmsContent = async () => {
+    try {
+      setLoading(true);
+      const res = await fetch("/api/admin/settings?key=cms_content");
+      const data = await res.json();
+      if (data.success && data.value) {
+        if (data.value.heroBadge) setHeroBadge(data.value.heroBadge);
+        if (data.value.heroDesc) setHeroDesc(data.value.heroDesc);
+        if (data.value.office17Price) setOffice17Price(data.value.office17Price);
+        if (data.value.office25Price) setOffice25Price(data.value.office25Price);
+        if (data.value.openSpacePrice) setOpenSpacePrice(data.value.openSpacePrice);
+        if (data.source === "ovh_mysql") setSyncedWithOvh(true);
+      }
+    } catch (err) {
+      console.error("Error loading CMS settings:", err);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    fetchCmsContent();
+  }, []);
+
+  const handleSave = async (e: React.FormEvent) => {
     e.preventDefault();
-    setSaved(true);
-    setTimeout(() => setSaved(false), 3000);
+    try {
+      setSaving(true);
+      const res = await fetch("/api/admin/settings", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          key: "cms_content",
+          value: {
+            heroBadge,
+            heroDesc,
+            office17Price,
+            office25Price,
+            openSpacePrice
+          }
+        })
+      });
+      const data = await res.json();
+      if (data.success) {
+        setSaved(true);
+        setSyncedWithOvh(Boolean(data.syncedWithOvh));
+        setTimeout(() => setSaved(false), 4000);
+      }
+    } catch (err) {
+      console.error("Error saving CMS content:", err);
+    } finally {
+      setSaving(false);
+    }
   };
 
   return (
     <AdminLayout
-      title={t("cms.title")}
-      subtitle={t("cms.subtitle")}
+      title={isEnglish ? "Content & Space Editor (CMS)" : "Éditeur de Contenu & Espaces (CMS)"}
+      subtitle={
+        isEnglish
+          ? "Edit key hero copy, online pricing, and urgency tags displayed on the Maison Calvé website."
+          : "Modifiez les textes clés du hero, les tarifs en ligne et les informations de disponibilité affichés sur le site Maison Calvé."
+      }
       headerAction={
-        <a
-          href="/"
-          target="_blank"
-          className="flex items-center gap-2 px-3.5 py-2 rounded-xl bg-white border border-calve-border hover:border-calve-slate text-xs font-semibold text-calve-charcoal transition-all shadow-2xs"
-        >
-          <Eye className="w-3.5 h-3.5 text-calve-slate" />
-          <span>{t("cms.preview")}</span>
-          <ExternalLink className="w-3 h-3 text-calve-muted" />
-        </a>
+        <div className="flex items-center gap-2">
+          <button
+            type="button"
+            onClick={fetchCmsContent}
+            disabled={loading}
+            className="flex items-center gap-1.5 px-3 py-2 rounded-xl bg-white border border-calve-border hover:border-calve-slate text-xs font-semibold text-calve-charcoal transition-all shadow-2xs cursor-pointer"
+          >
+            <RefreshCw className={`w-3.5 h-3.5 text-calve-slate ${loading ? "animate-spin" : ""}`} />
+            <span className="hidden sm:inline">{isEnglish ? "Refresh" : "Actualiser"}</span>
+          </button>
+          <a
+            href="/"
+            target="_blank"
+            className="flex items-center gap-2 px-3.5 py-2 rounded-xl bg-white border border-calve-border hover:border-calve-slate text-xs font-semibold text-calve-charcoal transition-all shadow-2xs"
+          >
+            <Eye className="w-3.5 h-3.5 text-calve-slate" />
+            <span>{isEnglish ? "Live Preview" : "Aperçu Direct"}</span>
+            <ExternalLink className="w-3 h-3 text-calve-muted" />
+          </a>
+        </div>
       }
     >
       <form onSubmit={handleSave} className="space-y-6">
         {saved && (
-          <div className="p-4 rounded-2xl bg-emerald-50 border border-emerald-200 text-emerald-900 text-xs font-bold flex items-center gap-2 animate-in fade-in">
-            <CheckCircle2 className="w-4 h-4 text-emerald-600 shrink-0" />
-            <span>{t("cms.saved")}</span>
+          <div className="p-4 rounded-2xl bg-emerald-50 border border-emerald-200 text-emerald-900 text-xs font-bold flex items-center justify-between gap-2 animate-in fade-in">
+            <div className="flex items-center gap-2">
+              <CheckCircle2 className="w-4 h-4 text-emerald-600 shrink-0" />
+              <span>
+                {isEnglish
+                  ? "CMS modifications successfully saved to MySQL database."
+                  : "Modifications CMS enregistrées avec succès dans la base de données MySQL."}
+              </span>
+            </div>
+            {syncedWithOvh && (
+              <span className="px-2.5 py-1 rounded-full bg-emerald-200/60 text-emerald-900 text-[10px] font-bold flex items-center gap-1">
+                <Database className="w-3 h-3" />
+                <span>OVH MySQL Live Synced</span>
+              </span>
+            )}
           </div>
         )}
 
@@ -68,7 +149,7 @@ export default function CMSPage() {
           <div className="space-y-3">
             <div>
               <label className="block text-[11px] font-bold uppercase tracking-wider text-calve-slate mb-1">
-                {isEnglish ? "Top Hero Badge" : "Badge supérieur du Hero"}
+                TOP HERO BADGE
               </label>
               <input
                 type="text"
@@ -80,7 +161,7 @@ export default function CMSPage() {
 
             <div>
               <label className="block text-[11px] font-bold uppercase tracking-wider text-calve-slate mb-1">
-                {isEnglish ? "Catchphrase description (Under Maison Calvé wordmark)" : "Description d'accroche (Sous le mot-symbole Maison Calvé)"}
+                CATCHPHRASE DESCRIPTION (UNDER MAISON CALVÉ WORDMARK)
               </label>
               <textarea
                 rows={2}
@@ -97,14 +178,14 @@ export default function CMSPage() {
           <div className="flex items-center gap-2 border-b border-calve-border/60 pb-3">
             <Layers className="w-4 h-4 text-calve-slate" />
             <h3 className="font-extrabold text-sm text-calve-charcoal">
-              {isEnglish ? "Official Space Pricing (Excl. VAT)" : "Tarification officielle des Espaces (Hors Taxes)"}
+              Official Space Pricing (Excl. VAT)
             </h3>
           </div>
 
           <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
             <div>
               <label className="block text-[11px] font-bold uppercase tracking-wider text-calve-slate mb-1">
-                {isEnglish ? "Private Office 21 sqm" : "Bureau Privatif 21 m²"}
+                PRIVATE OFFICE 21 SQM
               </label>
               <input
                 type="text"
@@ -113,13 +194,13 @@ export default function CMSPage() {
                 className="w-full px-3.5 py-2.5 rounded-xl border border-calve-border text-xs font-bold text-calve-charcoal"
               />
               <span className="text-[10px] text-calve-muted mt-1 block">
-                {isEnglish ? "per month · 3 to 4 desks" : "par mois · 3 à 4 postes"}
+                per month · 3 to 4 desks
               </span>
             </div>
 
             <div>
               <label className="block text-[11px] font-bold uppercase tracking-wider text-calve-slate mb-1">
-                {isEnglish ? "Private Office 28 sqm" : "Bureau privatif 28 m²"}
+                PRIVATE OFFICE 28 SQM
               </label>
               <input
                 type="text"
@@ -128,13 +209,13 @@ export default function CMSPage() {
                 className="w-full px-3.5 py-2.5 rounded-xl border border-calve-border text-xs font-bold text-calve-charcoal"
               />
               <span className="text-[10px] text-calve-muted mt-1 block">
-                {isEnglish ? "per month · 5 to 6 desks" : "par mois · 5 à 6 postes"}
+                per month · 5 to 6 desks
               </span>
             </div>
 
             <div>
               <label className="block text-[11px] font-bold uppercase tracking-wider text-calve-slate mb-1">
-                {isEnglish ? "Dedicated Open Space Desk" : "Poste Fixe Open Space"}
+                DEDICATED OPEN SPACE DESK
               </label>
               <input
                 type="text"
@@ -143,7 +224,7 @@ export default function CMSPage() {
                 className="w-full px-3.5 py-2.5 rounded-xl border border-calve-border text-xs font-bold text-calve-charcoal"
               />
               <span className="text-[10px] text-calve-muted mt-1 block">
-                {isEnglish ? "per month per desk · 5 max" : "par mois par poste · 5 max"}
+                per month per desk · 5 max
               </span>
             </div>
           </div>
@@ -153,10 +234,11 @@ export default function CMSPage() {
         <div className="flex justify-end gap-3">
           <button
             type="submit"
-            className="flex items-center gap-2 px-6 py-3 rounded-xl bg-calve-slate hover:bg-calve-slate-dark text-white text-xs font-bold uppercase tracking-wider shadow-xs hover:shadow-sm cursor-pointer transition-all"
+            disabled={saving}
+            className="flex items-center gap-2 px-6 py-3 rounded-xl bg-calve-slate hover:bg-calve-slate-dark text-white text-xs font-bold uppercase tracking-wider shadow-xs hover:shadow-sm cursor-pointer transition-all disabled:opacity-50"
           >
-            <Save className="w-4 h-4" />
-            <span>{isEnglish ? "Save CMS changes" : "Enregistrer les modifications CMS"}</span>
+            <Save className={`w-4 h-4 ${saving ? "animate-spin" : ""}`} />
+            <span>{saving ? "Saving..." : "SAVE CMS CHANGES"}</span>
           </button>
         </div>
       </form>
