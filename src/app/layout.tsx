@@ -111,7 +111,9 @@ export default function RootLayout({
       className={`${jakartaSans.variable} font-sans h-full antialiased scroll-smooth`}
       suppressHydrationWarning
     >
-      <head />
+      <head>
+        <script src="/anti-extension.js" suppressHydrationWarning />
+      </head>
       <body
         className="min-h-full flex flex-col font-sans bg-calve-cream text-calve-charcoal"
         suppressHydrationWarning

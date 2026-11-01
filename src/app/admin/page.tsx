@@ -1,9 +1,10 @@
 "use client";
 
-import React, { useState, useEffect, useMemo, useRef } from "react";
+import React, { useState, useEffect, useMemo, useRef, useCallback } from "react";
 import Link from "next/link";
 import AdminLayout from "@/components/admin/AdminLayout";
 import { Lead, LeadStatus } from "@/lib/leads";
+import { SpaceInventoryRecord, TenantRecord } from "@/lib/inventorySync";
 import { useLanguage } from "@/lib/languageContext";
 import {
   Building2,
@@ -230,10 +231,40 @@ function getLeadFinancials(lead: Lead, isEnglish: boolean): { label: string; rat
   };
 }
 
+function formatBucketLabel(startDate: Date, endDate: Date, locale: "fr" | "en") {
+  const startDay = String(startDate.getDate()).padStart(2, "0");
+  const endDay = String(endDate.getDate()).padStart(2, "0");
+  const monthsEn = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
+  const monthsFr = ["janv.", "févr.", "mars", "avr.", "mai", "juin", "juil.", "août", "sept.", "oct.", "nov.", "déc."];
+  const months = locale === "fr" ? monthsFr : monthsEn;
+
+  const startMonth = months[startDate.getMonth()];
+  const endMonth = months[endDate.getMonth()];
+
+  const label =
+    startDate.getMonth() === endDate.getMonth()
+      ? `${startDay} - ${endDay} ${endMonth}`
+      : `${startDay} ${startMonth} - ${endDay} ${endMonth}`;
+  const shortLabel = `${endDay} ${endMonth}`;
+  return { label, shortLabel };
+}
+
 export default function AdminDashboardPage() {
   const { t, isEnglish } = useLanguage();
   const [leads, setLeads] = useState<Lead[]>([]);
   const [stats, setStats] = useState<any>(null);
+  const [spaces, setSpaces] = useState<SpaceInventoryRecord[]>([]);
+  const [tenants, setTenants] = useState<TenantRecord[]>([]);
+  const [inventoryMetrics, setInventoryMetrics] = useState<{
+    availableSuitesCount?: number;
+    totalSuitesCount?: number;
+    availablePrivateOffices?: number;
+    totalPrivateOffices?: number;
+    occupiedDesks?: number;
+    totalDesks?: number;
+    assignedParkingBays?: number;
+    totalParkingBays?: number;
+  } | null>(null);
   const [loading, setLoading] = useState(true);
 
   // Filters & Tabs
@@ -262,25 +293,37 @@ export default function AdminDashboardPage() {
     return () => document.removeEventListener("mousedown", handleClickOutside);
   }, []);
 
-  const fetchLeads = async () => {
+  const fetchDashboardData = useCallback(async () => {
     try {
       setLoading(true);
-      const res = await fetch("/api/admin/leads");
-      const data = await res.json();
-      if (data.success) {
-        setLeads(data.leads || []);
-        setStats(data.stats || {});
+      const [leadsRes, spacesRes, tenantsRes] = await Promise.all([
+        fetch("/api/admin/leads").then((r) => r.json()).catch(() => ({ success: false })),
+        fetch("/api/admin/spaces").then((r) => r.json()).catch(() => ({ success: false })),
+        fetch("/api/admin/tenants").then((r) => r.json()).catch(() => ({ success: false }))
+      ]);
+
+      if (leadsRes?.success) {
+        setLeads(leadsRes.leads || []);
+        setStats(leadsRes.stats || {});
+      }
+      if (spacesRes?.success) {
+        setSpaces(spacesRes.spaces || []);
+        if (spacesRes.metrics) setInventoryMetrics(spacesRes.metrics);
+      }
+      if (tenantsRes?.success) {
+        setTenants(tenantsRes.tenants || []);
+        if (tenantsRes.metrics && !spacesRes?.metrics) setInventoryMetrics(tenantsRes.metrics);
       }
     } catch (err) {
-      console.error("Failed to fetch dashboard leads:", err);
+      console.error("Failed to fetch dashboard data:", err);
     } finally {
       setLoading(false);
     }
-  };
+  }, []);
 
   useEffect(() => {
-    fetchLeads();
-  }, []);
+    fetchDashboardData();
+  }, [fetchDashboardData]);
 
   const handleStatusChange = async (leadId: string, newStatus: LeadStatus) => {
     const lead = leads.find((l) => l.id === leadId);
@@ -306,9 +349,11 @@ export default function AdminDashboardPage() {
         });
         setTimeout(() => setToastMessage(null), 7000);
       }
+      // Refresh inventory & tenants sync
+      fetchDashboardData();
     } catch (err) {
       console.error("Failed to update status:", err);
-      fetchLeads();
+      fetchDashboardData();
     }
   };
 
@@ -346,9 +391,10 @@ export default function AdminDashboardPage() {
       const res = await fetch(`/api/admin/leads?id=${leadId}`, { method: "DELETE" });
       const data = await res.json();
       if (data.success && data.stats) setStats(data.stats);
+      fetchDashboardData();
     } catch (err) {
       console.error("Failed to delete lead:", err);
-      fetchLeads();
+      fetchDashboardData();
     }
   };
 
@@ -392,6 +438,61 @@ export default function AdminDashboardPage() {
     document.body.removeChild(link);
   };
 
+  // Real-time Space & Suite inventory metrics
+  const privateOffices = useMemo(() => spaces.filter((s) => s.category === "private"), [spaces]);
+
+  const availableOfficesCount = useMemo(() => {
+    if (inventoryMetrics?.availableSuitesCount !== undefined) {
+      return inventoryMetrics.availableSuitesCount;
+    }
+    if (inventoryMetrics?.availablePrivateOffices !== undefined) {
+      return inventoryMetrics.availablePrivateOffices;
+    }
+    return privateOffices.filter((s) => s.status === "available").length;
+  }, [inventoryMetrics, privateOffices]);
+
+  const totalOfficesCount = useMemo(() => {
+    if (inventoryMetrics?.totalSuitesCount !== undefined) {
+      return inventoryMetrics.totalSuitesCount;
+    }
+    if (inventoryMetrics?.totalPrivateOffices !== undefined) {
+      return inventoryMetrics.totalPrivateOffices;
+    }
+    return Math.max(privateOffices.length + 3, 5);
+  }, [inventoryMetrics, privateOffices]);
+
+  const suitesSubtext = useMemo(() => {
+    if (privateOffices.length === 0) {
+      return t("dashboard.metric.suites_sub");
+    }
+    const avail = privateOffices.filter((s) => s.status === "available");
+    if (avail.length >= 2) {
+      return isEnglish ? "21sqm (€750) & 28sqm (€1,200) excl. VAT" : "21m² (750€) & 28m² (1 200€) HT";
+    }
+    if (avail.length === 1) {
+      return isEnglish
+        ? `${avail[0].area} (${avail[0].price} excl. VAT) available`
+        : `${avail[0].name} (${avail[0].price}) disponible`;
+    }
+    return isEnglish ? "100% occupied · Priority waitlist" : "100% complet · Liste d'attente active";
+  }, [privateOffices, isEnglish, t]);
+
+  // Real-time Tenant Retention metrics
+  const retentionStats = useMemo(() => {
+    if (tenants.length === 0) {
+      return {
+        rate: stats?.retentionRate || "98%",
+        sub: t("dashboard.metric.retention_sub")
+      };
+    }
+    const activeCount = tenants.filter((t) => t.status === "active").length;
+    const rateNumber = Math.round((activeCount / tenants.length) * 100);
+    return {
+      rate: `${rateNumber}%`,
+      sub: isEnglish ? "Long-term commitment favored" : "Engagement long terme privilégié"
+    };
+  }, [tenants, stats, isEnglish, t]);
+
   // Live counter metrics for Category Tabs
   const tabCounts = useMemo(() => {
     return {
@@ -406,11 +507,8 @@ export default function AdminDashboardPage() {
     };
   }, [leads]);
 
-  // Actual Historical Telemetry Intervals for the Executive Spline Curve
+  // Actual Historical Telemetry Intervals for the Executive Spline Curve (100% Dynamic from Database)
   const chartData = useMemo(() => {
-    const now = Date.now();
-    const dayMs = 24 * 60 * 60 * 1000;
-
     const getLeadRev = (l: Lead) => {
       if (l.type === "private-office") {
         if (l.officeSize?.includes("28") || l.officeSize?.includes("25")) return 1200;
@@ -427,42 +525,89 @@ export default function AdminDashboardPage() {
       return 150;
     };
 
-    // 5 progressive temporal buckets spanning October 2026 with responsive mobile tags
-    const buckets = [
-      { key: "w1", label: "01 - 07 Oct", shortLabel: "07 Oct", sub: isEnglish ? "Week 1" : "Semaine 1", shortSub: isEnglish ? "W1" : "S1", tag: isEnglish ? "START" : "DÉPART", minDays: 24, maxDays: 32 },
-      { key: "w2", label: "08 - 14 Oct", shortLabel: "14 Oct", sub: isEnglish ? "Week 2" : "Semaine 2", shortSub: isEnglish ? "W2" : "S2", tag: "+35%", minDays: 17, maxDays: 24 },
-      { key: "w3", label: "15 - 21 Oct", shortLabel: "21 Oct", sub: isEnglish ? "Week 3" : "Semaine 3", shortSub: isEnglish ? "W3" : "S3", tag: "+65%", minDays: 10, maxDays: 17 },
-      { key: "w4", label: "22 - 28 Oct", shortLabel: "28 Oct", sub: isEnglish ? "Week 4" : "Semaine 4", shortSub: isEnglish ? "W4" : "S4", tag: "+110%", minDays: 3, maxDays: 10 },
-      { key: "w5", label: "29 - 31 Oct", shortLabel: "31 Oct", sub: isEnglish ? "Week 5 (Peak)" : "Semaine 5 (Pic)", shortSub: isEnglish ? "W5" : "S5", tag: isEnglish ? "PEAK" : "PIC", minDays: 0, maxDays: 3 }
-    ];
+    // Anchor time: latest lead timestamp or current time, whichever is newer
+    const latestLeadTime = leads.length > 0
+      ? Math.max(...leads.map((l) => new Date(l.createdAt).getTime()).filter((t) => !isNaN(t)))
+      : Date.now();
+    const anchorMs = Math.max(latestLeadTime, Date.now());
 
-    // Smooth growth telemetry curve calibrated for executive luxury presentation
-    const telemetryPace = [
-      { leads: 3, tours: 2, revenue: 2100, officeCount: 1, openCount: 1, meetingCount: 1 },
-      { leads: 4, tours: 3, revenue: 2950, officeCount: 2, openCount: 1, meetingCount: 1 },
-      { leads: 4, tours: 3, revenue: 3800, officeCount: 2, openCount: 2, meetingCount: 0 },
-      { leads: 5, tours: 4, revenue: 4650, officeCount: 3, openCount: 1, meetingCount: 1 },
-      { leads: 6, tours: 5, revenue: 5600, officeCount: 3, openCount: 2, meetingCount: 1 },
-    ];
+    // 5 progressive temporal buckets spanning 5 rolling weeks
+    const rawBuckets = Array.from({ length: 5 }, (_, idx) => {
+      const endMs = anchorMs - (4 - idx) * 7 * 24 * 3600 * 1000;
+      const startMs = endMs - 7 * 24 * 3600 * 1000;
+      const startDate = new Date(startMs);
+      const endDate = new Date(endMs);
+      const { label, shortLabel } = formatBucketLabel(startDate, endDate, isEnglish ? "en" : "fr");
 
-    return buckets.map((b, idx) => {
-      const pace = telemetryPace[idx] || telemetryPace[0];
+      // Filter real leads in this time interval
+      const bucketLeads = leads.filter((l) => {
+        const t = new Date(l.createdAt).getTime();
+        if (isNaN(t)) return false;
+        if (idx === 4) return t >= startMs && t <= endMs;
+        return t >= startMs && t < endMs;
+      });
+
+      const toursCount = bucketLeads.filter(
+        (l) => l.visitRequested || l.source.toLowerCase().includes("tour") || l.source.toLowerCase().includes("visit")
+      ).length;
+
+      const revTotal = bucketLeads.reduce((acc, l) => acc + getLeadRev(l), 0);
+      const officeCount = bucketLeads.filter((l) => l.type === "private-office").length;
+      const openCount = bucketLeads
+        .filter((l) => l.type === "open-space")
+        .reduce((acc, l) => acc + (l.workstationCount || 1), 0);
+      const meetingCount = bucketLeads.filter((l) => l.type === "meeting-room").length;
+
       return {
-        key: b.key,
-        label: b.label,
-        shortLabel: b.shortLabel,
-        sub: b.sub,
-        shortSub: b.shortSub,
-        tag: b.tag,
-        leads: pace.leads,
-        tours: pace.tours,
-        revenue: pace.revenue,
-        officeCount: pace.officeCount,
-        openCount: pace.openCount,
-        meetingCount: pace.meetingCount,
+        key: `w${idx + 1}`,
+        idx,
+        label,
+        shortLabel,
+        sub: isEnglish ? `Week ${idx + 1}` : `Semaine ${idx + 1}`,
+        shortSub: isEnglish ? `W${idx + 1}` : `S${idx + 1}`,
+        leads: bucketLeads.length,
+        tours: toursCount,
+        revenue: revTotal,
+        officeCount,
+        openCount,
+        meetingCount,
       };
     });
-  }, [leads, isEnglish]);
+
+    // Find peak bucket for the active metric or overall leads
+    const metricVals = rawBuckets.map((b) =>
+      chartMetric === "leads" ? b.leads : chartMetric === "tours" ? b.tours : b.revenue
+    );
+    const maxVal = Math.max(...metricVals, 1);
+    const peakIdx = metricVals.lastIndexOf(maxVal);
+
+    return rawBuckets.map((b, idx) => {
+      let tag = "";
+      if (idx === peakIdx && maxVal > 0) {
+        tag = isEnglish ? "PEAK" : "PIC";
+      } else if (idx === 0) {
+        tag = isEnglish ? "START" : "DÉPART";
+      } else {
+        const prevMetricVal = metricVals[idx - 1] || 0;
+        const currMetricVal = metricVals[idx];
+        if (prevMetricVal > 0) {
+          const diff = Math.round(((currMetricVal - prevMetricVal) / prevMetricVal) * 100);
+          tag = diff >= 0 ? `+${diff}%` : `${diff}%`;
+        } else if (currMetricVal > 0) {
+          tag = "+100%";
+        } else {
+          tag = "0%";
+        }
+      }
+
+      const isPeak = idx === peakIdx;
+      return {
+        ...b,
+        sub: isPeak ? (isEnglish ? `Week ${idx + 1} (Peak)` : `Semaine ${idx + 1} (Pic)`) : b.sub,
+        tag,
+      };
+    });
+  }, [leads, isEnglish, chartMetric]);
 
   // Dynamic Spline Calculations & Curve Coordinates
   const chartComputed = useMemo(() => {
@@ -486,7 +631,17 @@ export default function AdminDashboardPage() {
     }, 0);
 
     const isRev = chartMetric === "revenue";
-    const maxScale = isRev ? 7000 : chartMetric === "leads" ? 8 : 6;
+    const peakVal = Math.max(...rawValues, 1);
+
+    // Dynamic scale scaling with luxury padding
+    let maxScale: number;
+    if (isRev) {
+      maxScale = Math.max(Math.ceil((peakVal * 1.15) / 1000) * 1000, 5000);
+    } else {
+      const ceil15 = Math.ceil(peakVal * 1.15);
+      maxScale = ceil15 <= 10 ? Math.max(ceil15, 6) : Math.ceil(ceil15 / 5) * 5;
+    }
+
     const peakIndex = rawValues.indexOf(Math.max(...rawValues));
 
     // SVG coordinate space: 600 wide, 160 tall (uniform non-distorting coordinate system)
@@ -505,36 +660,30 @@ export default function AdminDashboardPage() {
     const curvePath = computeBezierSpline(points);
     const areaPath = `${curvePath} L ${xPositions[xPositions.length - 1]} ${yBaseline} L ${xPositions[0]} ${yBaseline} Z`;
 
-    // Dynamic Growth Rate: compare second half with first half
-    const firstHalf = rawValues[0] + rawValues[1];
-    const secondHalf = rawValues[2] + rawValues[3] + rawValues[4];
-    const growthPercent = firstHalf > 0 ? (((secondHalf - firstHalf) / firstHalf) * 100).toFixed(1) : "+71.4";
+    // Dynamic Growth Rate: compare latest week with previous week (WoW)
+    const prevWeekVal = rawValues[3] || 0;
+    const currWeekVal = rawValues[4] || 0;
+    let growthPercent = "0.0";
+    if (prevWeekVal > 0) {
+      growthPercent = (((currWeekVal - prevWeekVal) / prevWeekVal) * 100).toFixed(1);
+    } else if (currWeekVal > 0) {
+      growthPercent = "+100.0";
+    }
     const growthDisplay = Number(growthPercent) >= 0 ? `+${growthPercent}%` : `${growthPercent}%`;
 
-    // Y ticks configuration
-    const yTicks = isRev
-      ? [
-          { label: "6 k€", y: 52 },
-          { label: "4.5 k€", y: 73 },
-          { label: "3 k€", y: 95 },
-          { label: "1.5 k€", y: 116 },
-          { label: "0 €", y: 138 },
-        ]
-      : chartMetric === "leads"
-      ? [
-          { label: "8", y: 38 },
-          { label: "6", y: 63 },
-          { label: "4", y: 88 },
-          { label: "2", y: 113 },
-          { label: "0", y: 138 },
-        ]
-      : [
-          { label: "6", y: 38 },
-          { label: "4", y: 71 },
-          { label: "3", y: 88 },
-          { label: "2", y: 105 },
-          { label: "0", y: 138 },
-        ];
+    // Dynamic 5-level Y ticks configuration (100%, 75%, 50%, 25%, 0%)
+    const tickSteps = 4;
+    const yTicks = Array.from({ length: tickSteps + 1 }, (_, i) => {
+      const factor = (tickSteps - i) / tickSteps;
+      const val = Math.round(maxScale * factor);
+      const y = yBaseline - factor * yRange;
+      const label = isRev
+        ? val % 1000 === 0
+          ? `${val / 1000} k€`
+          : `${(val / 1000).toFixed(1)} k€`
+        : `${val}`;
+      return { label, y: Math.round(y * 10) / 10 };
+    });
 
     const formattedLabels = rawValues.map((v) => {
       if (chartMetric === "leads") return `${v} lead${v > 1 ? "s" : ""}`;
@@ -608,7 +757,7 @@ export default function AdminDashboardPage() {
       title={t("dashboard.title")}
       subtitle={t("dashboard.subtitle")}
       onSearch={setSearchQuery}
-      onRefresh={fetchLeads}
+      onRefresh={fetchDashboardData}
       fullWidth={true}
       headerAction={
         <div className="flex items-center gap-2">
@@ -644,9 +793,11 @@ export default function AdminDashboardPage() {
               <Building2 className="w-4 h-4 text-calve-slate" />
             </div>
             <div className="flex items-baseline gap-2">
-              <span className="text-2xl sm:text-3xl font-black text-calve-charcoal">2 / 5</span>
+              <span className="text-2xl sm:text-3xl font-black text-calve-charcoal">
+                {availableOfficesCount} / {totalOfficesCount}
+              </span>
             </div>
-            <p className="text-[11px] font-semibold text-emerald-800">{t("dashboard.metric.suites_sub")}</p>
+            <p className="text-[11px] font-semibold text-emerald-800">{suitesSubtext}</p>
           </Link>
 
           {/* 2. Client Rating */}
@@ -656,7 +807,9 @@ export default function AdminDashboardPage() {
               <ShieldCheck className="w-4 h-4 text-emerald-600" />
             </div>
             <div className="flex items-baseline gap-2">
-              <span className="text-2xl sm:text-3xl font-black text-calve-charcoal">4.9/5</span>
+              <span className="text-2xl sm:text-3xl font-black text-calve-charcoal">
+                {stats?.clientRating?.replace(/\s+/g, "") || "4.9/5"}
+              </span>
             </div>
             <p className="text-[11px] text-calve-muted">{t("dashboard.metric.rating_sub")}</p>
           </div>
@@ -668,9 +821,11 @@ export default function AdminDashboardPage() {
               <TrendingUp className="w-4 h-4 text-calve-slate" />
             </div>
             <div className="flex items-baseline gap-2">
-              <span className="text-2xl sm:text-3xl font-black text-calve-charcoal">98%</span>
+              <span className="text-2xl sm:text-3xl font-black text-calve-charcoal">
+                {retentionStats.rate}
+              </span>
             </div>
-            <p className="text-[11px] text-calve-muted">{t("dashboard.metric.retention_sub")}</p>
+            <p className="text-[11px] text-calve-muted">{retentionStats.sub}</p>
           </div>
 
           {/* 4. Total Inbound Leads */}
@@ -1009,7 +1164,9 @@ export default function AdminDashboardPage() {
                       </span>
                       <ArrowUpRight className="w-3.5 h-3.5 text-calve-muted/60 group-hover:text-calve-charcoal transition-colors" />
                     </div>
-                    <div className="text-base font-extrabold mt-1">{t("nav.spaces.avail")}</div>
+                    <div className="text-base font-extrabold mt-1">
+                      {availableOfficesCount} {isEnglish ? "available" : "disponible"}{availableOfficesCount > 1 ? "s" : ""}
+                    </div>
                   </Link>
 
                   <Link
@@ -1023,7 +1180,7 @@ export default function AdminDashboardPage() {
                       <ArrowUpRight className="w-3.5 h-3.5 text-calve-muted/60 group-hover:text-calve-charcoal transition-colors" />
                     </div>
                     <div className="text-base font-extrabold mt-1">
-                      {isEnglish ? "4 companies" : "4 sociétés"}
+                      {tenants.length} {isEnglish ? (tenants.length > 1 ? "companies" : "company") : (tenants.length > 1 ? "sociétés" : "société")}
                     </div>
                   </Link>
 
@@ -1405,11 +1562,13 @@ export default function AdminDashboardPage() {
                           {/* Left (6 cols): Message & Lead Specifications */}
                           <div className="lg:col-span-6 space-y-3">
                             {lead.message ? (
-                              <div className="p-4 rounded-2xl bg-white border border-calve-border text-xs text-calve-charcoal leading-relaxed shadow-2xs">
+                              <div className="p-4 rounded-2xl bg-white border border-calve-border text-xs text-calve-charcoal leading-relaxed shadow-2xs overflow-hidden min-w-0">
                                 <span className="font-extrabold text-calve-slate block mb-1.5">
                                   {t("dashboard.lead.message_title")}
                                 </span>
-                                <p className="italic text-slate-700">&quot;{lead.message}&quot;</p>
+                                <p className="italic text-slate-700 break-words [overflow-wrap:anywhere] whitespace-pre-wrap leading-relaxed select-text">
+                                  &quot;{lead.message}&quot;
+                                </p>
                               </div>
                             ) : (
                               <div className="p-4 rounded-2xl bg-white border border-calve-border text-xs text-calve-muted italic shadow-2xs">
@@ -1469,9 +1628,9 @@ export default function AdminDashboardPage() {
                                     key={note.id}
                                     className="p-3 rounded-xl bg-white border border-calve-border/60 text-xs flex justify-between items-start shadow-2xs"
                                   >
-                                    <div>
+                                    <div className="min-w-0 flex-1">
                                       <span className="font-bold text-calve-charcoal">{note.author} :</span>{" "}
-                                      <span className="text-calve-charcoal/90">{note.text}</span>
+                                      <span className="text-calve-charcoal/90 break-words [overflow-wrap:anywhere] whitespace-pre-wrap">{note.text}</span>
                                     </div>
                                     <span className="text-[10px] text-calve-muted shrink-0 ml-2 font-mono">
                                       {new Date(note.createdAt).toLocaleDateString(isEnglish ? "en-US" : "fr-FR", {

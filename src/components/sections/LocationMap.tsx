@@ -130,8 +130,8 @@ export default function LocationMap({ language }: LocationMapProps) {
                   {language === "en"
                     ? "9 private on-site parking spots"
                     : language === "es"
-                    ? "9 plazas de parking privadas en el patio"
-                    : "9 Places de parking privatives sur site"}
+                      ? "9 plazas de parking privadas en el patio"
+                      : "9 Places de parking privatives sur site"}
                 </span>
               </div>
             </div>
@@ -143,15 +143,15 @@ export default function LocationMap({ language }: LocationMapProps) {
                   {language === "en"
                     ? "Nearest transit stop"
                     : language === "es"
-                    ? "Parada más cercana"
-                    : "Arrêt le plus proche"}
+                      ? "Parada más cercana"
+                      : "Arrêt le plus proche"}
                 </span>
                 <span className="text-xs font-semibold text-calve-charcoal">
                   {language === "en"
                     ? "Tram D · Fondaudège Muséum (3 min walk)"
                     : language === "es"
-                    ? "Tranvía D · Fondaudège Muséum (3 min a pie)"
-                    : "Tram D · Fondaudège Muséum (3 min à pied)"}
+                      ? "Tranvía D · Fondaudège Muséum (3 min a pie)"
+                      : "Tram D · Fondaudège Muséum (3 min à pied)"}
                 </span>
               </div>
               <a

@@ -1021,11 +1021,13 @@ export default function PipelinePage() {
 
             {/* Initial Enquiry Message if any */}
             {selectedLead.message && (
-              <div className="p-3.5 rounded-2xl bg-amber-50/50 border border-amber-200/70 text-xs text-calve-charcoal leading-relaxed space-y-1">
+              <div className="p-3.5 rounded-2xl bg-amber-50/60 border border-amber-200/80 text-xs text-calve-charcoal leading-relaxed space-y-1.5 overflow-hidden min-w-0">
                 <span className="font-bold text-amber-900 block text-[11px] uppercase tracking-wider">
                   {language === "fr" ? "Message initial du prospect :" : "Initial Enquiry Message:"}
                 </span>
-                <p className="italic text-slate-700">&quot;{selectedLead.message}&quot;</p>
+                <p className="italic text-slate-700 break-words [overflow-wrap:anywhere] whitespace-pre-wrap leading-relaxed select-text">
+                  &quot;{selectedLead.message}&quot;
+                </p>
               </div>
             )}
 
@@ -1095,7 +1097,7 @@ export default function PipelinePage() {
                       key={n.id}
                       className="p-3 rounded-xl bg-white border border-slate-200/90 text-xs flex justify-between items-start gap-3 shadow-2xs"
                     >
-                      <div className="space-y-0.5">
+                      <div className="space-y-0.5 min-w-0 flex-1">
                         <div className="flex items-center gap-2">
                           <strong className="text-calve-charcoal font-bold">{n.author}</strong>
                           <span className="text-[10px] text-calve-muted font-mono">
@@ -1107,7 +1109,7 @@ export default function PipelinePage() {
                             })}
                           </span>
                         </div>
-                        <p className="text-slate-700 leading-relaxed">{n.text}</p>
+                        <p className="text-slate-700 leading-relaxed break-words [overflow-wrap:anywhere] whitespace-pre-wrap">{n.text}</p>
                       </div>
                     </div>
                   ))}

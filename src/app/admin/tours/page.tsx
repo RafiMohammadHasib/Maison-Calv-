@@ -515,13 +515,15 @@ export default function ToursPage() {
 
                   {/* Visitor Message Quote (if present) */}
                   {tour.message && (
-                    <div className="p-3.5 rounded-xl bg-[#F8F9FA] border border-slate-200/90 text-xs text-calve-charcoal flex items-start gap-2.5">
+                    <div className="p-3.5 rounded-xl bg-[#F8F9FA] border border-slate-200/90 text-xs text-calve-charcoal flex items-start gap-2.5 overflow-hidden min-w-0">
                       <MessageSquare className="w-4 h-4 text-calve-slate shrink-0 mt-0.5" />
-                      <div>
+                      <div className="min-w-0 flex-1">
                         <span className="font-bold text-calve-slate block text-[11px] uppercase tracking-wider mb-0.5">
                           {t("tours.quote_title")}
                         </span>
-                        <p className="italic text-slate-700">&quot;{tour.message}&quot;</p>
+                        <p className="italic text-slate-700 break-words [overflow-wrap:anywhere] whitespace-pre-wrap leading-relaxed select-text">
+                          &quot;{tour.message}&quot;
+                        </p>
                       </div>
                     </div>
                   )}

@@ -365,6 +365,8 @@ export function getInventoryMetrics(providedLeads?: Lead[]) {
   return {
     availableSuitesCount,
     totalSuitesCount,
+    availablePrivateOffices: availableSuitesCount,
+    totalPrivateOffices: totalSuitesCount,
     activeTenantsCount: tenants.length,
     openSpaceOccupiedCount,
     residentMembersCount,
