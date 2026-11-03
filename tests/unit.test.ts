@@ -4,6 +4,8 @@ import { createSession, verifySession, revokeSession } from "../src/lib/session"
 import { getAdminConfig, saveAdminConfig, verifyAdminPassword } from "../src/lib/adminConfig";
 import { getLeads, addLead, updateLead, addLeadNote, deleteLead, getCRMStats } from "../src/lib/leads";
 import { getUnifiedSpaces, getInventoryMetrics } from "../src/lib/inventorySync";
+import sitemap from "../src/app/sitemap";
+import robots from "../src/app/robots";
 
 describe("1. Unit Tests: Session & Cryptographic Security", () => {
   it("creates a cryptographically signed token with 3 components (UUID, expiresAt, HMAC)", async () => {
@@ -162,5 +164,48 @@ describe("4. Unit Tests: Spaces & Real-Time Inventory Sync", () => {
     assert.ok(typeof metrics.availableSuitesCount === "number", "Available suites must be a number");
     assert.equal(metrics.totalCourtyardBays, 9, "Total courtyard bays must be 9");
     assert.ok(typeof metrics.assignedCourtyardBays === "number", "Assigned bays must be a number");
+  });
+});
+
+describe("5. Unit Tests: Sitemap & Robots SEO Architecture", () => {
+  it("generates a compliant XML sitemap entries array adhering to Sitemaps.org protocol", () => {
+    const entries = sitemap();
+    assert.ok(Array.isArray(entries), "Sitemap must return an array of entries");
+    assert.ok(entries.length >= 3, "Sitemap must contain canonical and localized routes");
+
+    const rootEntry = entries.find((e) => e.url === "https://maisoncalve.fr/");
+    assert.ok(rootEntry, "Root canonical URL https://maisoncalve.fr/ must be present");
+    assert.equal(rootEntry.priority, 1.0, "Root priority must be 1.0");
+    assert.equal(rootEntry.changeFrequency, "weekly", "Root changeFrequency must be weekly");
+
+    // Strictly enforce NO illegal hash fragments (#) in sitemaps per Google Search Central
+    for (const entry of entries) {
+      assert.ok(!entry.url.includes("#"), `Sitemap URL must not contain '#' fragment: ${entry.url}`);
+      assert.ok(entry.url.startsWith("https://maisoncalve.fr"), `URL must use production domain: ${entry.url}`);
+    }
+
+    // Verify multilingual alternates
+    assert.ok(rootEntry.alternates?.languages?.fr, "FR language alternate must exist");
+    assert.ok(rootEntry.alternates?.languages?.en, "EN language alternate must exist");
+    assert.ok(rootEntry.alternates?.languages?.es, "ES language alternate must exist");
+
+    // Verify Google Image sitemap tags
+    assert.ok(Array.isArray(rootEntry.images), "Root entry must contain images array for Google Image Search");
+    assert.ok(rootEntry.images.length >= 5, "Root must include key 4K architectural assets");
+    assert.ok(rootEntry.images.some((img) => img.includes("real-meeting-room-30m-4k.jpg")));
+    assert.ok(rootEntry.images.some((img) => img.includes("calve-exterior.jpg")));
+    assert.ok(rootEntry.images.some((img) => img.includes("calve-parking.jpg")));
+  });
+
+  it("configures robots.txt to index public pages and shield private admin CRM endpoints", () => {
+    const config = robots();
+    assert.ok(config.rules, "Rules must be defined");
+    assert.equal(config.sitemap, "https://maisoncalve.fr/sitemap.xml", "Sitemap URL must be accurate");
+
+    const rules = Array.isArray(config.rules) ? config.rules[0] : config.rules;
+    assert.equal(rules.allow, "/", "Root public site must be allowed");
+    assert.ok(Array.isArray(rules.disallow), "Disallow must be an array");
+    assert.ok(rules.disallow.includes("/api/"), "API routes must be disallowed from indexing");
+    assert.ok(rules.disallow.includes("/admin/"), "Admin CRM portal routes must be disallowed from indexing");
   });
 });
