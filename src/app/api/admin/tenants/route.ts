@@ -99,7 +99,7 @@ export async function POST(request: Request) {
       parkingBays: body.parkingBays || "Place cour privée",
       badgeIds: body.badgeIds || [`BADGE-048-${String(Date.now()).slice(-3)}`],
       leaseStart: body.leaseStart || new Date().toISOString().split("T")[0],
-      monthlyRent: body.monthlyRent || "750 € HT / mois",
+      monthlyRent: body.monthlyRent || "950 € HT / mois",
       status: body.status || "active",
       isFromWonLead: Boolean(body.isFromWonLead)
     };

@@ -152,7 +152,7 @@ function autoSeedIfEmpty($pdo) {
                 'category' => 'private',
                 'area' => '17 m²',
                 'capacity' => '3 à 4 postes de travail',
-                'price' => '750 € HT',
+                'price' => '950 € HT',
                 'period' => 'par mois',
                 'status' => 'available',
                 'status_text' => 'Disponible immédiatement',
@@ -757,7 +757,7 @@ function autoSeedIfEmpty($pdo) {
             'cms_content' => [
                 'heroBadge'       => 'Coworking haut de gamme – Bordeaux Fondaudège',
                 'heroDesc'        => "Un espace de travail confortable, calme et haut de gamme pensé pour s'y installer dans le temps.",
-                'office17Price'   => '750€ HT',
+                'office17Price'   => '950€ HT',
                 'office25Price'   => '1200€ HT',
                 'openSpacePrice'  => '250€ HT'
             ],
@@ -774,7 +774,7 @@ function autoSeedIfEmpty($pdo) {
                 'guarantee'       => 'Galian Assurances — 120 000 € / Allianz Pro'
             ],
             'settings_rental' => [
-                'office17Rate'    => '€750 excl. VAT / month',
+                'office17Rate'    => '€950 excl. VAT / month',
                 'office25Rate'    => '€1,200 excl. VAT / month',
                 'openSpaceRate'   => '€250 excl. VAT / month',
                 'nomadRate'       => '€20 excl. VAT day / €10 excl. VAT half-day',

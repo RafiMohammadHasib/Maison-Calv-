@@ -65,7 +65,7 @@ export default function TenantsPage() {
     spaceAssigned: "Bureau Privatif 21 m²",
     workstations: 3,
     parkingBays: "Places #3 & #4",
-    monthlyRent: "750 € HT / mois",
+    monthlyRent: "950 € HT / mois",
     status: "active" as "active" | "onboarding" | "notice"
   });
 
@@ -172,7 +172,7 @@ export default function TenantsPage() {
           spaceAssigned: "Bureau Privatif 21 m²",
           workstations: 3,
           parkingBays: "Places #3 & #4",
-          monthlyRent: "750 € HT / mois",
+          monthlyRent: "950 € HT / mois",
           status: "active"
         });
       }
@@ -358,41 +358,37 @@ export default function TenantsPage() {
       <div className="flex items-center gap-1.5 p-1.5 bg-slate-100 border border-slate-200/80 rounded-2xl overflow-x-auto text-xs font-semibold w-fit">
         <button
           onClick={() => setFilterType("all")}
-          className={`px-3.5 py-1.5 rounded-xl transition-all cursor-pointer ${
-            filterType === "all"
+          className={`px-3.5 py-1.5 rounded-xl transition-all cursor-pointer ${filterType === "all"
               ? "bg-white text-calve-charcoal shadow-2xs font-bold"
               : "text-calve-muted hover:text-calve-charcoal"
-          }`}
+            }`}
         >
           {isEnglish ? `All Residents (${tenants.length})` : `Tous les Résidents (${tenants.length})`}
         </button>
         <button
           onClick={() => setFilterType("private")}
-          className={`px-3.5 py-1.5 rounded-xl transition-all cursor-pointer ${
-            filterType === "private"
+          className={`px-3.5 py-1.5 rounded-xl transition-all cursor-pointer ${filterType === "private"
               ? "bg-white text-calve-charcoal shadow-2xs font-bold"
               : "text-calve-muted hover:text-calve-charcoal"
-          }`}
+            }`}
         >
           {isEnglish ? "Private Offices" : "Bureaux Privatifs"}
         </button>
         <button
           onClick={() => setFilterType("open")}
-          className={`px-3.5 py-1.5 rounded-xl transition-all cursor-pointer ${
-            filterType === "open"
+          className={`px-3.5 py-1.5 rounded-xl transition-all cursor-pointer ${filterType === "open"
               ? "bg-white text-calve-charcoal shadow-2xs font-bold"
               : "text-calve-muted hover:text-calve-charcoal"
-          }`}
+            }`}
         >
           Open Space
         </button>
         <button
           onClick={() => setFilterType("meeting")}
-          className={`px-3.5 py-1.5 rounded-xl transition-all cursor-pointer ${
-            filterType === "meeting"
+          className={`px-3.5 py-1.5 rounded-xl transition-all cursor-pointer ${filterType === "meeting"
               ? "bg-white text-calve-charcoal shadow-2xs font-bold"
               : "text-calve-muted hover:text-calve-charcoal"
-          }`}
+            }`}
         >
           {isEnglish ? "Meeting Room Sessions" : "Sessions Réunion"}
         </button>
@@ -434,10 +430,10 @@ export default function TenantsPage() {
               const { title, subtitle, initials } = getResidentIdentity(tenant);
               const formattedLeaseDate = tenant.leaseStart
                 ? new Date(tenant.leaseStart).toLocaleDateString(isEnglish ? "en-US" : "fr-FR", {
-                    day: "numeric",
-                    month: "short",
-                    year: "numeric"
-                  })
+                  day: "numeric",
+                  month: "short",
+                  year: "numeric"
+                })
                 : (isEnglish ? "Permanent Partner Agreement" : "Convention Partenaire Permanente");
 
               return (
@@ -474,11 +470,10 @@ export default function TenantsPage() {
 
                           {/* Status Pill */}
                           <span
-                            className={`inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-[10px] font-bold ${
-                              tenant.status === "active"
+                            className={`inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-[10px] font-bold ${tenant.status === "active"
                                 ? "bg-emerald-100/80 text-emerald-900 border border-emerald-200"
                                 : "bg-blue-50 text-blue-800 border border-blue-200"
-                            }`}
+                              }`}
                           >
                             <span className="w-1.5 h-1.5 rounded-full bg-emerald-600 animate-pulse" />
                             <span>
@@ -487,8 +482,8 @@ export default function TenantsPage() {
                                   ? "Active"
                                   : "Actif"
                                 : isEnglish
-                                ? "Onboarding"
-                                : "En installation"}
+                                  ? "Onboarding"
+                                  : "En installation"}
                             </span>
                           </span>
                         </div>

@@ -512,7 +512,7 @@ if ($action === 'update_lead' || ($action === 'lead' && ($method === 'PATCH' || 
         $tenantId = 'TEN-' . preg_replace('/[^0-9]/', '', $id);
         $companyName = !empty($existing['company']) ? $existing['company'] : $existing['name'];
         $spaceName = 'Bureau Privatif Maison Calvé';
-        $rentStr = '750 € HT / mois';
+        $rentStr = '950 € HT / mois';
         $ws = (int)($existing['workstation_count'] ?? 1);
         $parking = 'Places #3 & #4';
 
@@ -523,7 +523,7 @@ if ($action === 'update_lead' || ($action === 'lead' && ($method === 'PATCH' || 
                 $ws = 5;
             } else {
                 $spaceName = 'Bureau Privatif 17 m² (Aile Ouest)';
-                $rentStr = '750 € HT / mois';
+                $rentStr = '950 € HT / mois';
                 $ws = 3;
             }
         } elseif ($existing['type'] === 'open-space') {
@@ -897,7 +897,7 @@ if ($action === 'tenant' && $method === 'POST') {
     $workstations  = (int)($inputData['workstations'] ?? 1);
     $parkingBays   = trim($inputData['parkingBays'] ?? $inputData['parking_bays'] ?? 'Places cour sécurisée');
     $leaseStart    = trim($inputData['leaseStart'] ?? $inputData['lease_start'] ?? substr($now, 0, 10));
-    $monthlyRent   = trim($inputData['monthlyRent'] ?? $inputData['monthly_rent'] ?? '750 € HT / mois');
+    $monthlyRent   = trim($inputData['monthlyRent'] ?? $inputData['monthly_rent'] ?? '950 € HT / mois');
     $status        = trim($inputData['status'] ?? 'active');
     $isFromWon     = isset($inputData['isFromWonLead']) ? ($inputData['isFromWonLead'] ? 1 : 0) : 0;
 

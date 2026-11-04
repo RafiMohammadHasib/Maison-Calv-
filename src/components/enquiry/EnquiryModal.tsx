@@ -18,7 +18,7 @@ const MODAL_STRINGS = {
   fr: {
     closeAria: "Fermer la boîte de dialogue",
     office17Title: "Bureau privatif 21 m² (~3 à 4 postes)",
-    office17Price: "750€ HT / mois",
+    office17Price: "950€ HT / mois",
     office17Avail: "✓ Disponible immédiatement",
     office25Title: "Bureau privatif 28 m² (~5 à 6 postes)",
     office25Price: "1200€ HT / mois",
@@ -59,7 +59,7 @@ const MODAL_STRINGS = {
   en: {
     closeAria: "Close dialog",
     office17Title: "Private Office 21 sqm (~3 to 4 desks)",
-    office17Price: "€750 excl. VAT / mo",
+    office17Price: "€950 excl. VAT / mo",
     office17Avail: "✓ Immediately available",
     office25Title: "Private Office 28 sqm (~5 to 6 desks)",
     office25Price: "€1,200 excl. VAT / mo",
@@ -100,7 +100,7 @@ const MODAL_STRINGS = {
   es: {
     closeAria: "Cerrar diálogo",
     office17Title: "Despacho Privado 21 m² (~3 a 4 puestos)",
-    office17Price: "750€ + IVA / mes",
+    office17Price: "950€ + IVA / mes",
     office17Avail: "✓ Disponible de inmediato",
     office25Title: "Despacho Privado 28 m² (~5 a 6 puestos)",
     office25Price: "1200€ + IVA / mes",

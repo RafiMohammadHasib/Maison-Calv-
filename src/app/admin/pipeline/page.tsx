@@ -459,7 +459,7 @@ export default function PipelinePage() {
   const getCardPrice = (lead: Lead) => {
     if (lead.type === "private-office") {
       if (lead.officeSize?.includes("28") || lead.officeSize?.includes("25")) return "1 200 € HT";
-      return "750 € HT";
+      return "950 € HT";
     }
     if (lead.type === "open-space") {
       if (lead.openSpacePlan === "fixe") {
@@ -471,7 +471,7 @@ export default function PipelinePage() {
     if (lead.type === "meeting-room") {
       return lead.timeSlot === "full-day" ? "200 € HT" : "120 € HT";
     }
-    return "750 € HT";
+    return "950 € HT";
   };
 
   // Helper for category badge pill

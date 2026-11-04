@@ -14,7 +14,7 @@ export const DEFAULT_SETTINGS: Record<string, any> = {
     heroBadge: "Coworking haut de gamme – Bordeaux Fondaudège",
     heroDesc:
       "Un espace de travail confortable, calme et haut de gamme pensé pour s'y installer dans le temps.",
-    office17Price: "750€ HT",
+    office17Price: "950€ HT",
     office25Price: "1200€ HT",
     openSpacePrice: "250€ HT"
   },
@@ -32,7 +32,7 @@ export const DEFAULT_SETTINGS: Record<string, any> = {
     guarantee: "Galian Assurances — 120 000 € / Allianz Pro"
   },
   settings_rental: {
-    office17Rate: "€750 excl. VAT / month",
+    office17Rate: "€950 excl. VAT / month",
     office25Rate: "€1,200 excl. VAT / month",
     openSpaceRate: "€250 excl. VAT / month",
     nomadRate: "€20 excl. VAT day / €10 excl. VAT half-day",

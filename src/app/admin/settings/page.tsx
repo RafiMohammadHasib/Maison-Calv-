@@ -109,7 +109,7 @@ export default function SettingsPage() {
   const [guarantee, setGuarantee] = useState("Galian Assurances — 120 000 € / Allianz Pro");
 
   // Form State: 3. Rental Rules & Rates
-  const [office17Rate, setOffice17Rate] = useState("€750 excl. VAT / month");
+  const [office17Rate, setOffice17Rate] = useState("€950 excl. VAT / month");
   const [office25Rate, setOffice25Rate] = useState("€1,200 excl. VAT / month");
   const [openSpaceRate, setOpenSpaceRate] = useState("€250 excl. VAT / month");
   const [nomadRate, setNomadRate] = useState("€20 excl. VAT day / €10 excl. VAT half-day");

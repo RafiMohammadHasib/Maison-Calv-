@@ -74,7 +74,7 @@ export function getUnifiedTenants(providedLeads?: Lead[]): TenantRecord[] {
 
   const crmTenants: TenantRecord[] = wonLeads.map((lead, idx) => {
     let spaceName = "Bureau Privatif Maison Calvé";
-    let rentStr = "750 € HT / mois";
+    let rentStr = "950 € HT / mois";
     let workstations = lead.workstationCount || 1;
     let parking = "Cour privée (place incluse)";
 
@@ -84,9 +84,9 @@ export function getUnifiedTenants(providedLeads?: Lead[]): TenantRecord[] {
         rentStr = "1 200 € HT / mois";
         workstations = 5;
         parking = "Places #3 & #4";
-      } else if (lead.officeSize?.includes("17")) {
+      } else if (lead.officeSize?.includes("17") || lead.officeSize?.includes("21")) {
         spaceName = "Bureau Privatif 21 m² (Aile Ouest)";
-        rentStr = "750 € HT / mois";
+        rentStr = "950 € HT / mois";
         workstations = 3;
         parking = "Place #5";
       } else {
@@ -163,7 +163,7 @@ export function getUnifiedSpaces(providedLeads?: Lead[]): SpaceInventoryRecord[]
       category: "private",
       area: "21 m²",
       capacity: "3 à 4 postes de travail",
-      price: "750 € HT",
+      price: "950 € HT",
       period: "par mois",
       status: won17m ? "occupied" : "available",
       statusText: won17m

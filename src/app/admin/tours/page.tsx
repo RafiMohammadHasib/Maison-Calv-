@@ -186,7 +186,7 @@ export default function ToursPage() {
   const getTourPrice = (tour: Lead) => {
     if (tour.type === "private-office") {
       if (tour.officeSize?.includes("28") || tour.officeSize?.includes("25")) return "1 200 € HT / mois";
-      return "750 € HT / mois";
+      return "950 € HT / mois";
     }
     if (tour.type === "open-space") {
       const count = tour.workstationCount || 1;
@@ -195,7 +195,7 @@ export default function ToursPage() {
     if (tour.type === "meeting-room") {
       return tour.timeSlot === "full-day" ? "200 € HT (Journée)" : "120 € HT (Demi-journée)";
     }
-    return "750 € HT / mois";
+    return "950 € HT / mois";
   };
 
   return (

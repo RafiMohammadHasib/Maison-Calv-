@@ -198,7 +198,7 @@ function getLeadFinancials(lead: Lead, isEnglish: boolean): { label: string; rat
     if (lead.officeSize?.includes("17") || lead.officeSize?.includes("21")) {
       return { 
         label: isEnglish ? lead.officeSize.replace(/Bureau [pP]rivatif/g, "Private Office").replace("postes", "desks") : lead.officeSize, 
-        rate: isEnglish ? "€750 excl. VAT/mo" : "750 € HT/mois" 
+        rate: isEnglish ? "€950 excl. VAT/mo" : "950 € HT/mois" 
       };
     }
     return { label: lead.officeSize || defaultName, rate: isEnglish ? "€850 excl. VAT/mo" : "850 € HT/mois" };
@@ -467,7 +467,7 @@ export default function AdminDashboardPage() {
     }
     const avail = privateOffices.filter((s) => s.status === "available");
     if (avail.length >= 2) {
-      return isEnglish ? "21sqm (€750) & 28sqm (€1,200) excl. VAT" : "21m² (750€) & 28m² (1 200€) HT";
+      return isEnglish ? "21sqm (€950) & 28sqm (€1,200) excl. VAT" : "21m² (950€) & 28m² (1 200€) HT";
     }
     if (avail.length === 1) {
       return isEnglish
@@ -512,7 +512,7 @@ export default function AdminDashboardPage() {
     const getLeadRev = (l: Lead) => {
       if (l.type === "private-office") {
         if (l.officeSize?.includes("28") || l.officeSize?.includes("25")) return 1200;
-        if (l.officeSize?.includes("17") || l.officeSize?.includes("21")) return 750;
+        if (l.officeSize?.includes("17") || l.officeSize?.includes("21")) return 950;
         return 850;
       }
       if (l.type === "open-space") {
@@ -617,7 +617,7 @@ export default function AdminDashboardPage() {
     const totalRev = leads.reduce((acc, l) => {
       if (l.type === "private-office") {
         if (l.officeSize?.includes("28") || l.officeSize?.includes("25")) return acc + 1200;
-        if (l.officeSize?.includes("17") || l.officeSize?.includes("21")) return acc + 750;
+        if (l.officeSize?.includes("17") || l.officeSize?.includes("21")) return acc + 950;
         return acc + 850;
       }
       if (l.type === "open-space") {
