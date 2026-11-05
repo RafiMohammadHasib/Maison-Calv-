@@ -22,7 +22,8 @@ import {
   X,
   Menu,
   CheckCircle2,
-  Clock
+  Clock,
+  Globe
 } from "lucide-react";
 import { Lead, LeadPriority } from "@/lib/leads";
 import { useLanguage } from "@/lib/languageContext";
@@ -255,7 +256,8 @@ export default function AdminLayout({
     {
       group: t("nav.system"),
       items: [
-        { label: t("nav.settings"), href: "/admin/settings", icon: Settings }
+        { label: t("nav.settings"), href: "/admin/settings", icon: Settings },
+        { label: "SEO & Analytics", href: "/admin/settings?tab=seo", icon: Globe }
       ]
     }
   ];
@@ -348,7 +350,9 @@ export default function AdminLayout({
                 <div className="space-y-0.5">
                   {group.items.map((item) => {
                     const Icon = item.icon;
-                    const isActive = pathname === item.href || (item.href.includes("?") && pathname === item.href.split("?")[0]);
+                    const isActive = item.href.includes("?")
+                      ? (typeof window !== "undefined" && window.location.pathname + window.location.search === item.href)
+                      : (pathname === item.href && (typeof window === "undefined" || !window.location.search.includes("tab=seo")));
                     return (
                       <Link
                         key={item.href}

@@ -23,19 +23,31 @@ import {
   AlertCircle,
   Database,
   Server,
-  RefreshCw
+  RefreshCw,
+  Globe,
+  BarChart3,
+  Copy,
+  Check,
+  Code,
+  Sparkles,
+  Search,
+  Layers,
+  HelpCircle,
+  Radio
 } from "lucide-react";
 
 export default function SettingsPage() {
   const { language, t, isEnglish } = useLanguage();
-  const [activeTab, setActiveTab] = useState<"identity" | "rental" | "system" | "profile">("identity");
+  const [activeTab, setActiveTab] = useState<"identity" | "rental" | "seo" | "system" | "profile">("identity");
 
-  // Read URL query parameter for direct tab linking (e.g. ?tab=system or ?tab=profile)
+  // Read URL query parameter for direct tab linking (e.g. ?tab=seo or ?tab=system or ?tab=profile)
   useEffect(() => {
     if (typeof window !== "undefined") {
       const params = new URLSearchParams(window.location.search);
       const tab = params.get("tab");
-      if (tab === "seo" || tab === "system") {
+      if (tab === "seo") {
+        setActiveTab("seo");
+      } else if (tab === "system") {
         setActiveTab("system");
       } else if (tab === "profile") {
         setActiveTab("profile");
@@ -119,13 +131,35 @@ export default function SettingsPage() {
   const [noticePeriod, setNoticePeriod] = useState("3 months for private offices · 1 month for open space");
   const [parkingPolicy, setParkingPolicy] = useState("Included with private suites (9 secure courtyard bays total)");
 
-  // Form State: 4. System & SEO
-  const [metaTitle, setMetaTitle] = useState("Maison Calvé — Premium Coworking Bordeaux Fondaudège with Parking");
+  // Form State: 4. SEO & Google Analytics (User requested image integration)
+  const [googleTagId, setGoogleTagId] = useState("GTM-K7CVNBTS");
+  const [googleTagEnabled, setGoogleTagEnabled] = useState(true);
+  const [googleAnalyticsId, setGoogleAnalyticsId] = useState("");
+  const [googleSearchConsole, setGoogleSearchConsole] = useState("");
+  const [metaTitle, setMetaTitle] = useState("Maison Calvé — Coworking Bordeaux Fondaudège avec Parking");
+  const [metaDescription, setMetaDescription] = useState(
+    "Maison Calvé : espace de coworking haut de gamme à Bordeaux Fondaudège (48 rue Calvé). 5 bureaux privatifs, open space feutré, salle de réunion 30m² et 9 places de parking privatives sécurisées."
+  );
+  const [metaKeywords, setMetaKeywords] = useState(
+    "coworking bordeaux, coworking bordeaux parking, espace de coworking bordeaux, bureaux privatifs bordeaux, open space bordeaux, salle de reunion bordeaux, meeting room bordeaux, coworking with parking bordeaux, coworking fondaudege, location bureau bordeaux"
+  );
+  const [canonicalUrl, setCanonicalUrl] = useState("https://maisoncalve.fr");
+  const [allowIndexing, setAllowIndexing] = useState(true);
+  const [ogTitle, setOgTitle] = useState("Maison Calvé — Coworking Bordeaux Fondaudège");
+  const [ogDescription, setOgDescription] = useState(
+    "Bureaux privatifs, open space feutré et salle de réunion au 48 rue Calvé avec 9 places de parking privatives."
+  );
+  const [ogImage, setOgImage] = useState("/images/spaces/real-open-space-fixe-4k.jpg");
+  const [customHeadCode, setCustomHeadCode] = useState("");
+  const [customBodyCode, setCustomBodyCode] = useState("");
+  const [copiedSnippet, setCopiedSnippet] = useState(false);
+
+  // Form State: 5. System, Coordinates & Alerts
   const [instagramAccount, setInstagramAccount] = useState("@maisoncalvebordeaux");
   const [gpsCoordinates, setGpsCoordinates] = useState("44.8488° N, 0.5843° W (Tram D Croix-de-Seguey)");
   const [leadDispatcherEmail, setLeadDispatcherEmail] = useState("admin@maisoncalve.fr");
 
-  // Form State: 5. Profile & Security
+  // Form State: 6. Profile & Security
   const [adminName, setAdminName] = useState("Paul (Operations Director)");
   const [adminEmail, setAdminEmail] = useState("admin@maisoncalve.fr");
 
@@ -172,9 +206,26 @@ export default function SettingsPage() {
           if (r.noticePeriod) setNoticePeriod(r.noticePeriod);
           if (r.parkingPolicy) setParkingPolicy(r.parkingPolicy);
         }
+        if (s.settings_seo) {
+          const seo = s.settings_seo;
+          if (seo.googleTagId !== undefined) setGoogleTagId(seo.googleTagId);
+          if (seo.googleTagEnabled !== undefined) setGoogleTagEnabled(Boolean(seo.googleTagEnabled));
+          if (seo.googleAnalyticsId !== undefined) setGoogleAnalyticsId(seo.googleAnalyticsId);
+          if (seo.googleSearchConsole !== undefined) setGoogleSearchConsole(seo.googleSearchConsole);
+          if (seo.metaTitle) setMetaTitle(seo.metaTitle);
+          if (seo.metaDescription) setMetaDescription(seo.metaDescription);
+          if (seo.metaKeywords) setMetaKeywords(seo.metaKeywords);
+          if (seo.canonicalUrl) setCanonicalUrl(seo.canonicalUrl);
+          if (seo.allowIndexing !== undefined) setAllowIndexing(Boolean(seo.allowIndexing));
+          if (seo.ogTitle) setOgTitle(seo.ogTitle);
+          if (seo.ogDescription) setOgDescription(seo.ogDescription);
+          if (seo.ogImage) setOgImage(seo.ogImage);
+          if (seo.customHeadCode !== undefined) setCustomHeadCode(seo.customHeadCode);
+          if (seo.customBodyCode !== undefined) setCustomBodyCode(seo.customBodyCode);
+        }
         if (s.settings_system) {
           const sys = s.settings_system;
-          if (sys.metaTitle) setMetaTitle(sys.metaTitle);
+          if (!s.settings_seo && sys.metaTitle) setMetaTitle(sys.metaTitle);
           if (sys.instagramAccount) setInstagramAccount(sys.instagramAccount);
           if (sys.gpsCoordinates) setGpsCoordinates(sys.gpsCoordinates);
           if (sys.leadDispatcherEmail) setLeadDispatcherEmail(sys.leadDispatcherEmail);
@@ -203,7 +254,7 @@ export default function SettingsPage() {
     fetchAllSettings();
   }, []);
 
-  // Save all 4 tabs in bulk to database
+  // Save all tabs in bulk to database & disk
   const handleSave = async (e: React.FormEvent) => {
     e.preventDefault();
     try {
@@ -235,6 +286,22 @@ export default function SettingsPage() {
               depositRule,
               noticePeriod,
               parkingPolicy
+            },
+            settings_seo: {
+              googleTagId,
+              googleTagEnabled,
+              googleAnalyticsId,
+              googleSearchConsole,
+              metaTitle,
+              metaDescription,
+              metaKeywords,
+              canonicalUrl,
+              allowIndexing,
+              ogTitle,
+              ogDescription,
+              ogImage,
+              customHeadCode,
+              customBodyCode
             },
             settings_system: {
               metaTitle,
@@ -344,11 +411,23 @@ export default function SettingsPage() {
     }
   };
 
+  const copyGoogleTagSnippet = () => {
+    const snippet = `<script async src="https://www.googletagmanager.com/gtm.js?id=${googleTagId || "GTM-K7CVNBTS"}"></script>
+<script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  gtag('js', new Date());
+</script>`;
+    navigator.clipboard.writeText(snippet);
+    setCopiedSnippet(true);
+    setTimeout(() => setCopiedSnippet(false), 2500);
+  };
+
   return (
     <AdminLayout>
       <form onSubmit={handleSave} className="space-y-6">
         {/* ========================================================== */}
-        {/* 1. TOP HEADER STRIP (MATCHING REFERENCE IMAGES)            */}
+        {/* 1. TOP HEADER STRIP                                        */}
         {/* ========================================================== */}
         <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-4">
           <div>
@@ -383,12 +462,16 @@ export default function SettingsPage() {
         {saved && (
           <div className="p-4 rounded-2xl bg-emerald-50 border border-emerald-200 text-emerald-900 text-xs font-bold flex items-center gap-2 animate-in fade-in">
             <CheckCircle2 className="w-4 h-4 text-emerald-600 shrink-0" />
-            <span>{isEnglish ? "Settings & system rules successfully saved in database!" : "Paramètres et règles système enregistrés avec succès dans MySQL !"}</span>
+            <span>
+              {isEnglish
+                ? "Settings, SEO parameters & Google tag successfully saved and applied to the site!"
+                : "Paramètres, configuration SEO et Google Tag enregistrés et appliqués au site avec succès !"}
+            </span>
           </div>
         )}
 
         {/* ========================================================== */}
-        {/* 2. SEGMENTED NAVIGATION TABS CAPSULE (MATCHING REFERENCE)  */}
+        {/* 2. NAVIGATION TABS                                         */}
         {/* ========================================================== */}
         <div className="flex items-center gap-1.5 p-1.5 bg-slate-100/90 border border-slate-200/80 rounded-2xl overflow-x-auto text-xs font-semibold">
           <button
@@ -419,6 +502,22 @@ export default function SettingsPage() {
 
           <button
             type="button"
+            onClick={() => setActiveTab("seo")}
+            className={`flex items-center gap-2 px-4 py-2 rounded-xl transition-all cursor-pointer whitespace-nowrap ${
+              activeTab === "seo"
+                ? "bg-white text-calve-charcoal shadow-2xs font-bold ring-1 ring-calve-slate/20"
+                : "text-calve-muted hover:text-calve-charcoal"
+            }`}
+          >
+            <Globe className="w-4 h-4 text-emerald-600" />
+            <span>{isEnglish ? "SEO & Google Analytics" : "SEO & Google Analytics"}</span>
+            {googleTagEnabled && googleTagId && (
+              <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span>
+            )}
+          </button>
+
+          <button
+            type="button"
             onClick={() => setActiveTab("system")}
             className={`flex items-center gap-2 px-4 py-2 rounded-xl transition-all cursor-pointer whitespace-nowrap ${
               activeTab === "system"
@@ -427,7 +526,7 @@ export default function SettingsPage() {
             }`}
           >
             <Sliders className="w-4 h-4 text-calve-slate" />
-            <span>{isEnglish ? "System, SEO & Social" : "Système, SEO & Réseaux"}</span>
+            <span>{isEnglish ? "System & Alerts" : "Système & Alertes"}</span>
           </button>
 
           <button
@@ -445,7 +544,7 @@ export default function SettingsPage() {
         </div>
 
         {/* ========================================================== */}
-        {/* TAB 1: IDENTITY & AGENCY (MATCHING IMAGE 8)                */}
+        {/* TAB 1: IDENTITY & AGENCY                                   */}
         {/* ========================================================== */}
         {activeTab === "identity" && (
           <div className="space-y-6 animate-in fade-in">
@@ -500,48 +599,45 @@ export default function SettingsPage() {
                 <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                   <div>
                     <label className="block text-[10px] font-bold uppercase tracking-wider text-calve-muted mb-1.5">
-                      PAUL GOIZET PHONE
+                      {isEnglish ? "DIRECTOR PHONE (PAUL)" : "TÉLÉPHONE DIRECTEUR (PAUL)"}
                     </label>
                     <input
                       type="text"
                       value={paulPhone}
                       onChange={(e) => setPaulPhone(e.target.value)}
-                      className="w-full px-4 py-2.5 rounded-xl border border-calve-border bg-white text-xs font-mono text-calve-charcoal focus:border-calve-slate shadow-2xs"
+                      className="w-full px-4 py-2.5 rounded-xl border border-calve-border bg-white text-xs text-calve-charcoal focus:border-calve-slate shadow-2xs font-mono"
                     />
                   </div>
 
                   <div>
                     <label className="block text-[10px] font-bold uppercase tracking-wider text-calve-muted mb-1.5">
-                      EDGAR GOIZET PHONE
+                      {isEnglish ? "COMMERCIAL PHONE (EDGAR)" : "TÉLÉPHONE COMMERCIAL (EDGAR)"}
                     </label>
                     <input
                       type="text"
                       value={edgarPhone}
                       onChange={(e) => setEdgarPhone(e.target.value)}
-                      className="w-full px-4 py-2.5 rounded-xl border border-calve-border bg-white text-xs font-mono text-calve-charcoal focus:border-calve-slate shadow-2xs"
+                      className="w-full px-4 py-2.5 rounded-xl border border-calve-border bg-white text-xs text-calve-charcoal focus:border-calve-slate shadow-2xs font-mono"
                     />
                   </div>
 
                   <div>
                     <label className="block text-[10px] font-bold uppercase tracking-wider text-calve-muted mb-1.5">
-                      PRIMARY AGENCY EMAIL
+                      {isEnglish ? "AGENCY EMAIL" : "EMAIL OFFICIEL DE CONTACT"}
                     </label>
-                    <div className="relative">
-                      <Mail className="w-3.5 h-3.5 text-calve-muted absolute left-3.5 top-1/2 -translate-y-1/2" />
-                      <input
-                        type="email"
-                        value={agencyEmail}
-                        onChange={(e) => setAgencyEmail(e.target.value)}
-                        className="w-full pl-9 pr-3 py-2.5 rounded-xl border border-calve-border bg-white text-xs text-calve-charcoal focus:border-calve-slate shadow-2xs"
-                      />
-                    </div>
+                    <input
+                      type="email"
+                      value={agencyEmail}
+                      onChange={(e) => setAgencyEmail(e.target.value)}
+                      className="w-full px-4 py-2.5 rounded-xl border border-calve-border bg-white text-xs text-calve-charcoal focus:border-calve-slate shadow-2xs"
+                    />
                   </div>
                 </div>
 
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                   <div>
                     <label className="block text-[10px] font-bold uppercase tracking-wider text-calve-muted mb-1.5">
-                      BORDEAUX OFFICE ADDRESS
+                      {isEnglish ? "HEADQUARTERS ADDRESS" : "ADRESSE DU SIÈGE SOCIAL"}
                     </label>
                     <div className="relative">
                       <MapPin className="w-3.5 h-3.5 text-calve-muted absolute left-3.5 top-1/2 -translate-y-1/2" />
@@ -556,7 +652,7 @@ export default function SettingsPage() {
 
                   <div>
                     <label className="block text-[10px] font-bold uppercase tracking-wider text-calve-muted mb-1.5">
-                      OFFICE OPENING HOURS
+                      {isEnglish ? "OPENING HOURS & PROTOCOL" : "HORAIRES D'OUVERTURE & ACCÈS"}
                     </label>
                     <div className="relative">
                       <Clock className="w-3.5 h-3.5 text-calve-muted absolute left-3.5 top-1/2 -translate-y-1/2" />
@@ -576,14 +672,17 @@ export default function SettingsPage() {
             <div className="p-6 sm:p-8 rounded-3xl bg-white border border-calve-border/80 shadow-2xs space-y-5">
               <div className="border-b border-calve-border/60 pb-3">
                 <h3 className="text-base font-extrabold text-calve-charcoal">
-                  2. Legal Notice &amp; Professional Licenses (Hoguet Law)
+                  {isEnglish ? "2. Legal Notice & Professional Licenses (Hoguet Law)" : "2. Mentions Légales & Cartes Professionnelles (Loi Hoguet)"}
                 </h3>
+                <p className="text-xs text-calve-muted mt-0.5">
+                  {isEnglish ? "Mandatory French legal disclosures and financial guarantees." : "Mentions obligatoires régies par la CCI Bordeaux et la législation immobilière."}
+                </p>
               </div>
 
               <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                 <div>
                   <label className="block text-[10px] font-bold uppercase tracking-wider text-calve-muted mb-1.5">
-                    SIRET NUMBER
+                    {isEnglish ? "SIRET NUMBER" : "NUMÉRO DE SIRET"}
                   </label>
                   <input
                     type="text"
@@ -595,19 +694,19 @@ export default function SettingsPage() {
 
                 <div>
                   <label className="block text-[10px] font-bold uppercase tracking-wider text-calve-muted mb-1.5">
-                    PROFESSIONAL LICENSE CPI (CCI BORDEAUX)
+                    {isEnglish ? "CPI PROFESSIONAL CARD" : "CARTE PROFESSIONNELLE CPI"}
                   </label>
                   <input
                     type="text"
                     value={licenseCPI}
                     onChange={(e) => setLicenseCPI(e.target.value)}
-                    className="w-full px-4 py-2.5 rounded-xl border border-calve-border bg-white text-xs text-calve-charcoal focus:border-calve-slate shadow-2xs"
+                    className="w-full px-4 py-2.5 rounded-xl border border-calve-border bg-white text-xs font-mono text-calve-charcoal focus:border-calve-slate shadow-2xs"
                   />
                 </div>
 
                 <div>
                   <label className="block text-[10px] font-bold uppercase tracking-wider text-calve-muted mb-1.5">
-                    FINANCIAL GUARANTEE &amp; PROVIDER
+                    {isEnglish ? "FINANCIAL GUARANTEE & INSURER" : "GARANTIE FINANCIÈRE & ASSURANCE"}
                   </label>
                   <input
                     type="text"
@@ -622,144 +721,141 @@ export default function SettingsPage() {
         )}
 
         {/* ========================================================== */}
-        {/* TAB 2: RENTAL RULES & RATES (MATCHING IMAGE 9)             */}
+        {/* TAB 2: RENTAL RULES & RATES                                */}
         {/* ========================================================== */}
         {activeTab === "rental" && (
           <div className="space-y-6 animate-in fade-in">
-            {/* Card 1: Official Pricing Grid */}
             <div className="p-6 sm:p-8 rounded-3xl bg-white border border-calve-border/80 shadow-2xs space-y-5">
               <div className="border-b border-calve-border/60 pb-3">
                 <h3 className="text-base font-extrabold text-calve-charcoal">
-                  1. Official Rental Pricing (Prices excl. VAT)
+                  {isEnglish ? "1. Official Rental Pricing (Prices excl. VAT)" : "1. Grille Tarifaire Officielle (Prix en € HT)"}
                 </h3>
                 <p className="text-xs text-calve-muted mt-0.5">
-                  Rates displayed live on Maison Calvé public portal and CRM quotes.
+                  {isEnglish ? "Rates displayed live on Maison Calvé public portal and CRM quotes." : "Tarifs affichés en direct sur le site public de Maison Calvé et les devis CRM."}
                 </p>
               </div>
 
-              <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
                 <div>
                   <label className="block text-[10px] font-bold uppercase tracking-wider text-calve-muted mb-1.5">
-                    PRIVATE OFFICE 21 SQM
+                    PRIVATE SUITE 17 M² (3-4 DESKS)
                   </label>
                   <input
                     type="text"
                     value={office17Rate}
                     onChange={(e) => setOffice17Rate(e.target.value)}
-                    className="w-full px-4 py-2.5 rounded-xl border border-calve-border text-xs font-bold text-calve-charcoal"
+                    className="w-full px-4 py-2.5 rounded-xl border border-calve-border bg-white text-xs font-bold text-calve-charcoal focus:border-calve-slate shadow-2xs"
                   />
-                  <span className="text-[10px] text-calve-muted mt-1 block">3 to 4 workstations</span>
                 </div>
 
                 <div>
                   <label className="block text-[10px] font-bold uppercase tracking-wider text-calve-muted mb-1.5">
-                    PRIVATE OFFICE 28 SQM
+                    PRIVATE SUITE 25-28 M² (5-6 DESKS)
                   </label>
                   <input
                     type="text"
                     value={office25Rate}
                     onChange={(e) => setOffice25Rate(e.target.value)}
-                    className="w-full px-4 py-2.5 rounded-xl border border-calve-border text-xs font-bold text-calve-charcoal"
+                    className="w-full px-4 py-2.5 rounded-xl border border-calve-border bg-white text-xs font-bold text-calve-charcoal focus:border-calve-slate shadow-2xs"
                   />
-                  <span className="text-[10px] text-calve-muted mt-1 block">5 to 6 workstations</span>
                 </div>
 
                 <div>
                   <label className="block text-[10px] font-bold uppercase tracking-wider text-calve-muted mb-1.5">
-                    DEDICATED DESK OPEN SPACE
+                    DEDICATED DESK (OPEN SPACE)
                   </label>
                   <input
                     type="text"
                     value={openSpaceRate}
                     onChange={(e) => setOpenSpaceRate(e.target.value)}
-                    className="w-full px-4 py-2.5 rounded-xl border border-calve-border text-xs font-bold text-calve-charcoal"
+                    className="w-full px-4 py-2.5 rounded-xl border border-calve-border bg-white text-xs font-bold text-calve-charcoal focus:border-calve-slate shadow-2xs"
                   />
-                  <span className="text-[10px] text-calve-muted mt-1 block">per month per desk (5 desks/space)</span>
                 </div>
 
                 <div>
                   <label className="block text-[10px] font-bold uppercase tracking-wider text-calve-muted mb-1.5">
-                    FLEXIBLE HOT DESK
+                    NOMAD PASS (DAY / HALF-DAY)
                   </label>
                   <input
                     type="text"
                     value={nomadRate}
                     onChange={(e) => setNomadRate(e.target.value)}
-                    className="w-full px-4 py-2.5 rounded-xl border border-calve-border text-xs font-bold text-calve-charcoal"
+                    className="w-full px-4 py-2.5 rounded-xl border border-calve-border bg-white text-xs font-bold text-calve-charcoal focus:border-calve-slate shadow-2xs"
                   />
-                  <span className="text-[10px] text-calve-muted mt-1 block">upon prior reservation</span>
                 </div>
 
                 <div>
                   <label className="block text-[10px] font-bold uppercase tracking-wider text-calve-muted mb-1.5">
-                    EXECUTIVE MEETING ROOM 30 SQM
+                    MEETING ROOM 30 M² (HOURLY / DAY)
                   </label>
                   <input
                     type="text"
                     value={meetingRate}
                     onChange={(e) => setMeetingRate(e.target.value)}
-                    className="w-full px-4 py-2.5 rounded-xl border border-calve-border text-xs font-bold text-calve-charcoal"
+                    className="w-full px-4 py-2.5 rounded-xl border border-calve-border bg-white text-xs font-bold text-calve-charcoal focus:border-calve-slate shadow-2xs"
                   />
-                  <span className="text-[10px] text-calve-muted mt-1 block">with 4K screen &amp; barista coffee included</span>
                 </div>
 
                 <div>
                   <label className="block text-[10px] font-bold uppercase tracking-wider text-calve-muted mb-1.5">
-                    STANDARD VAT RATE
+                    APPLICABLE VAT RATE
                   </label>
                   <input
                     type="text"
                     value={vatRate}
                     onChange={(e) => setVatRate(e.target.value)}
-                    className="w-full px-4 py-2.5 rounded-xl border border-calve-border text-xs font-bold text-calve-charcoal"
+                    className="w-full px-4 py-2.5 rounded-xl border border-calve-border bg-white text-xs font-mono font-bold text-calve-charcoal focus:border-calve-slate shadow-2xs"
                   />
-                  <span className="text-[10px] text-calve-muted mt-1 block">applicable to corporate service contracts</span>
                 </div>
               </div>
             </div>
 
-            {/* Card 2: Lease Conditions & Resident Policies */}
             <div className="p-6 sm:p-8 rounded-3xl bg-white border border-calve-border/80 shadow-2xs space-y-5">
               <div className="border-b border-calve-border/60 pb-3">
                 <h3 className="text-base font-extrabold text-calve-charcoal">
-                  2. Lease Conditions &amp; Resident Policies
+                  {isEnglish ? "2. Lease Conditions & Resident Policies" : "2. Conditions de Bail & Politiques Résidents"}
                 </h3>
+                <p className="text-xs text-calve-muted mt-0.5">
+                  {isEnglish ? "Terms embedded into contract generation and member agreements." : "Conditions appliquées à la signature des contrats et règlements intérieurs."}
+                </p>
               </div>
 
-              <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
-                <div>
-                  <label className="block text-[10px] font-bold uppercase tracking-wider text-calve-muted mb-1.5">
-                    SECURITY DEPOSIT
-                  </label>
-                  <input
-                    type="text"
-                    value={depositRule}
-                    onChange={(e) => setDepositRule(e.target.value)}
-                    className="w-full px-4 py-2.5 rounded-xl border border-calve-border text-xs text-calve-charcoal"
-                  />
+              <div className="space-y-4">
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  <div>
+                    <label className="block text-[10px] font-bold uppercase tracking-wider text-calve-muted mb-1.5">
+                      SECURITY DEPOSIT REQUIREMENT
+                    </label>
+                    <input
+                      type="text"
+                      value={depositRule}
+                      onChange={(e) => setDepositRule(e.target.value)}
+                      className="w-full px-4 py-2.5 rounded-xl border border-calve-border bg-white text-xs text-calve-charcoal focus:border-calve-slate shadow-2xs"
+                    />
+                  </div>
+
+                  <div>
+                    <label className="block text-[10px] font-bold uppercase tracking-wider text-calve-muted mb-1.5">
+                      TERMINATION NOTICE PERIOD
+                    </label>
+                    <input
+                      type="text"
+                      value={noticePeriod}
+                      onChange={(e) => setNoticePeriod(e.target.value)}
+                      className="w-full px-4 py-2.5 rounded-xl border border-calve-border bg-white text-xs text-calve-charcoal focus:border-calve-slate shadow-2xs"
+                    />
+                  </div>
                 </div>
 
                 <div>
                   <label className="block text-[10px] font-bold uppercase tracking-wider text-calve-muted mb-1.5">
-                    NOTICE PERIOD
-                  </label>
-                  <input
-                    type="text"
-                    value={noticePeriod}
-                    onChange={(e) => setNoticePeriod(e.target.value)}
-                    className="w-full px-4 py-2.5 rounded-xl border border-calve-border text-xs text-calve-charcoal"
-                  />
-                </div>
-
-                <div>
-                  <label className="block text-[10px] font-bold uppercase tracking-wider text-calve-muted mb-1.5">
-                    SECURE COURTYARD PARKING
+                    PARKING ALLOCATION POLICY
                   </label>
                   <input
                     type="text"
                     value={parkingPolicy}
                     onChange={(e) => setParkingPolicy(e.target.value)}
-                    className="w-full px-4 py-2.5 rounded-xl border border-calve-border text-xs text-calve-charcoal"
+                    className="w-full px-4 py-2.5 rounded-xl border border-calve-border bg-white text-xs text-calve-charcoal focus:border-calve-slate shadow-2xs"
                   />
                 </div>
               </div>
@@ -768,30 +864,487 @@ export default function SettingsPage() {
         )}
 
         {/* ========================================================== */}
-        {/* TAB 3: SYSTEM, SEO & SOCIAL (MATCHING IMAGE 10)            */}
+        {/* TAB 3: SEO & GOOGLE ANALYTICS (USER IMAGE IMPLEMENTATION)  */}
+        {/* ========================================================== */}
+        {activeTab === "seo" && (
+          <div className="space-y-6 animate-in fade-in">
+            {/* Card 1: Google Tag & Google Analytics 4 (GA4) Container */}
+            <div className="p-6 sm:p-8 rounded-3xl bg-white border border-calve-border/80 shadow-2xs space-y-6">
+              <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-calve-border/60 pb-4">
+                <div className="flex items-start gap-3">
+                  <div className="w-10 h-10 rounded-2xl bg-emerald-50 border border-emerald-200/80 flex items-center justify-center shrink-0">
+                    <BarChart3 className="w-5 h-5 text-emerald-600" />
+                  </div>
+                  <div>
+                    <div className="flex items-center gap-2">
+                      <h3 className="text-base font-extrabold text-calve-charcoal">
+                        {isEnglish ? "1. Google Tag & Google Analytics (GA4 / GTM)" : "1. Google Tag & Google Analytics (GA4 / GTM)"}
+                      </h3>
+                      {googleTagEnabled && googleTagId ? (
+                        <span className="px-2.5 py-0.5 rounded-full text-[10px] font-bold bg-emerald-100 text-emerald-800 flex items-center gap-1">
+                          <span className="w-1.5 h-1.5 rounded-full bg-emerald-600"></span>
+                          {isEnglish ? "Live & Tagging" : "Actif & Connecté"}
+                        </span>
+                      ) : (
+                        <span className="px-2.5 py-0.5 rounded-full text-[10px] font-bold bg-amber-100 text-amber-800">
+                          {isEnglish ? "Inactive / Paused" : "Inactif / En Pause"}
+                        </span>
+                      )}
+                    </div>
+                    <p className="text-xs text-calve-muted mt-0.5">
+                      {isEnglish
+                        ? "Configure Google Tag Manager container or Google Analytics 4 Measurement ID shown on your setup screen."
+                        : "Configurez l'identifiant de tag Google Analytics ou le conteneur Google Tag Manager (GTM) requis pour mesurer l'audience."}
+                    </p>
+                  </div>
+                </div>
+
+                <div className="flex items-center gap-3">
+                  <label className="relative inline-flex items-center cursor-pointer">
+                    <input
+                      type="checkbox"
+                      checked={googleTagEnabled}
+                      onChange={(e) => setGoogleTagEnabled(e.target.checked)}
+                      className="sr-only peer"
+                    />
+                    <div className="w-11 h-6 bg-slate-200 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-slate-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-emerald-600"></div>
+                    <span className="ml-2.5 text-xs font-bold text-calve-charcoal select-none">
+                      {googleTagEnabled ? (isEnglish ? "Google Tag Enabled" : "Google Tag Activé") : (isEnglish ? "Google Tag Paused" : "Google Tag Désactivé")}
+                    </span>
+                  </label>
+                </div>
+              </div>
+
+              {/* Tag ID input and GA4 input */}
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div>
+                  <div className="flex items-center justify-between mb-1.5">
+                    <label className="text-[10px] font-bold uppercase tracking-wider text-calve-muted">
+                      {isEnglish ? "PRIMARY GOOGLE TAG ID / GTM CONTAINER ID *" : "IDENTIFIANT GOOGLE TAG / GTM PRINCIPAL *"}
+                    </label>
+                    <span className="text-[10px] font-mono text-emerald-700 bg-emerald-50 px-2 py-0.5 rounded-md font-bold">
+                      {googleTagId.startsWith("GTM-") ? "GTM Container" : googleTagId.startsWith("G-") ? "GA4 Stream" : "Google Tag"}
+                    </span>
+                  </div>
+                  <div className="relative">
+                    <input
+                      type="text"
+                      value={googleTagId}
+                      onChange={(e) => setGoogleTagId(e.target.value.trim())}
+                      placeholder="GTM-K7CVNBTS ou G-XXXXXXXXXX"
+                      className="w-full px-4 py-2.5 rounded-xl border border-calve-border bg-white text-xs font-mono font-bold text-calve-charcoal focus:border-calve-slate shadow-2xs"
+                    />
+                  </div>
+                  <p className="text-[11px] text-calve-muted mt-1.5">
+                    {isEnglish
+                      ? "Directly matches the container ID from your screenshot: GTM-K7CVNBTS"
+                      : "Correspond directement à l'ID affiché sur votre écran Google Tag : GTM-K7CVNBTS"}
+                  </p>
+                </div>
+
+                <div>
+                  <div className="flex items-center justify-between mb-1.5">
+                    <label className="text-[10px] font-bold uppercase tracking-wider text-calve-muted">
+                      {isEnglish ? "SECONDARY GA4 MEASUREMENT ID (OPTIONAL)" : "ID DE MESURE GOOGLE ANALYTICS 4 DIRECT (OPTIONNEL)"}
+                    </label>
+                    <span className="text-[10px] text-calve-muted font-mono">G-XXXXXXXXXX</span>
+                  </div>
+                  <input
+                    type="text"
+                    value={googleAnalyticsId}
+                    onChange={(e) => setGoogleAnalyticsId(e.target.value.trim())}
+                    placeholder="ex: G-E7W8S9KL10"
+                    className="w-full px-4 py-2.5 rounded-xl border border-calve-border bg-white text-xs font-mono text-calve-charcoal focus:border-calve-slate shadow-2xs"
+                  />
+                  <p className="text-[11px] text-calve-muted mt-1.5">
+                    {isEnglish
+                      ? "Optional: Only needed if you run a direct GA4 measurement stream separate from Tag Manager."
+                      : "Facultatif : Nécessaire uniquement si vous suivez un flux GA4 direct en dehors de GTM."}
+                  </p>
+                </div>
+              </div>
+
+              {/* Exact Code Preview matching User's screenshot */}
+              <div className="p-5 rounded-2xl bg-slate-900 text-slate-100 border border-slate-800 space-y-3">
+                <div className="flex items-center justify-between">
+                  <div className="flex items-center gap-2">
+                    <Code className="w-4 h-4 text-emerald-400" />
+                    <span className="text-xs font-bold font-mono text-slate-200">
+                      {isEnglish ? "Auto-Injected Tag Snippet (Next.js <head>)" : "Extrait de Tag Injecté Automatiquement (Next.js <head>)"}
+                    </span>
+                  </div>
+                  <button
+                    type="button"
+                    onClick={copyGoogleTagSnippet}
+                    className="flex items-center gap-1.5 px-3 py-1 rounded-lg bg-slate-800 hover:bg-slate-700 text-slate-200 text-xs font-semibold transition-all cursor-pointer border border-slate-700"
+                  >
+                    {copiedSnippet ? (
+                      <>
+                        <Check className="w-3.5 h-3.5 text-emerald-400" />
+                        <span className="text-emerald-400">{isEnglish ? "Copied!" : "Copié !"}</span>
+                      </>
+                    ) : (
+                      <>
+                        <Copy className="w-3.5 h-3.5 text-slate-400" />
+                        <span>{isEnglish ? "Copy Code" : "Copier"}</span>
+                      </>
+                    )}
+                  </button>
+                </div>
+
+                <pre className="text-[11px] font-mono leading-relaxed bg-slate-950 p-3.5 rounded-xl border border-slate-800/80 overflow-x-auto text-emerald-300/90 selection:bg-emerald-900 selection:text-white">
+{`<script async src="https://www.googletagmanager.com/gtm.js?id=${googleTagId || "GTM-K7CVNBTS"}"></script>
+<script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  gtag('js', new Date());
+</script>`}
+                </pre>
+
+                <div className="flex items-start gap-2 text-[11px] text-slate-400 pt-1">
+                  <CheckCircle2 className="w-3.5 h-3.5 text-emerald-400 shrink-0 mt-0.5" />
+                  <span>
+                    {isEnglish
+                      ? "Automatic Setup: When you click 'Save Settings' above, this script and the GTM container noscript fallback are automatically embedded in every page. Google Analytics can immediately verify your site!"
+                      : "Installation Automatique : Dès que vous cliquez sur 'Enregistrer' en haut, ce script ainsi que la balise noscript de secours sont automatiquement intégrés dans chaque page. Google Analytics peut valider le tag immédiatement !"}
+                  </span>
+                </div>
+              </div>
+            </div>
+
+            {/* Card 2: Core Meta Tags & Search Engine Indexing */}
+            <div className="p-6 sm:p-8 rounded-3xl bg-white border border-calve-border/80 shadow-2xs space-y-5">
+              <div className="border-b border-calve-border/60 pb-3">
+                <div className="flex items-center gap-2">
+                  <Search className="w-4 h-4 text-calve-slate" />
+                  <h3 className="text-base font-extrabold text-calve-charcoal">
+                    {isEnglish ? "2. Search Engine Optimization (SEO) & Core Meta Tags" : "2. Référencement Naturel (SEO) & Balises Méta Principales"}
+                  </h3>
+                </div>
+                <p className="text-xs text-calve-muted mt-0.5">
+                  {isEnglish
+                    ? "Control how Maison Calvé appears on Google Search results, Bing, and web crawlers."
+                    : "Contrôlez les titres, résumés et mots-clés affichés dans les résultats Google et Bing."}
+                </p>
+              </div>
+
+              <div className="space-y-4">
+                {/* Meta Title */}
+                <div>
+                  <div className="flex items-center justify-between mb-1.5">
+                    <label className="text-[10px] font-bold uppercase tracking-wider text-calve-muted">
+                      {isEnglish ? "PRIMARY WEBSITE META TITLE *" : "TITRE MÉTA PRINCIPAL DU SITE (PAGE D'ACCUEIL) *"}
+                    </label>
+                    <span className={`text-[10px] font-mono ${metaTitle.length > 65 ? "text-amber-600 font-bold" : "text-calve-muted"}`}>
+                      {metaTitle.length} / 60 {isEnglish ? "characters (ideal: 50-60)" : "caractères (idéal: 50-60)"}
+                    </span>
+                  </div>
+                  <input
+                    type="text"
+                    value={metaTitle}
+                    onChange={(e) => setMetaTitle(e.target.value)}
+                    className="w-full px-4 py-2.5 rounded-xl border border-calve-border bg-white text-xs font-semibold text-calve-charcoal focus:border-calve-slate shadow-2xs"
+                  />
+                </div>
+
+                {/* Meta Description */}
+                <div>
+                  <div className="flex items-center justify-between mb-1.5">
+                    <label className="text-[10px] font-bold uppercase tracking-wider text-calve-muted">
+                      {isEnglish ? "PRIMARY META DESCRIPTION *" : "DESCRIPTION MÉTA DU SITE (RÉSUMÉ GOOGLE) *"}
+                    </label>
+                    <span className={`text-[10px] font-mono ${metaDescription.length > 165 ? "text-amber-600 font-bold" : "text-calve-muted"}`}>
+                      {metaDescription.length} / 160 {isEnglish ? "characters (ideal: 150-160)" : "caractères (idéal: 150-160)"}
+                    </span>
+                  </div>
+                  <textarea
+                    rows={3}
+                    value={metaDescription}
+                    onChange={(e) => setMetaDescription(e.target.value)}
+                    className="w-full px-4 py-2.5 rounded-xl border border-calve-border bg-white text-xs text-calve-charcoal focus:border-calve-slate shadow-2xs leading-relaxed"
+                  />
+                </div>
+
+                {/* Meta Keywords */}
+                <div>
+                  <label className="block text-[10px] font-bold uppercase tracking-wider text-calve-muted mb-1.5">
+                    {isEnglish ? "META KEYWORDS (COMMA SEPARATED)" : "MOTS-CLÉS SEO (SÉPARÉS PAR DES VIRGULES)"}
+                  </label>
+                  <input
+                    type="text"
+                    value={metaKeywords}
+                    onChange={(e) => setMetaKeywords(e.target.value)}
+                    className="w-full px-4 py-2.5 rounded-xl border border-calve-border bg-white text-xs text-calve-charcoal focus:border-calve-slate shadow-2xs font-mono"
+                  />
+                </div>
+
+                {/* Canonical URL and Allow Indexing toggle */}
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4 pt-1">
+                  <div>
+                    <label className="block text-[10px] font-bold uppercase tracking-wider text-calve-muted mb-1.5">
+                      {isEnglish ? "CANONICAL BASE URL" : "URL CANONIQUE OFFICIELLE"}
+                    </label>
+                    <input
+                      type="url"
+                      value={canonicalUrl}
+                      onChange={(e) => setCanonicalUrl(e.target.value)}
+                      className="w-full px-4 py-2.5 rounded-xl border border-calve-border bg-white text-xs font-mono text-calve-charcoal focus:border-calve-slate shadow-2xs"
+                    />
+                  </div>
+
+                  <div>
+                    <label className="block text-[10px] font-bold uppercase tracking-wider text-calve-muted mb-1.5">
+                      {isEnglish ? "SEARCH ENGINE CRAWLING (ROBOTS.TXT)" : "INDEXATION MOTEURS DE RECHERCHE (ROBOTS)"}
+                    </label>
+                    <div className="flex items-center justify-between p-2.5 rounded-xl border border-calve-border bg-slate-50">
+                      <span className="text-xs font-bold text-calve-charcoal">
+                        {allowIndexing ? (isEnglish ? "Index & Follow (Active)" : "Index & Follow (Autorisé)") : (isEnglish ? "No-Index (Paused)" : "No-Index (Bloqué)")}
+                      </span>
+                      <label className="relative inline-flex items-center cursor-pointer">
+                        <input
+                          type="checkbox"
+                          checked={allowIndexing}
+                          onChange={(e) => setAllowIndexing(e.target.checked)}
+                          className="sr-only peer"
+                        />
+                        <div className="w-9 h-5 bg-slate-200 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-slate-300 after:border after:rounded-full after:h-4 after:w-4 after:transition-all peer-checked:bg-emerald-600"></div>
+                      </label>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            {/* Card 3: Google Search Console & Domain Verification */}
+            <div className="p-6 sm:p-8 rounded-3xl bg-white border border-calve-border/80 shadow-2xs space-y-5">
+              <div className="border-b border-calve-border/60 pb-3">
+                <div className="flex items-center gap-2">
+                  <ShieldCheck className="w-4 h-4 text-calve-slate" />
+                  <h3 className="text-base font-extrabold text-calve-charcoal">
+                    {isEnglish ? "3. Google Search Console & Domain Verification" : "3. Validation Google Search Console & Outils Webmasters"}
+                  </h3>
+                </div>
+                <p className="text-xs text-calve-muted mt-0.5">
+                  {isEnglish
+                    ? "Validate domain property in Google Search Console using HTML tag verification."
+                    : "Validez la propriété de votre site dans Google Search Console grâce à la balise de vérification."}
+                </p>
+              </div>
+
+              <div className="space-y-4">
+                <div>
+                  <label className="block text-[10px] font-bold uppercase tracking-wider text-calve-muted mb-1.5">
+                    {isEnglish ? "GOOGLE SITE VERIFICATION TOKEN OR TAG" : "CODE OU BALISE GOOGLE-SITE-VERIFICATION"}
+                  </label>
+                  <input
+                    type="text"
+                    value={googleSearchConsole}
+                    onChange={(e) => setGoogleSearchConsole(e.target.value)}
+                    placeholder='ex: <meta name="google-site-verification" content="abcdef123..." /> ou juste le code abcdef123...'
+                    className="w-full px-4 py-2.5 rounded-xl border border-calve-border bg-white text-xs font-mono text-calve-charcoal focus:border-calve-slate shadow-2xs"
+                  />
+                  <p className="text-[11px] text-calve-muted mt-1.5">
+                    {isEnglish
+                      ? "In Google Search Console, choose 'HTML Tag' verification method and paste the string here."
+                      : "Dans Google Search Console, choisissez la méthode 'Balise HTML' et collez la balise ou le code ici."}
+                  </p>
+                </div>
+
+                {/* Direct quick action buttons */}
+                <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-3 pt-1">
+                  <a
+                    href="https://search.google.com/search-console"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="p-3 rounded-xl bg-slate-50 border border-slate-200/80 hover:border-calve-slate flex items-center justify-between text-xs font-bold text-calve-charcoal transition-all group"
+                  >
+                    <span>Search Console</span>
+                    <ExternalLink className="w-3.5 h-3.5 text-calve-muted group-hover:text-calve-slate" />
+                  </a>
+
+                  <a
+                    href="https://analytics.google.com"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="p-3 rounded-xl bg-slate-50 border border-slate-200/80 hover:border-calve-slate flex items-center justify-between text-xs font-bold text-calve-charcoal transition-all group"
+                  >
+                    <span>Google Analytics</span>
+                    <ExternalLink className="w-3.5 h-3.5 text-calve-muted group-hover:text-calve-slate" />
+                  </a>
+
+                  <a
+                    href="/sitemap.xml"
+                    target="_blank"
+                    className="p-3 rounded-xl bg-slate-50 border border-slate-200/80 hover:border-calve-slate flex items-center justify-between text-xs font-bold text-calve-charcoal transition-all group"
+                  >
+                    <span>Sitemap XML</span>
+                    <ExternalLink className="w-3.5 h-3.5 text-calve-muted group-hover:text-calve-slate" />
+                  </a>
+
+                  <a
+                    href="/robots.txt"
+                    target="_blank"
+                    className="p-3 rounded-xl bg-slate-50 border border-slate-200/80 hover:border-calve-slate flex items-center justify-between text-xs font-bold text-calve-charcoal transition-all group"
+                  >
+                    <span>Robots.txt</span>
+                    <ExternalLink className="w-3.5 h-3.5 text-calve-muted group-hover:text-calve-slate" />
+                  </a>
+                </div>
+              </div>
+            </div>
+
+            {/* Card 4: Social Share & Open Graph (OG) Preview */}
+            <div className="p-6 sm:p-8 rounded-3xl bg-white border border-calve-border/80 shadow-2xs space-y-5">
+              <div className="border-b border-calve-border/60 pb-3">
+                <div className="flex items-center gap-2">
+                  <Share2 className="w-4 h-4 text-calve-slate" />
+                  <h3 className="text-base font-extrabold text-calve-charcoal">
+                    {isEnglish ? "4. Social Share & Open Graph (LinkedIn, WhatsApp, Facebook, X)" : "4. Partage Réseaux Sociaux & Open Graph (LinkedIn, WhatsApp, Facebook, X)"}
+                  </h3>
+                </div>
+                <p className="text-xs text-calve-muted mt-0.5">
+                  {isEnglish
+                    ? "Customize the preview card generated when your link is shared on messaging apps and social platforms."
+                    : "Personnalisez l'aperçu du lien lorsqu'il est partagé sur WhatsApp, LinkedIn, X ou Facebook."}
+                </p>
+              </div>
+
+              <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                <div className="space-y-4">
+                  <div>
+                    <label className="block text-[10px] font-bold uppercase tracking-wider text-calve-muted mb-1.5">
+                      {isEnglish ? "SOCIAL SHARE TITLE (OG:TITLE)" : "TITRE DU PARTAGE SOCIAL (OG:TITLE)"}
+                    </label>
+                    <input
+                      type="text"
+                      value={ogTitle}
+                      onChange={(e) => setOgTitle(e.target.value)}
+                      className="w-full px-4 py-2.5 rounded-xl border border-calve-border bg-white text-xs font-semibold text-calve-charcoal focus:border-calve-slate shadow-2xs"
+                    />
+                  </div>
+
+                  <div>
+                    <label className="block text-[10px] font-bold uppercase tracking-wider text-calve-muted mb-1.5">
+                      {isEnglish ? "SOCIAL SHARE DESCRIPTION (OG:DESCRIPTION)" : "DESCRIPTION DU PARTAGE SOCIAL (OG:DESCRIPTION)"}
+                    </label>
+                    <textarea
+                      rows={2}
+                      value={ogDescription}
+                      onChange={(e) => setOgDescription(e.target.value)}
+                      className="w-full px-4 py-2.5 rounded-xl border border-calve-border bg-white text-xs text-calve-charcoal focus:border-calve-slate shadow-2xs"
+                    />
+                  </div>
+
+                  <div>
+                    <label className="block text-[10px] font-bold uppercase tracking-wider text-calve-muted mb-1.5">
+                      {isEnglish ? "SOCIAL SHARE IMAGE URL (1200X630PX)" : "URL IMAGE DE PARTAGE SOCIAL (1200X630PX)"}
+                    </label>
+                    <input
+                      type="text"
+                      value={ogImage}
+                      onChange={(e) => setOgImage(e.target.value)}
+                      className="w-full px-4 py-2.5 rounded-xl border border-calve-border bg-white text-xs font-mono text-calve-charcoal focus:border-calve-slate shadow-2xs"
+                    />
+                  </div>
+                </div>
+
+                {/* Social Card Live Preview */}
+                <div className="space-y-2">
+                  <span className="text-[10px] font-bold uppercase tracking-wider text-calve-muted">
+                    {isEnglish ? "LIVE SOCIAL PREVIEW CARD" : "APERÇU DE LA CARTE DE PARTAGE"}
+                  </span>
+                  <div className="rounded-2xl border border-slate-200 overflow-hidden shadow-xs bg-slate-50">
+                    <div className="aspect-[1.91/1] w-full bg-slate-200 relative overflow-hidden flex items-center justify-center">
+                      {ogImage ? (
+                        // eslint-disable-next-line @next/next/no-img-element
+                        <img
+                          src={ogImage}
+                          alt="Open Graph preview"
+                          className="w-full h-full object-cover"
+                          onError={(e) => {
+                            (e.target as any).src = "/images/spaces/real-open-space-fixe-4k.jpg";
+                          }}
+                        />
+                      ) : (
+                        <span className="text-xs text-slate-400">1200 x 630</span>
+                      )}
+                    </div>
+                    <div className="p-3.5 bg-white border-t border-slate-100 space-y-1">
+                      <span className="text-[10px] uppercase font-bold text-calve-muted font-mono tracking-wider">
+                        maisoncalve.fr
+                      </span>
+                      <h4 className="text-xs font-extrabold text-calve-charcoal line-clamp-1">
+                        {ogTitle || metaTitle}
+                      </h4>
+                      <p className="text-[11px] text-calve-muted line-clamp-2 leading-relaxed">
+                        {ogDescription || metaDescription}
+                      </p>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            {/* Card 5: Advanced Custom Code Injection (<head> & <body>) */}
+            <div className="p-6 sm:p-8 rounded-3xl bg-white border border-calve-border/80 shadow-2xs space-y-5">
+              <div className="border-b border-calve-border/60 pb-3">
+                <div className="flex items-center gap-2">
+                  <Code className="w-4 h-4 text-calve-slate" />
+                  <h3 className="text-base font-extrabold text-calve-charcoal">
+                    {isEnglish ? "5. Advanced Custom Script Injection (<head> & <body>)" : "5. Injection de Scripts & Pixels Avancés (<head> & <body>)"}
+                  </h3>
+                </div>
+                <p className="text-xs text-calve-muted mt-0.5">
+                  {isEnglish
+                    ? "Add custom marketing pixels (Meta Pixel, LinkedIn Insight, Hotjar, TikTok) without touching source code."
+                    : "Intégrez d'autres pixels marketing (Pixel Facebook, LinkedIn Insight, Hotjar) en toute sécurité."}
+                </p>
+              </div>
+
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div>
+                  <label className="block text-[10px] font-bold uppercase tracking-wider text-calve-muted mb-1.5">
+                    {isEnglish ? "CUSTOM CODE IN <HEAD>" : "CODE PERSONNALISÉ DANS <HEAD>"}
+                  </label>
+                  <textarea
+                    rows={4}
+                    value={customHeadCode}
+                    onChange={(e) => setCustomHeadCode(e.target.value)}
+                    placeholder="<!-- Ex: <script ...></script> ou <meta ...> -->"
+                    className="w-full px-4 py-2.5 rounded-xl border border-calve-border bg-slate-900 text-emerald-300 font-mono text-[11px] focus:border-calve-slate shadow-2xs leading-relaxed"
+                  />
+                </div>
+
+                <div>
+                  <label className="block text-[10px] font-bold uppercase tracking-wider text-calve-muted mb-1.5">
+                    {isEnglish ? "CUSTOM CODE IN <BODY> (FOOTER)" : "CODE PERSONNALISÉ DANS <BODY> (BAS DE PAGE)"}
+                  </label>
+                  <textarea
+                    rows={4}
+                    value={customBodyCode}
+                    onChange={(e) => setCustomBodyCode(e.target.value)}
+                    placeholder="<!-- Ex: widget de chat, noscript, etc. -->"
+                    className="w-full px-4 py-2.5 rounded-xl border border-calve-border bg-slate-900 text-emerald-300 font-mono text-[11px] focus:border-calve-slate shadow-2xs leading-relaxed"
+                  />
+                </div>
+              </div>
+            </div>
+          </div>
+        )}
+
+        {/* ========================================================== */}
+        {/* TAB 4: SYSTEM & ALERTS                                     */}
         {/* ========================================================== */}
         {activeTab === "system" && (
           <div className="space-y-6 animate-in fade-in">
             <div className="p-6 sm:p-8 rounded-3xl bg-white border border-calve-border/80 shadow-2xs space-y-5">
               <div className="border-b border-calve-border/60 pb-3">
                 <h3 className="text-base font-extrabold text-calve-charcoal">
-                  1. Search Engine Optimization (SEO) &amp; Social Channels
+                  1. Coordinates, Social Channels &amp; Notifications
                 </h3>
               </div>
 
               <div className="space-y-4">
-                <div>
-                  <label className="block text-[10px] font-bold uppercase tracking-wider text-calve-muted mb-1.5">
-                    PRIMARY WEBSITE META TITLE
-                  </label>
-                  <input
-                    type="text"
-                    value={metaTitle}
-                    onChange={(e) => setMetaTitle(e.target.value)}
-                    className="w-full px-4 py-2.5 rounded-xl border border-calve-border text-xs text-calve-charcoal font-medium"
-                  />
-                </div>
-
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                   <div>
                     <label className="block text-[10px] font-bold uppercase tracking-wider text-calve-muted mb-1.5">
@@ -844,7 +1397,7 @@ export default function SettingsPage() {
         )}
 
         {/* ========================================================== */}
-        {/* TAB 4: PROFILE & SECURITY (MATCHING IMAGE 5)               */}
+        {/* TAB 5: PROFILE & SECURITY                                  */}
         {/* ========================================================== */}
         {activeTab === "profile" && (
           <div className="space-y-6 animate-in fade-in">
@@ -898,7 +1451,7 @@ export default function SettingsPage() {
               </div>
             </div>
 
-            {/* Card 2: Change Administrator Password (Matching Image 5) */}
+            {/* Card 2: Change Administrator Password */}
             <div className="p-6 sm:p-8 rounded-3xl bg-white border border-calve-border/80 shadow-2xs space-y-5">
               <div className="border-b border-calve-border/60 pb-3">
                 <div className="flex items-center gap-2">

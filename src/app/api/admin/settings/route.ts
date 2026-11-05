@@ -1,61 +1,17 @@
 import { NextResponse } from "next/server";
 import {
+  getLocalSettings,
+  getSiteSettingsAsync,
+  saveSiteSettingsAsync,
+  persistLocalSettings,
+  DEFAULT_SITE_SETTINGS
+} from "@/lib/settingsStore";
+import {
   isOvhBridgeConfigured,
-  fetchOvhSettings,
   fetchOvhSetting,
   saveOvhSetting,
-  saveOvhSettingsBulk,
   deleteOvhSetting
 } from "@/lib/ovhBridge";
-
-// Default settings fallbacks matching reference production data
-export const DEFAULT_SETTINGS: Record<string, any> = {
-  cms_content: {
-    heroBadge: "Coworking haut de gamme – Bordeaux Fondaudège",
-    heroDesc:
-      "Un espace de travail confortable, calme et haut de gamme pensé pour s'y installer dans le temps.",
-    office17Price: "950€ HT",
-    office25Price: "1200€ HT",
-    openSpacePrice: "250€ HT"
-  },
-  settings_identity: {
-    agencyName: "MAISON CALVÉ",
-    tagline: "High-End Real Estate & Coworking in Bordeaux",
-    paulPhone: "+33 5 56 00 22 10",
-    edgarPhone: "+33 7 81 96 83 95",
-    agencyEmail: "contact@maisoncalve.fr",
-    officeAddress: "48 rue Calvé, 33000 Bordeaux",
-    officeHours:
-      "Monday - Friday: 08:30 AM - 07:00 PM | Saturday: By Appointment (Residents 24/7)",
-    siret: "944 393 487 00011",
-    licenseCPI: "CPI33012023000000128 · CCI Bordeaux Gironde",
-    guarantee: "Galian Assurances — 120 000 € / Allianz Pro"
-  },
-  settings_rental: {
-    office17Rate: "€950 excl. VAT / month",
-    office25Rate: "€1,200 excl. VAT / month",
-    openSpaceRate: "€250 excl. VAT / month",
-    nomadRate: "€20 excl. VAT day / €10 excl. VAT half-day",
-    meetingRate: "€120 excl. VAT half-day / €200 excl. VAT full day",
-    vatRate: "20%",
-    depositRule: "2 months rent excl. VAT",
-    noticePeriod: "3 months for private offices · 1 month for open space",
-    parkingPolicy: "Included with private suites (9 secure courtyard bays total)"
-  },
-  settings_system: {
-    metaTitle: "Maison Calvé — Premium Coworking Bordeaux Fondaudège with Parking",
-    instagramAccount: "@maisoncalvebordeaux",
-    gpsCoordinates: "44.8488° N, 0.5843° W (Tram D Croix-de-Seguey)",
-    leadDispatcherEmail: "admin@maisoncalve.fr"
-  },
-  settings_profile: {
-    adminName: "Paul (Operations Director)",
-    adminEmail: "admin@maisoncalve.fr"
-  }
-};
-
-// In-memory fallback cache for development or temporary disconnection
-let localSettingsCache: Record<string, any> = { ...DEFAULT_SETTINGS };
 
 export async function GET(request: Request) {
   try {
@@ -80,35 +36,22 @@ export async function GET(request: Request) {
         }
       }
 
+      const local = getLocalSettings();
       return NextResponse.json({
         success: true,
-        source: "local_fallback",
+        source: "local_storage",
         key,
-        value: localSettingsCache[key] ?? DEFAULT_SETTINGS[key] ?? null
+        value: local[key] ?? DEFAULT_SITE_SETTINGS[key] ?? null
       });
     }
 
     // 2. All settings lookup
-    let mergedSettings = { ...DEFAULT_SETTINGS, ...localSettingsCache };
-    let source = "local_fallback";
-
-    if (isOvhBridgeConfigured()) {
-      try {
-        const ovhRes = await fetchOvhSettings();
-        if (ovhRes.success && ovhRes.settings && typeof ovhRes.settings === "object") {
-          mergedSettings = { ...DEFAULT_SETTINGS, ...ovhRes.settings };
-          localSettingsCache = { ...mergedSettings };
-          source = "ovh_mysql";
-        }
-      } catch (err) {
-        console.warn("Could not fetch settings from OVH:", err);
-      }
-    }
+    const { settings, source } = await getSiteSettingsAsync();
 
     return NextResponse.json({
       success: true,
       source,
-      settings: mergedSettings,
+      settings,
       timestamp: new Date().toISOString()
     });
   } catch (err: any) {
@@ -127,22 +70,13 @@ export async function POST(request: Request) {
 
     // 1. Bulk update: { settings: { key1: val1, key2: val2, ... } }
     if (body.settings && typeof body.settings === "object") {
-      localSettingsCache = { ...localSettingsCache, ...body.settings };
-
-      let ovhSuccess = false;
-      if (isOvhBridgeConfigured()) {
-        try {
-          const ovhRes = await saveOvhSettingsBulk(body.settings);
-          ovhSuccess = Boolean(ovhRes.success);
-        } catch (err) {
-          console.warn("Could not save bulk settings to OVH:", err);
-        }
-      }
+      const { settings, syncedWithOvh } = await saveSiteSettingsAsync(body.settings);
 
       return NextResponse.json({
         success: true,
-        message: "Tous les paramètres ont été enregistrés.",
-        syncedWithOvh: ovhSuccess,
+        message: "Tous les paramètres ont été enregistrés avec succès.",
+        settings,
+        syncedWithOvh,
         timestamp: now
       });
     }
@@ -156,7 +90,7 @@ export async function POST(request: Request) {
       );
     }
 
-    localSettingsCache[key] = value;
+    const updated = persistLocalSettings({ [key]: value });
 
     let ovhSuccess = false;
     if (isOvhBridgeConfigured()) {
@@ -173,6 +107,7 @@ export async function POST(request: Request) {
       message: `Paramètre '${key}' enregistré avec succès.`,
       key,
       value,
+      settings: updated,
       syncedWithOvh: ovhSuccess,
       timestamp: now
     });
@@ -206,7 +141,9 @@ export async function DELETE(request: Request) {
       );
     }
 
-    delete localSettingsCache[key];
+    const current = getLocalSettings();
+    delete current[key];
+    persistLocalSettings(current);
 
     let ovhSuccess = false;
     if (isOvhBridgeConfigured()) {
@@ -232,4 +169,3 @@ export async function DELETE(request: Request) {
     );
   }
 }
-
